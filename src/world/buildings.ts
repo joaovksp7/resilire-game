@@ -20,7 +20,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { CAMERA } from '../config';
 import type { CityMap, InstitutionSite, Side } from './cityMap';
 import { createIconTexture } from './icons';
-import { INSTITUTION_STYLES, type InstitutionStyle } from './institutions';
+import { type InstitutionId, INSTITUTION_STYLES, type InstitutionStyle } from './institutions';
 
 /**
  * Junta várias peças simples (caixas, cilindros…) numa geometria só, com cor por vértice.
@@ -299,14 +299,27 @@ function createSite(map: CityMap, site: InstitutionSite, material: MeshLambertMa
   sign.rotation.copy(SIGN_ROTATION);
   group.add(sign);
 
+  // Ponto logo acima da placa: onde fica o marcador da missão (Fase 4).
+  group.userData.markerAnchor = new Vector3(cx, signY + signSize / 2 + 0.3, cz);
   return group;
 }
 
+export interface InstitutionBuildings {
+  readonly group: Group;
+  /** Ponto acima da placa de cada instituição, para o marcador da missão. */
+  readonly markerAnchors: ReadonlyMap<InstitutionId, Vector3>;
+}
+
 /** Prédios das instituições (e da casa do jogador), com placa de ícone no topo. */
-export function createInstitutionBuildings(map: CityMap): Group {
+export function createInstitutionBuildings(map: CityMap): InstitutionBuildings {
   const group = new Group();
   group.name = 'instituicoes';
   const material = new MeshLambertMaterial({ vertexColors: true });
-  for (const site of map.sites.values()) group.add(createSite(map, site, material));
-  return group;
+  const markerAnchors = new Map<InstitutionId, Vector3>();
+  for (const site of map.sites.values()) {
+    const siteGroup = createSite(map, site, material);
+    markerAnchors.set(site.id, siteGroup.userData.markerAnchor as Vector3);
+    group.add(siteGroup);
+  }
+  return { group, markerAnchors };
 }

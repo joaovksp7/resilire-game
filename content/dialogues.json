@@ -1,0 +1,106 @@
+[
+  {
+    "id": "d01-fique-por-dentro",
+    "falas": [
+      "Oi! Eu sou a Marta, da Defesa Civil. Que bom que você veio.",
+      "Quando vem chuva forte, a Defesa Civil manda alertas oficiais para avisar a população.",
+      "Você pode se cadastrar para receber esses alertas por SMS, no seu celular ou no de alguém da sua família.",
+      "Os alertas têm níveis. Quanto mais alto o nível, maior o risco e mais importante é seguir as orientações.",
+      "Quando chegar um alerta, leia com calma e siga as orientações da Defesa Civil."
+    ],
+    "todoValidar": "Incluir como se cadastrar para receber os alertas por SMS (número e mensagem a enviar) e quais são os níveis de alerta usados no RS."
+  },
+  {
+    "id": "d02-noticia-ou-boato",
+    "falas": [
+      "Olá! Eu sou o Beto, locutor da rádio comunitária.",
+      "Em dia de chuva forte, muita mensagem circula nos grupos de WhatsApp. Algumas são boatos.",
+      "Antes de acreditar ou repassar, confira se a informação veio de uma fonte oficial, como a Defesa Civil.",
+      "Na dúvida, não compartilhe. Boato espalha confusão e atrapalha quem precisa de ajuda."
+    ],
+    "todoValidar": "Confirmar quais fontes oficiais citar como exemplo (além da Defesa Civil)."
+  },
+  {
+    "id": "d03-combinado",
+    "falas": [
+      "Oi! Eu sou a professora Ana.",
+      "Toda família pode ter um plano de emergência: um combinado do que fazer se a chuva ficar perigosa.",
+      "Nesse plano, vocês escolhem um ponto de encontro seguro, para se acharem se estiverem separados.",
+      "Também é importante anotar os telefones de contato da família.",
+      "Combinem tudo juntos, com calma, antes de qualquer emergência."
+    ]
+  },
+  {
+    "id": "d04-mochila",
+    "falas": [
+      "Bom dia! Eu sou o seu Valdir, do mercado.",
+      "Uma mochila de emergência guarda o que a família pode precisar se tiver que sair de casa rápido.",
+      "Coisas úteis: documentos num saco plástico, lanterna, pilhas, rádio a pilha, água, comida que não estraga, remédios, carregador portátil, apito, capa de chuva e roupa extra.",
+      "O que não ajuda: videogame, objetos pesados, eletrodomésticos e coisas de vidro.",
+      "A mochila não pode ficar pesada demais. Leve o que é útil de verdade."
+    ]
+  },
+  {
+    "id": "d05-remedio",
+    "falas": [
+      "Olá! Eu sou o Jorge, enfermeiro da UBS.",
+      "Tem alguém na sua família que toma remédio todo dia? Esses são os remédios de uso contínuo.",
+      "Numa emergência, eles não podem faltar. Separe esses remédios junto com a mochila da família.",
+      "Guarde também cópias das receitas. Com elas fica mais fácil conseguir o remédio se precisar.",
+      "E aqui na UBS a gente também cuida das vacinas da família."
+    ],
+    "todoValidar": "Confirmar se há orientação específica sobre vacinas em período de enchente para incluir na fala."
+  },
+  {
+    "id": "d06-morro",
+    "falas": [
+      "E aí! Eu sou o Paulo, bombeiro.",
+      "Em chuva forte, o morro pode dar sinais de que a terra está se movendo.",
+      "Fique de olho em rachaduras nas paredes, em árvores ou postes inclinados e em água barrenta minando do chão.",
+      "Se notar esses sinais, avise um adulto e chame ajuda: o telefone dos Bombeiros é 193."
+    ],
+    "todoValidar": "Confirmar a orientação completa ao notar sinais de deslizamento (por exemplo, sair do local e para onde ir)."
+  },
+  {
+    "id": "d07-desliga",
+    "falas": [
+      "Que bom que você chegou! Sou a Vó Cida.",
+      "Antes de sair de casa numa emergência, a gente desliga a energia e o gás.",
+      "Isso ajuda a evitar acidentes enquanto a casa estiver vazia.",
+      "Agora pegue a mochila de emergência e vamos seguir o plano da família."
+    ],
+    "todoValidar": "Confirmar como orientar crianças sobre desligar energia e gás (quem deve fazer e como) e a explicação do porquê."
+  },
+  {
+    "id": "d08-agua-corrente",
+    "falas": [
+      "Paulo de novo! Agora presta atenção, que é importante.",
+      "Nunca atravesse uma rua alagada, nem a pé, nem de carro.",
+      "A água pode estar mais funda e mais forte do que parece.",
+      "Procure outro caminho pelas ruas da parte alta.",
+      "Se precisar de ajuda, ligue para os Bombeiros no 193."
+    ],
+    "todoValidar": "Confirmar a explicação do porquê (água mais funda e mais forte do que parece)."
+  },
+  {
+    "id": "d09-lugar-seguro",
+    "falas": [
+      "Bem-vindo ao abrigo! Eu sou a Lúcia e cuido daqui.",
+      "O abrigo é um lugar seguro para as famílias ficarem enquanto não dá para voltar para casa.",
+      "Traga a mochila de emergência, com os documentos e os remédios.",
+      "Animais de estimação também precisam de cuidado. Pergunte para a equipe do abrigo como fazer com o seu.",
+      "Você chegou pela parte alta, longe da água. Muito bem!"
+    ],
+    "todoValidar": "Confirmar como funciona o abrigo no município, o que levar e a regra para animais de estimação."
+  },
+  {
+    "id": "d10-ninguem-fica",
+    "falas": [
+      "Olá! Eu sou a Rosa, assistente social do CRAS.",
+      "O CRAS apoia as famílias atingidas pela enchente.",
+      "As famílias podem fazer um cadastro aqui para receber esse apoio.",
+      "Você também pode ajudar: veja se os vizinhos estão bem e conte para um adulto se alguém precisar de apoio."
+    ],
+    "todoValidar": "Confirmar que tipo de apoio o CRAS oferece no município e quais documentos o cadastro pede."
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "defesa-civil",
+    "nome": "Defesa Civil",
+    "nomeComPreposicao": "na Defesa Civil",
+    "personagem": { "nome": "Marta", "funcao": "agente da Defesa Civil" },
+    "todoValidar": "Nome do personagem é rascunho."
+  },
+  {
+    "id": "bombeiros",
+    "nome": "Corpo de Bombeiros",
+    "nomeComPreposicao": "no Corpo de Bombeiros",
+    "personagem": { "nome": "Paulo", "funcao": "bombeiro" },
+    "todoValidar": "Nome do personagem é rascunho."
+  },
+  {
+    "id": "escola",
+    "nome": "Escola",
+    "nomeComPreposicao": "na escola",
+    "personagem": { "nome": "Ana", "funcao": "professora" },
+    "todoValidar": "Nome do personagem é rascunho."
+  },
+  {
+    "id": "ubs",
+    "nome": "UBS",
+    "nomeComPreposicao": "na UBS",
+    "personagem": { "nome": "Jorge", "funcao": "enfermeiro da UBS" },
+    "todoValidar": "Nome do personagem é rascunho."
+  },
+  {
+    "id": "abrigo",
+    "nome": "Abrigo municipal",
+    "nomeComPreposicao": "no abrigo municipal",
+    "personagem": { "nome": "Lúcia", "funcao": "coordenadora do abrigo" },
+    "todoValidar": "Nome do personagem é rascunho."
+  },
+  {
+    "id": "radio",
+    "nome": "Rádio comunitária",
+    "nomeComPreposicao": "na rádio comunitária",
+    "personagem": { "nome": "Beto", "funcao": "locutor da rádio" },
+    "todoValidar": "Nome do personagem é rascunho."
+  },
+  {
+    "id": "mercado",
+    "nome": "Mercado",
+    "nomeComPreposicao": "no mercado",
+    "personagem": { "nome": "Seu Valdir", "funcao": "dono do mercado" },
+    "todoValidar": "Nome do personagem é rascunho."
+  },
+  {
+    "id": "cras",
+    "nome": "CRAS",
+    "nomeComPreposicao": "no CRAS",
+    "personagem": { "nome": "Rosa", "funcao": "assistente social do CRAS" },
+    "todoValidar": "Nome do personagem é rascunho."
+  },
+  {
+    "id": "casa",
+    "nome": "Sua casa",
+    "nomeComPreposicao": "em casa",
+    "personagem": { "nome": "Vó Cida", "funcao": "sua avó" },
+    "todoValidar": "Nome do personagem é rascunho."
+  }
+]

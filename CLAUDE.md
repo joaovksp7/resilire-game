@@ -116,6 +116,8 @@ O único lugar onde mora texto educativo. **Nunca** tocar no código de renderiz
 - Toda missão tem `eixo` com uma das três chaves fixas
 - Pergunta: `correta` é o **índice** dentro de `alternativas`, não o texto. Alternativas embaralhadas na exibição
 - Os JSONs ficam formatados e legíveis, porque o conteúdo é revisado lendo esses arquivos
+- JSON não aceita comentário: o `// TODO validar` vira o campo `"todoValidar": "o que falta confirmar"` no próprio item (não aparece no jogo). Toda informação de segurança que não está no plano fica genérica no texto e anotada aí
+- Os JSONs entram no build (import estático): mudar texto exige `npm run build`. `src/missions/content.ts` confere formato (no build) e ligações por `id` (ao abrir o jogo)
 
 ---
 

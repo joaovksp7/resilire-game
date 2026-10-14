@@ -1,0 +1,122 @@
+{
+  "eixos": [
+    {
+      "id": "alerta",
+      "nome": "Alerta",
+      "descricao": "O céu está nublado e começou a chover fraco. É hora de saber receber e conferir os alertas oficiais."
+    },
+    {
+      "id": "preparacao",
+      "nome": "Preparação",
+      "descricao": "A chuva aumentou e o rio está subindo um pouco. É hora de montar o kit, combinar o plano da família e reconhecer as áreas de risco."
+    },
+    {
+      "id": "durante",
+      "nome": "Durante o evento",
+      "descricao": "A chuva está forte e o rio transbordou. Algumas ruas da parte baixa estão alagadas: use as ruas da parte alta. É hora de agir com segurança, buscar abrigo e pedir ajuda."
+    }
+  ],
+  "missoes": [
+    {
+      "id": "m01-fique-por-dentro",
+      "eixo": "alerta",
+      "titulo": "Fique por dentro",
+      "descricao": "Vá até a Defesa Civil e descubra como receber os alertas oficiais no celular.",
+      "instituicao": "defesa-civil",
+      "dialogo": "d01-fique-por-dentro",
+      "pergunta": "q01-fique-por-dentro",
+      "aprendizado": "Dá para se cadastrar e receber os alertas oficiais da Defesa Civil por SMS."
+    },
+    {
+      "id": "m02-noticia-ou-boato",
+      "eixo": "alerta",
+      "titulo": "Notícia ou boato?",
+      "descricao": "Uma mensagem estranha está circulando nos grupos. Vá até a rádio comunitária e descubra como saber se ela é verdadeira.",
+      "instituicao": "radio",
+      "dialogo": "d02-noticia-ou-boato",
+      "pergunta": "q02-noticia-ou-boato",
+      "aprendizado": "Antes de acreditar ou repassar uma mensagem, confira se ela veio de uma fonte oficial."
+    },
+    {
+      "id": "m03-combinado",
+      "eixo": "alerta",
+      "titulo": "Combinado é combinado",
+      "descricao": "Vá até a escola e monte com a professora o plano de emergência da sua família.",
+      "instituicao": "escola",
+      "dialogo": "d03-combinado",
+      "pergunta": "q03-combinado",
+      "aprendizado": "O plano de emergência da família tem um ponto de encontro e os contatos de todos."
+    },
+    {
+      "id": "m04-mochila",
+      "eixo": "preparacao",
+      "titulo": "Monte sua mochila",
+      "descricao": "Vá até o mercado e descubra o que levar numa mochila de emergência.",
+      "instituicao": "mercado",
+      "dialogo": "d04-mochila",
+      "pergunta": "q04-mochila",
+      "aprendizado": "Na mochila de emergência vão documentos num saco plástico, lanterna, pilhas, água, comida que não estraga e remédios.",
+      "todoValidar": "A pergunta desta missão é provisória: na Fase 6 entra o minijogo da mochila."
+    },
+    {
+      "id": "m05-remedio",
+      "eixo": "preparacao",
+      "titulo": "Remédio não pode faltar",
+      "descricao": "Vá até a UBS e descubra como deixar os remédios da família prontos para uma emergência.",
+      "instituicao": "ubs",
+      "dialogo": "d05-remedio",
+      "pergunta": "q05-remedio",
+      "aprendizado": "Remédios de uso contínuo e cópias das receitas ficam separados para levar."
+    },
+    {
+      "id": "m06-morro",
+      "eixo": "preparacao",
+      "titulo": "O morro está avisando",
+      "descricao": "Vá até o quartel dos Bombeiros e aprenda a reconhecer os sinais de que um morro pode deslizar.",
+      "instituicao": "bombeiros",
+      "dialogo": "d06-morro",
+      "pergunta": "q06-morro",
+      "aprendizado": "Rachaduras em paredes, árvores ou postes inclinados e água barrenta minando do chão são sinais de deslizamento."
+    },
+    {
+      "id": "m07-desliga",
+      "eixo": "durante",
+      "titulo": "Desliga antes de sair",
+      "descricao": "A chuva apertou. Volte para casa e prepare a casa antes de sair.",
+      "instituicao": "casa",
+      "dialogo": "d07-desliga",
+      "pergunta": "q07-desliga",
+      "aprendizado": "Antes de sair de casa, desligar a energia e o gás."
+    },
+    {
+      "id": "m08-agua-corrente",
+      "eixo": "durante",
+      "titulo": "Água corrente não se atravessa",
+      "descricao": "Algumas ruas alagaram. Volte ao Corpo de Bombeiros e aprenda o que fazer diante de uma rua cheia de água.",
+      "instituicao": "bombeiros",
+      "dialogo": "d08-agua-corrente",
+      "pergunta": "q08-agua-corrente",
+      "aprendizado": "Rua alagada não se atravessa, nem a pé, nem de carro: procure outro caminho pela parte alta."
+    },
+    {
+      "id": "m09-lugar-seguro",
+      "eixo": "durante",
+      "titulo": "Para o lugar seguro",
+      "descricao": "Chegou a hora de ir para o abrigo. As ruas baixas estão alagadas: vá pela parte alta da cidade.",
+      "instituicao": "abrigo",
+      "dialogo": "d09-lugar-seguro",
+      "pergunta": "q09-lugar-seguro",
+      "aprendizado": "Para chegar ao abrigo, use a rota pela parte alta e leve a mochila de emergência."
+    },
+    {
+      "id": "m10-ninguem-fica",
+      "eixo": "durante",
+      "titulo": "Ninguém fica para trás",
+      "descricao": "Vá até o CRAS e descubra como ajudar os vizinhos e as famílias que precisam de apoio.",
+      "instituicao": "cras",
+      "dialogo": "d10-ninguem-fica",
+      "pergunta": "q10-ninguem-fica",
+      "aprendizado": "Ajudar os vizinhos e procurar o CRAS: ninguém fica para trás."
+    }
+  ]
+}

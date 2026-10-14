@@ -1,0 +1,203 @@
+[
+  {
+    "id": "q01-fique-por-dentro",
+    "tipo": "multipla-escolha",
+    "enunciado": "Qual é o jeito certo de receber os alertas oficiais da Defesa Civil?",
+    "alternativas": [
+      {
+        "texto": "Esperar alguém comentar no grupo da turma",
+        "explicacao": "Mensagem de grupo pode atrasar ou estar errada. O alerta oficial vem da Defesa Civil."
+      },
+      {
+        "texto": "Fazer o cadastro para receber os alertas por SMS",
+        "explicacao": "Isso! Com o cadastro, o alerta oficial chega direto no celular."
+      },
+      {
+        "texto": "Olhar para o céu e adivinhar se vai chover forte",
+        "explicacao": "Só olhar o céu não basta. A Defesa Civil acompanha a chuva e o rio e avisa pelos alertas."
+      }
+    ],
+    "correta": 1
+  },
+  {
+    "id": "q02-noticia-ou-boato",
+    "tipo": "acao",
+    "enunciado": "Chegou no grupo da família: “Repassem! A ponte vai fechar hoje à noite!”. A mensagem não diz quem mandou.",
+    "alternativas": [
+      {
+        "texto": "Confiro se a Defesa Civil ou outra fonte oficial deu essa informação",
+        "explicacao": "Muito bem! Conferir na fonte oficial é o jeito de separar notícia de boato."
+      },
+      {
+        "texto": "Repasso para todos os grupos, por garantia",
+        "explicacao": "Repassar sem conferir pode espalhar um boato. Primeiro confira na fonte oficial."
+      },
+      {
+        "texto": "Acredito, porque foi alguém da família que mandou",
+        "explicacao": "Mesmo quem a gente conhece pode repassar boato sem saber. Confira na fonte oficial."
+      }
+    ],
+    "correta": 0
+  },
+  {
+    "id": "q03-combinado",
+    "tipo": "multipla-escolha",
+    "enunciado": "O que precisa ter no plano de emergência da família?",
+    "alternativas": [
+      {
+        "texto": "A lista de séries para assistir durante a chuva",
+        "explicacao": "Diversão é bom, mas o plano serve para a família saber o que fazer e onde se encontrar."
+      },
+      {
+        "texto": "Só o endereço da escola",
+        "explicacao": "O endereço ajuda, mas o plano precisa do ponto de encontro e dos contatos de todos."
+      },
+      {
+        "texto": "Um ponto de encontro e os contatos da família",
+        "explicacao": "Isso! Com o ponto de encontro e os contatos, fica mais fácil a família se reencontrar."
+      }
+    ],
+    "correta": 2
+  },
+  {
+    "id": "q04-mochila",
+    "tipo": "acao",
+    "enunciado": "Sua mochila de emergência tem espaço para só mais um item. O que você coloca?",
+    "alternativas": [
+      {
+        "texto": "O videogame",
+        "explicacao": "O videogame ocupa espaço e não ajuda numa emergência. Prefira algo útil, como a lanterna."
+      },
+      {
+        "texto": "Uma lanterna com pilhas",
+        "explicacao": "Ótima escolha! A lanterna é um dos itens úteis da mochila, e as pilhas mantêm ela funcionando."
+      },
+      {
+        "texto": "Um copo de vidro",
+        "explicacao": "Coisas de vidro não são prioridade e podem quebrar. Prefira algo útil, como a lanterna."
+      }
+    ],
+    "correta": 1,
+    "todoValidar": "Pergunta provisória: na Fase 6 o minijogo da mochila entra no lugar dela."
+  },
+  {
+    "id": "q05-remedio",
+    "tipo": "multipla-escolha",
+    "enunciado": "O que a família deve separar para quem toma remédio todo dia?",
+    "alternativas": [
+      {
+        "texto": "Os remédios de uso contínuo e cópias das receitas",
+        "explicacao": "Isso mesmo! Assim o tratamento não para, mesmo fora de casa."
+      },
+      {
+        "texto": "Só a caixa vazia do remédio",
+        "explicacao": "A caixa vazia não resolve. Separe os remédios e cópias das receitas."
+      },
+      {
+        "texto": "Nada, depois a gente vê",
+        "explicacao": "Numa emergência pode não dar tempo. Deixe os remédios e as receitas separados antes."
+      }
+    ],
+    "correta": 0
+  },
+  {
+    "id": "q06-morro",
+    "tipo": "multipla-escolha",
+    "enunciado": "Qual destes é um sinal de que o morro pode deslizar?",
+    "alternativas": [
+      {
+        "texto": "Passarinhos cantando de manhã",
+        "explicacao": "Passarinho cantando é normal. Os sinais são rachaduras, árvores ou postes inclinados e água barrenta minando do chão."
+      },
+      {
+        "texto": "Uma casa recém-pintada",
+        "explicacao": "Pintura nova não indica risco. Fique de olho em rachaduras, árvores ou postes inclinados e água barrenta minando do chão."
+      },
+      {
+        "texto": "Rachaduras novas nas paredes de casa",
+        "explicacao": "Isso! Rachaduras, árvores ou postes inclinados e água barrenta minando do chão são sinais de alerta."
+      }
+    ],
+    "correta": 2
+  },
+  {
+    "id": "q07-desliga",
+    "tipo": "acao",
+    "enunciado": "Vocês vão sair de casa por causa da chuva. O que fazer antes de sair?",
+    "alternativas": [
+      {
+        "texto": "Deixar as luzes e o fogão ligados",
+        "explicacao": "Deixar tudo ligado pode causar acidentes. O certo é desligar a energia e o gás."
+      },
+      {
+        "texto": "Desligar a energia e o gás",
+        "explicacao": "Muito bem! Desligar a energia e o gás antes de sair ajuda a evitar acidentes."
+      },
+      {
+        "texto": "Sair correndo sem olhar nada",
+        "explicacao": "Com calma dá tempo: desligue a energia e o gás antes de sair."
+      }
+    ],
+    "correta": 1
+  },
+  {
+    "id": "q08-agua-corrente",
+    "tipo": "acao",
+    "enunciado": "A rua na sua frente está alagada e a água está correndo.",
+    "alternativas": [
+      {
+        "texto": "Volto e procuro outro caminho pela parte alta",
+        "explicacao": "Isso! Rua alagada não se atravessa. Buscar outro caminho pelas ruas altas é o certo."
+      },
+      {
+        "texto": "Atravesso correndo, rapidinho",
+        "explicacao": "Nunca atravesse rua alagada a pé. Volte e procure outro caminho pela parte alta."
+      },
+      {
+        "texto": "Peço para alguém atravessar de carro comigo",
+        "explicacao": "De carro também não. Rua alagada não se atravessa, nem a pé, nem de carro."
+      }
+    ],
+    "correta": 0
+  },
+  {
+    "id": "q09-lugar-seguro",
+    "tipo": "multipla-escolha",
+    "enunciado": "Qual é o melhor caminho para chegar ao abrigo quando as ruas baixas estão alagadas?",
+    "alternativas": [
+      {
+        "texto": "Pela rua alagada, que é mais curta",
+        "explicacao": "O caminho mais curto nem sempre é o mais seguro. Rua alagada não se atravessa."
+      },
+      {
+        "texto": "Pelas ruas da parte alta, longe da água",
+        "explicacao": "Isso! A rota pela parte alta é a rota segura."
+      },
+      {
+        "texto": "Pela beira do rio, para ver a água subir",
+        "explicacao": "A beira do rio não é lugar seguro durante a cheia. Vá pela parte alta."
+      }
+    ],
+    "correta": 1
+  },
+  {
+    "id": "q10-ninguem-fica",
+    "tipo": "acao",
+    "enunciado": "Sua vizinha mora sozinha e você não a viu desde que a chuva começou.",
+    "alternativas": [
+      {
+        "texto": "Não faço nada, ela deve estar bem",
+        "explicacao": "Na dúvida, vale conferir. Peça para um adulto ver se ela está bem."
+      },
+      {
+        "texto": "Posto no grupo que ela sumiu",
+        "explicacao": "Isso pode espalhar boato e não ajuda. Peça para um adulto ir ver como ela está."
+      },
+      {
+        "texto": "Peço para um adulto ir ver se ela está bem",
+        "explicacao": "Muito bem! Ninguém fica para trás. Um adulto pode ver como ela está e chamar ajuda se precisar."
+      }
+    ],
+    "correta": 2
+  }
+]

@@ -8,6 +8,15 @@
   --cor-destaque: #ffc23d;
   --cor-destaque-texto: #1b2a35;
   --sombra: 0 4px 14px rgba(27, 42, 53, 0.25);
+  --cor-texto-suave: #45535e;
+  --cor-fundo-suave: #f1f4f6;
+  --cor-linha: #9aa7b1;
+  --cor-certo: #2e7d32;
+  --cor-certo-fundo: #e8f5e9;
+  --cor-errado: #9a5b00;
+  --cor-errado-fundo: #fff4e5;
+  --cor-perigo: #b3261e;
+  --cor-veu: rgba(27, 42, 53, 0.45);
 
   --fonte-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --tamanho-texto: 1.125rem;
@@ -152,4 +161,499 @@ body {
 
 .aviso[hidden] {
   display: none;
+}
+
+/* Atributo hidden sempre vence (elementos com display próprio, como flex, ignorariam). */
+[hidden] {
+  display: none !important;
+}
+
+.aviso__detalhe {
+  padding: 0.75rem 1rem;
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Ícones e selos ---------- */
+
+.icone {
+  width: 1.4em;
+  height: 1.4em;
+  flex: none;
+}
+
+.selo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  border: 3px solid var(--cor-superficie);
+  border-radius: 50%;
+  background: var(--cor-selo, var(--cor-linha));
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(27, 42, 53, 0.3);
+}
+
+.selo .icone {
+  width: 58%;
+  height: 58%;
+}
+
+.selo--pequeno {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-width: 2px;
+}
+
+.selo--grande {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-width: 4px;
+}
+
+.selo--vazio {
+  background: var(--cor-fundo-suave);
+  color: var(--cor-texto-suave);
+  font-weight: 700;
+  border-color: var(--cor-linha);
+  border-style: dashed;
+}
+
+/* ---------- Botões ---------- */
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.4rem 1.25rem;
+  border: 3px solid var(--cor-borda);
+  border-radius: 999px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.botao--primario {
+  background: var(--cor-destaque);
+  color: var(--cor-destaque-texto);
+}
+
+.botao--perigo {
+  border-color: var(--cor-perigo);
+  background: var(--cor-perigo);
+  color: #ffffff;
+}
+
+.botao--alternativa {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--cor-linha);
+  border-radius: var(--raio);
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.botao--alternativa:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.botao--certa,
+.botao--certa:disabled {
+  border-color: var(--cor-certo);
+  background: var(--cor-certo-fundo);
+  opacity: 1;
+}
+
+.botao--errada,
+.botao--errada:disabled {
+  border-color: var(--cor-errado);
+  background: var(--cor-errado-fundo);
+  opacity: 0.85;
+}
+
+.botao--certa::before {
+  content: '\2713\00a0';
+  color: var(--cor-certo);
+}
+
+.botao--errada::before {
+  content: '\2717\00a0';
+  color: var(--cor-errado);
+}
+
+/* Só aparece quando recebe foco pelo teclado (Tab). */
+.botao-objetivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  pointer-events: auto;
+}
+
+.botao-objetivo:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  min-height: 3rem;
+  padding: 0.4rem 1.25rem;
+  border: 3px solid var(--cor-borda);
+  border-radius: 999px;
+  background: var(--cor-destaque);
+  color: var(--cor-destaque-texto);
+  font: inherit;
+  font-weight: 700;
+}
+
+/* ---------- Barra da missão (topo) ---------- */
+
+.hud-topo {
+  position: absolute;
+  top: max(var(--espaco), env(safe-area-inset-top));
+  left: var(--espaco);
+  right: var(--espaco);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.hud-missao {
+  flex: 1;
+  min-width: 0;
+  max-width: 26rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  box-shadow: var(--sombra);
+  pointer-events: auto;
+}
+
+.hud-missao p {
+  margin: 0;
+}
+
+.hud-missao__kicker {
+  color: var(--cor-texto-suave);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.hud-missao__titulo {
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.hud-missao p.hud-missao__destino {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+  font-size: 0.95rem;
+}
+
+.botao-pins {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 3rem;
+  min-height: 3rem;
+  padding: 0 0.75rem;
+  border: 3px solid var(--cor-borda);
+  border-radius: 999px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: var(--sombra);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* ---------- Janelas (cartões, diálogo, painel) ---------- */
+
+.modal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  padding: var(--espaco);
+  pointer-events: auto;
+}
+
+.modal--card,
+.modal--panel {
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-veu);
+}
+
+.modal--dialogue {
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: max(var(--espaco), env(safe-area-inset-bottom));
+}
+
+.cartao,
+.painel,
+.dialogo {
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  border-top: 8px solid var(--cor-inst, var(--cor-destaque));
+  border-radius: 16px;
+  background: var(--cor-superficie);
+  box-shadow: var(--sombra);
+}
+
+.cartao {
+  max-width: 26rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: center;
+}
+
+.cartao p,
+.cartao h2,
+.painel p,
+.painel h2,
+.dialogo p {
+  margin: 0;
+}
+
+.cartao__kicker {
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.cartao__titulo {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+.cartao__texto {
+  font-size: 1.1rem;
+}
+
+.cartao__linha {
+  font-weight: 700;
+}
+
+.cartao .botao {
+  margin-top: 0.4rem;
+  min-width: 10rem;
+}
+
+.dialogo {
+  max-width: 40rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dialogo__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.dialogo__nome {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.dialogo__funcao {
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+}
+
+.dialogo__corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.dialogo__texto {
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+
+.dialogo__kicker {
+  padding-left: 0.5rem;
+  border-left: 5px solid var(--cor-inst, var(--cor-destaque));
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.dialogo__alternativas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dialogo__retorno {
+  padding: 0.75rem 1rem;
+  border-left: 6px solid;
+  border-radius: var(--raio);
+}
+
+.dialogo__retorno--certo {
+  border-color: var(--cor-certo);
+  background: var(--cor-certo-fundo);
+}
+
+.dialogo__retorno--errado {
+  border-color: var(--cor-errado);
+  background: var(--cor-errado-fundo);
+}
+
+.dialogo__retorno-titulo {
+  font-weight: 800;
+}
+
+.dialogo__acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.dialogo__acoes:empty {
+  display: none;
+}
+
+.painel {
+  max-width: 32rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.painel__titulo {
+  font-size: 1.4rem;
+}
+
+.painel__pins {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pin {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--raio);
+  background: var(--cor-fundo-suave);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.pin--falta {
+  color: var(--cor-texto-suave);
+  font-weight: 600;
+}
+
+.pin .selo {
+  width: 2rem;
+  height: 2rem;
+  border-width: 2px;
+}
+
+.painel__resumo {
+  font-weight: 700;
+}
+
+.painel__acoes,
+.painel__confirmar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.painel__confirmar {
+  flex-direction: column;
+  align-items: stretch;
+  text-align: center;
+}
+
+.painel__confirmar-titulo {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+/* ---------- Seta na borda da tela ---------- */
+
+.seta-destino {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin: -1.625rem 0 0 -1.625rem;
+  pointer-events: none;
+}
+
+.seta-destino__icone {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--cor-superficie);
+  border-radius: 50%;
+  background: var(--cor-inst, var(--cor-destaque));
+  color: #ffffff;
+  box-shadow: var(--sombra);
+}
+
+.seta-destino__icone .icone {
+  width: 58%;
+  height: 58%;
+}
+
+.seta-destino__ponta {
+  position: absolute;
+  inset: 0;
+}
+
+/* Triângulo do lado direito; o elemento gira para apontar o destino. */
+.seta-destino__ponta::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-top: -0.6rem;
+  border-top: 0.6rem solid transparent;
+  border-bottom: 0.6rem solid transparent;
+  border-left: 0.8rem solid var(--cor-borda);
 }

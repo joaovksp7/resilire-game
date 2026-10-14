@@ -34,6 +34,16 @@ export const ICONS = {
 
 export type IconId = keyof typeof ICONS;
 
+/** Ícone como <svg> para a interface em HTML (pinta com a cor do texto, `currentColor`). */
+export function iconSvg(icon: IconId, className = 'icone'): string {
+  return `<svg class="${className}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="${ICONS[icon]}"/></svg>`;
+}
+
+/** Cor em hexadecimal para CSS (#rrggbb). */
+export function cssColor(color: number): string {
+  return `#${color.toString(16).padStart(6, '0')}`;
+}
+
 /** Textura redonda com o ícone em branco sobre a cor da instituição. */
 export function createIconTexture(icon: IconId, color: number, size = 128): CanvasTexture {
   const canvas = document.createElement('canvas');

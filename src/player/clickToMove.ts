@@ -15,6 +15,13 @@ export type TapTarget =
   | { kind: 'institution'; site: InstitutionSite; faceYaw: number }
   | { kind: 'ground'; point: Vector3 };
 
+/** Direção para ficar de frente para o prédio: da porta em direção ao centro do bloco. */
+export function faceYawFor(map: CityMap, site: InstitutionSite): number {
+  const bx = map.colToX((site.minCol + site.maxCol + 1) / 2) - map.colToX(site.door.col + 0.5);
+  const bz = map.rowToZ((site.minRow + site.maxRow + 1) / 2) - map.rowToZ(site.door.row + 0.5);
+  return Math.atan2(bx, bz);
+}
+
 /** Sobe na hierarquia até achar o id da instituição marcado no grupo do prédio. */
 function institutionOf(object: Object3D | null): InstitutionId | null {
   for (let o = object; o; o = o.parent) {
@@ -49,12 +56,7 @@ export class TapPicker {
 
     const id = institutionOf(hit.object);
     const site = id ? map.sites.get(id) : undefined;
-    if (site) {
-      // De frente para o prédio: da porta em direção ao centro do bloco.
-      const bx = map.colToX((site.minCol + site.maxCol + 1) / 2) - map.colToX(site.door.col + 0.5);
-      const bz = map.rowToZ((site.minRow + site.maxRow + 1) / 2) - map.rowToZ(site.door.row + 0.5);
-      return { kind: 'institution', site, faceYaw: Math.atan2(bx, bz) };
-    }
+    if (site) return { kind: 'institution', site, faceYaw: faceYawFor(map, site) };
     return { kind: 'ground', point: hit.point.clone() };
   }
 }

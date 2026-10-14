@@ -2,7 +2,7 @@ import { PLAYER } from '../config';
 import type { CityMap } from '../world/cityMap';
 import type { TapPicker } from './clickToMove';
 import { Dice3D } from './dice';
-import { type Cell, findPath, type Reach, reachableTiles, type WalkGrid } from './pathfinding';
+import { type Cell, distancesTo, findPath, type Reach, reachableTiles, type WalkGrid } from './pathfinding';
 import type { Player } from './player';
 import type { ReachHighlight } from './reachHighlight';
 
@@ -44,6 +44,9 @@ export class DiceTurn {
   private current: TurnState = 'waiting';
   private value: number | null = null;
   private reach: Reach | null = null;
+  private paused = false;
+  /** Muda a cada jogada; descarta o fim de uma rolagem que foi cancelada. */
+  private rollToken = 0;
 
   constructor(opts: DiceTurnOptions) {
     this.opts = opts;
@@ -66,15 +69,35 @@ export class DiceTurn {
     this.listeners.push(listener);
   }
 
+  /** Pausa a vez (ex.: com diálogo ou cartão aberto): não joga o dado nem aceita toques. */
+  setPaused(paused: boolean): void {
+    this.paused = paused;
+  }
+
+  get isPaused(): boolean {
+    return this.paused;
+  }
+
+  /** Volta para o começo da vez, sem dado nem casas destacadas (ex.: ao recomeçar o jogo). */
+  reset(): void {
+    this.rollToken++;
+    this.reach = null;
+    this.opts.highlight.hide();
+    this.opts.dice.dismiss();
+    this.setState('waiting');
+  }
+
   /** Joga o dado (só quando é a vez de jogar). */
   roll(): void {
-    if (this.current !== 'waiting') return;
+    if (this.current !== 'waiting' || this.paused) return;
     const { dice, player, highlight } = this.opts;
     const value = Dice3D.draw();
+    const token = ++this.rollToken;
     this.value = value;
     this.setState('rolling');
 
     void dice.roll(value, player.position).then(() => {
+      if (token !== this.rollToken) return;
       const start = player.cell;
       this.reach = start ? reachableTiles(this.grid, start, value) : null;
       if (!this.reach || this.reach.cells.length === 0) {
@@ -90,7 +113,7 @@ export class DiceTurn {
 
   /** Toque na tela durante a escolha: anda até a casa destacada tocada (ou a mais perto do toque). */
   handleTap(clientX: number, clientY: number): void {
-    if (this.current !== 'choosing' || !this.reach) return;
+    if (this.current !== 'choosing' || !this.reach || this.paused) return;
     const { map, picker } = this.opts;
     const target = picker.pick(clientX, clientY);
     if (!target) return;
@@ -121,6 +144,33 @@ export class DiceTurn {
     }
     if (best) this.walkTo(best, null);
     else this.setState('choosing', 'pick-highlighted');
+  }
+
+  /**
+   * Escolhe sozinho a casa destacada mais perto do destino `goal` (para quem joga só com teclado).
+   * Se o destino estiver ao alcance, vai direto até ele. Devolve false se nada aproxima do destino.
+   */
+  goTowards(goal: Cell, faceYaw: number | null = null): boolean {
+    if (this.current !== 'choosing' || !this.reach || this.paused) return false;
+    if (this.reach.stepsTo(goal.col, goal.row) !== undefined) {
+      this.walkTo(goal, faceYaw);
+      return true;
+    }
+    const dist = distancesTo(this.grid, goal);
+    const start = this.opts.player.cell;
+    let best: Cell | null = null;
+    let bestDist = start ? dist[start.row * this.grid.cols + start.col] : -1;
+    if (bestDist < 0) bestDist = Infinity;
+    for (const cell of this.reach.cells) {
+      const d = dist[cell.row * this.grid.cols + cell.col];
+      if (d >= 0 && d < bestDist) {
+        bestDist = d;
+        best = cell;
+      }
+    }
+    if (!best) return false;
+    this.walkTo(best, null);
+    return true;
   }
 
   private walkTo(cell: Cell, faceYaw: number | null): void {

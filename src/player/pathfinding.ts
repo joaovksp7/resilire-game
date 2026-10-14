@@ -191,3 +191,31 @@ export function reachableTiles(grid: WalkGrid, start: Cell, maxSteps: number): R
     },
   };
 }
+
+/**
+ * Passos de cada casa até `goal` (busca em largura a partir do destino).
+ * Casas sem caminho até o destino ficam com -1.
+ */
+export function distancesTo(grid: WalkGrid, goal: Cell): Int32Array {
+  const { cols, rows } = grid;
+  const dist = new Int32Array(cols * rows).fill(-1);
+  if (goal.col < 0 || goal.row < 0 || goal.col >= cols || goal.row >= rows) return dist;
+  const start = goal.row * cols + goal.col;
+  dist[start] = 0;
+  const queue = [start];
+  for (let qi = 0; qi < queue.length; qi++) {
+    const k = queue[qi];
+    const col = k % cols;
+    const row = Math.floor(k / cols);
+    for (const [dc, dr] of DIRS) {
+      const nc = col + dc;
+      const nr = row + dr;
+      if (nc < 0 || nr < 0 || nc >= cols || nr >= rows) continue;
+      const nk = nr * cols + nc;
+      if (dist[nk] !== -1 || !grid.isWalkable(nc, nr)) continue;
+      dist[nk] = dist[k] + 1;
+      queue.push(nk);
+    }
+  }
+  return dist;
+}

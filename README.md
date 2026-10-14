@@ -5,7 +5,7 @@ Jogo educativo para navegador sobre **enchentes e deslizamentos**, para estudant
 - Game design completo: [`prompt-jogo-desastres-climaticos.md`](prompt-jogo-desastres-climaticos.md)
 - Regras para quem desenvolve: [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)
 
-> **Status:** Fase 3 (Personagem) — cidade 3D completa e personagem que anda por dado, como num jogo de tabuleiro. As missões entram na próxima fase.
+> **Status:** Fase 4 (Missões) — as 10 missões jogáveis do começo ao fim: dado até a instituição, diálogo, pergunta, pin e próxima missão, com progresso salvo. O clima (chuva, rio subindo, ruas alagadas) entra na Fase 5. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`).
 
 ---
 
@@ -33,10 +33,18 @@ O personagem anda **por dado**, como num jogo de tabuleiro:
 | Jogar o dado | Botão "Jogar dado", `Enter` ou `Espaço` | Tocar em "Jogar dado" |
 | Escolher a casa | Clicar numa casa destacada | Tocar numa casa destacada |
 | Ir até uma instituição | Clicar no prédio (se a porta estiver destacada) | Tocar no prédio |
+| Ir rumo ao objetivo (só teclado) | Depois de jogar o dado, `Tab` até "Ir rumo ao objetivo" e `Enter` | — |
+| Ver os pins / começar de novo | Botão de pins no canto de cima | Tocar no botão de pins |
 | Mover a câmera | `W` `A` `S` `D` ou setas | — |
 | Zoom | Roda do mouse | Pinça com dois dedos |
 
-A cada jogada, a câmera volta a seguir o personagem.
+A cada jogada, a câmera volta a seguir o personagem. A instituição da missão tem uma seta flutuando em cima; quando ela está fora da tela, uma seta na borda aponta para onde ir. A porta da missão aparece em amarelo entre as casas destacadas.
+
+Diálogos, perguntas, cartões e o painel de pins funcionam só com teclado (`Tab`, `Enter`, `Espaço` e `Esc` para fechar o painel).
+
+### Progresso salvo
+
+O jogo salva sozinho a missão atual, os pins, os acertos de primeira e onde o personagem está. Ao recarregar a página, continua de onde parou. Se o navegador bloquear o armazenamento (acontece dentro de iframe em alguns navegadores), o jogo funciona normalmente, mas o progresso some ao recarregar. Para recomeçar, use "Começar de novo" no painel de pins.
 
 ## Como gerar o build
 
@@ -75,7 +83,64 @@ O jogo se ajusta sozinho ao tamanho do iframe. Rolar a roda do mouse sobre o jog
 
 ## Como editar o conteúdo
 
-Todo o texto educativo (missões, diálogos, perguntas, itens do kit) vai ficar em arquivos JSON na pasta `content/`, que podem ser editados sem programar. Essa pasta e a documentação do formato de cada arquivo entram na **Fase 4**.
+Todo o texto educativo fica em arquivos JSON na pasta [`content/`](content/). Dá para editar sem programar, com qualquer editor de texto.
+
+**Depois de editar, rode `npm run build`** (o conteúdo vai junto no build). Se algo estiver errado, o build ou o jogo avisa em português qual arquivo e qual item corrigir.
+
+### Regras gerais
+
+- **JSON é exigente:** textos entre aspas duplas `"…"`, vírgula entre os itens e **sem vírgula depois do último**. Para usar aspas dentro de um texto, prefira as aspas curvas “assim”.
+- Cada item tem um **`id`** (ex.: `"m03-combinado"`). Os arquivos se ligam pelo `id`, nunca pelo texto. Pode mudar os textos à vontade; mudar um `id` exige mudar também onde ele é usado.
+- **`todoValidar`** (opcional, em qualquer item): anota o que ainda precisa ser confirmado com a Defesa Civil. Não aparece no jogo. Apague o campo quando a informação for validada.
+- JSON não aceita comentários (`//`); por isso as pendências ficam no `todoValidar`.
+
+### `institutions.json` — instituições e personagens
+
+Uma lista com as 9 instituições do mapa (os `id` são fixos: `defesa-civil`, `bombeiros`, `escola`, `ubs`, `abrigo`, `radio`, `mercado`, `cras`, `casa`).
+
+| Campo | O que é |
+|---|---|
+| `id` | Id fixo da instituição (não mudar) |
+| `nome` | Nome que aparece no jogo (ex.: `"Defesa Civil"`) |
+| `nomeComPreposicao` | O nome com "na/no/em", para frases como "Você está **na Defesa Civil**" |
+| `personagem.nome` | Nome de quem conversa com o jogador |
+| `personagem.funcao` | Função, que aparece embaixo do nome (ex.: `"agente da Defesa Civil"`) |
+
+A cor, o ícone e o formato do prédio ficam no código ([`src/world/institutions.ts`](src/world/institutions.ts)).
+
+### `missions.json` — eixos e missões
+
+Tem duas listas:
+
+- **`eixos`**: os três eixos, **sempre nesta ordem e com estes `id`**: `alerta`, `preparacao`, `durante`. Cada um tem `nome` e `descricao` (o texto do cartão que aparece quando o jogo passa para aquele eixo).
+- **`missoes`**: as missões, **na ordem em que o jogador faz**. As missões de um eixo vêm todas antes das do próximo.
+
+| Campo da missão | O que é |
+|---|---|
+| `id` | Id da missão |
+| `eixo` | `alerta`, `preparacao` ou `durante` |
+| `titulo` | Título da missão |
+| `descricao` | O que o jogador precisa fazer (aparece no cartão da missão) |
+| `instituicao` | `id` da instituição de destino (de `institutions.json`) |
+| `dialogo` | `id` do diálogo (de `dialogues.json`) |
+| `pergunta` | `id` da pergunta (de `questions.json`) |
+| `aprendizado` | Um tópico curto com o que foi aprendido, para o resumo da tela final |
+
+### `dialogues.json` — falas dos personagens
+
+Uma lista de diálogos, cada um com `id` e `falas`: uma lista de frases, mostradas uma de cada vez, na ordem. Quem fala é o personagem da instituição da missão.
+
+### `questions.json` — perguntas
+
+| Campo | O que é |
+|---|---|
+| `id` | Id da pergunta |
+| `tipo` | `multipla-escolha` (aparece como "Pergunta") ou `acao` (aparece como "O que você faz agora?") |
+| `enunciado` | A pergunta ou a situação |
+| `alternativas` | De 2 a 4 alternativas, cada uma com `texto` e `explicacao` |
+| `correta` | **O número da alternativa certa, contando a partir de 0** (a primeira é `0`, a segunda é `1`…) |
+
+A `explicacao` da alternativa certa aparece quando o jogador acerta; a das erradas explica por que aquela não era a melhor escolha, e o jogador tenta de novo. **As alternativas aparecem embaralhadas no jogo**, então a ordem no arquivo não importa para o jogador.
 
 O nome do jogo fica em [`src/config.ts`](src/config.ts) (`GAME_NAME`).
 
@@ -91,17 +156,22 @@ Regras:
 - Só a rua (`#` e `*`), a praça (`+`) e a ponte (`=`) são caminháveis.
 - Se algo estiver errado, como uma letra desconhecida ou uma instituição sem porta, o jogo mostra no console do navegador qual linha e qual coluna corrigir.
 
-A aparência de cada instituição (cor, ícone e formato do prédio) fica em [`src/world/institutions.ts`](src/world/institutions.ts). Os nomes e textos das instituições vão para `content/` na Fase 4.
+A aparência de cada instituição (cor, ícone e formato do prédio) fica em [`src/world/institutions.ts`](src/world/institutions.ts). Os nomes e personagens ficam em [`content/institutions.json`](content/institutions.json).
 
 ## Estrutura
 
 ```
 index.html            página principal
+content/              texto educativo (ver "Como editar o conteúdo")
 src/
-  main.ts             liga tudo: renderer, cena, cidade, câmera, entrada e loop
+  main.ts             liga tudo: conteúdo, cidade, câmera, personagem, missões e interface
   config.ts           nome do jogo e constantes (câmera, render, mundo, personagem, cores)
-  style.css           cores e fontes (variáveis CSS) e layout base
-  core/               loop, entrada (teclado/mouse/toque), câmera, renderer
+  style.css           cores e fontes (variáveis CSS) e estilos da interface
+  core/               loop, entrada (teclado/mouse/toque), câmera, renderer, save (progresso)
+  missions/
+    content.ts        lê content/*.json e confere as ligações por id
+    missionManager.ts missão atual, pins e acertos de primeira
+    missionFlow.ts    o loop: missão → porta → diálogo → pergunta → pin → próxima
   player/
     character.ts      personagem low-poly e animação de andar
     player.ts         movimento casa por casa (com pulinho), altura do chão e da ponte
@@ -111,7 +181,11 @@ src/
     reachHighlight.ts destaques azuis das casas alcançáveis
     clickToMove.ts    descobre o que foi tocado na tela (chão ou prédio)
   ui/
-    diceHud.ts        botão "Jogar dado" e avisos
+    diceHud.ts        botão "Jogar dado", "Ir rumo ao objetivo" e avisos
+    missionHud.ts     barra da missão no topo e painel de pins
+    dialogue.ts       caixa de diálogo e pergunta
+    cards.ts          cartões (missão, pin, eixo, fim) e janelas com foco preso
+    edgeArrow.ts      seta na borda da tela apontando o destino
   world/
     layout.ts         mapa da cidade em texto (tipos e alturas)
     cityMap.ts        lê o mapa: tiles, alturas, instituições e portas
@@ -120,7 +194,8 @@ src/
     water.ts          água do rio (o nível sobe nas próximas fases)
     buildings.ts      prédios das instituições e placas com ícone
     institutions.ts   cor, ícone e formato de cada instituição
-    icons.ts          desenhos dos ícones
+    icons.ts          desenhos dos ícones (placas 3D e interface)
+    markers.ts        seta flutuante e anel na porta da missão atual
     decor.ts          casas, prédios, árvores e ponte
     scene.ts          céu e luzes
 ```
