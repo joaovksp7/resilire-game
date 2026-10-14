@@ -11,6 +11,11 @@ const PAN_KEYS: Record<string, [x: number, y: number]> = {
   ArrowRight: [1, 0],
 };
 
+/** Quanto o dedo/mouse pode se mexer (px) e ainda contar como toque, não como arraste. */
+const TAP_SLOP = 10;
+
+export type TapListener = (clientX: number, clientY: number) => void;
+
 /** Converte o deltaY da roda para pixels, independente do deltaMode do navegador. */
 function wheelPixels(event: WheelEvent): number {
   if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) return event.deltaY * 16;
@@ -25,17 +30,20 @@ function isTextField(target: EventTarget | null): boolean {
 }
 
 /**
- * Junta as entradas de câmera: WASD/setas (pan), roda do mouse e pinça (zoom).
+ * Junta as entradas: WASD/setas (pan), roda do mouse e pinça (zoom), e toque/clique simples.
  * Usa event.code, então WASD funciona igual em teclado ABNT2 e outros layouts.
  */
 export class Input {
-  /** Quando false, ignora teclado e zoom (ex.: com diálogo aberto). */
+  /** Quando false, ignora teclado, zoom e toques (ex.: com diálogo aberto). */
   enabled = true;
 
   private readonly pressed = new Set<string>();
   private readonly pointers = new Map<number, { x: number; y: number }>();
   private pinchDistance = 0;
   private zoomFactor = 1;
+  private readonly tapListeners: TapListener[] = [];
+  /** Toque em andamento; vira null se o dedo arrastar ou se entrar um segundo dedo. */
+  private tap: { id: number; x: number; y: number } | null = null;
 
   constructor(surface: HTMLElement) {
     window.addEventListener('keydown', this.onKeyDown);
@@ -64,6 +72,11 @@ export class Input {
     }
     const len = Math.hypot(x, y);
     return len > 0 ? { x: x / len, y: y / len } : { x: 0, y: 0 };
+  }
+
+  /** Chamado a cada toque ou clique simples (sem arrastar e sem pinça). */
+  onTap(listener: TapListener): void {
+    this.tapListeners.push(listener);
   }
 
   /** Zoom acumulado desde a última chamada (1 = sem mudança). */
@@ -96,6 +109,11 @@ export class Input {
   private readonly onPointerDown = (event: PointerEvent): void => {
     this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (this.pointers.size === 2) this.pinchDistance = this.currentPinchDistance();
+
+    // Só o primeiro dedo (ou o botão esquerdo do mouse) pode virar toque.
+    const primaryButton = event.pointerType !== 'mouse' || event.button === 0;
+    this.tap =
+      this.pointers.size === 1 && primaryButton ? { id: event.pointerId, x: event.clientX, y: event.clientY } : null;
   };
 
   private readonly onPointerMove = (event: PointerEvent): void => {
@@ -103,6 +121,10 @@ export class Input {
     if (!pointer) return;
     pointer.x = event.clientX;
     pointer.y = event.clientY;
+
+    if (this.tap && this.tap.id === event.pointerId) {
+      if (Math.hypot(event.clientX - this.tap.x, event.clientY - this.tap.y) > TAP_SLOP) this.tap = null;
+    }
 
     if (this.pointers.size === 2 && this.pinchDistance > 0) {
       const distance = this.currentPinchDistance();
@@ -114,6 +136,14 @@ export class Input {
   private readonly onPointerEnd = (event: PointerEvent): void => {
     this.pointers.delete(event.pointerId);
     this.pinchDistance = this.pointers.size === 2 ? this.currentPinchDistance() : 0;
+
+    const tap = this.tap;
+    if (tap && tap.id === event.pointerId) {
+      this.tap = null;
+      if (event.type === 'pointerup' && this.enabled) {
+        for (const listener of this.tapListeners) listener(event.clientX, event.clientY);
+      }
+    }
   };
 
   private currentPinchDistance(): number {

@@ -76,6 +76,14 @@ export class IsoCamera {
     this.camera.updateProjectionMatrix();
   }
 
+  /** Coloca o centro da tela em (x, y, z) na hora, sem animação. Para de seguir alvo. */
+  centerOn(x: number, z: number, y = 0): void {
+    this.followTarget = null;
+    this.focus.set(x, y, z);
+    this.clampFocus();
+    this.applyTransform();
+  }
+
   follow(target: FollowTarget | null): void {
     this.followTarget = target;
   }
@@ -88,6 +96,7 @@ export class IsoCamera {
     if (this.followTarget) {
       const t = 1 - Math.exp(-CAMERA.followSharpness * dt);
       this.focus.x += (this.followTarget.position.x - this.focus.x) * t;
+      this.focus.y += (this.followTarget.position.y - this.focus.y) * t;
       this.focus.z += (this.followTarget.position.z - this.focus.z) * t;
       this.clampFocus();
     }
@@ -97,7 +106,6 @@ export class IsoCamera {
   private clampFocus(): void {
     this.focus.x = MathUtils.clamp(this.focus.x, -this.bounds, this.bounds);
     this.focus.z = MathUtils.clamp(this.focus.z, -this.bounds, this.bounds);
-    this.focus.y = 0;
   }
 
   private applyTransform(): void {

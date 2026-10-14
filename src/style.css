@@ -5,6 +5,9 @@
   --cor-superficie: #ffffff;
   --cor-borda: #1b2a35;
   --cor-foco: #ffb000;
+  --cor-destaque: #ffc23d;
+  --cor-destaque-texto: #1b2a35;
+  --sombra: 0 4px 14px rgba(27, 42, 53, 0.25);
 
   --fonte-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --tamanho-texto: 1.125rem;
@@ -50,6 +53,78 @@ body {
   width: 100%;
   height: 100%;
   outline: none;
+}
+
+/* Interface sobre o canvas: só os elementos de dentro recebem toque. */
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hud-dado {
+  position: absolute;
+  left: 50%;
+  bottom: max(var(--espaco), env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(28rem, calc(100% - 2 * var(--espaco)));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hud-dado__aviso {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: var(--sombra);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  pointer-events: auto;
+}
+
+.botao-dado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.5rem;
+  min-width: 12rem;
+  padding: 0 1.5rem;
+  border: 3px solid var(--cor-borda);
+  border-radius: 999px;
+  background: var(--cor-destaque);
+  color: var(--cor-destaque-texto);
+  box-shadow: var(--sombra);
+  font: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.botao-dado[hidden] {
+  display: none;
+}
+
+.botao-dado:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.botao-dado:not(:disabled):active {
+  transform: translateY(2px);
+}
+
+.botao-dado__icone {
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: none;
 }
 
 :focus-visible {

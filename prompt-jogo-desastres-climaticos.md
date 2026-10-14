@@ -32,7 +32,7 @@ Por que essa stack: o build final é um site estático (pasta `dist/`) que roda 
 ### 4.1 Loop principal
 
 1. O jogador recebe uma missão (card na tela com título, descrição e instituição de destino)
-2. Anda pela cidade até a instituição
+2. Anda pela cidade até a instituição, jogando o dado (ver 4.3)
 3. Ao chegar, abre um diálogo com um personagem da instituição que explica o que fazer naquela situação
 4. O jogador responde uma pergunta ou faz uma pequena escolha sobre o que aprendeu
 5. Ganha o pin (selo) daquela instituição e a próxima missão é liberada
@@ -52,9 +52,13 @@ Na fase "Durante o evento", ruas da parte baixa da cidade ficam bloqueadas por �
 
 ### 4.3 Movimento e câmera
 
-- Movimento por clique ou toque: o jogador clica em um ponto da rua e o personagem anda até lá usando pathfinding (A*) em uma grade de tiles de rua
+- Movimento por dado, como jogo de tabuleiro (mudança aprovada em 14/10/2026; antes era clique livre com A*):
+  - O jogador joga um dado de 1 a 6 (botão na interface; Enter ou Espaço no teclado). Um dado 3D cai rolando ao lado do personagem e mostra o número
+  - As casas de rua, praça ou ponte alcançáveis com até aquele número de passos ficam destacadas no chão. O número é o máximo: dá para parar antes, inclusive na porta da instituição
+  - O jogador toca ou clica numa casa destacada e o personagem anda casa por casa até lá (4 direções, uma casa por passo). Tocar no prédio de uma instituição leva até a porta, se ela estiver ao alcance
+  - Ruas bloqueadas (como as alagadas na fase "Durante o evento") não aparecem entre as casas destacadas, então é o próprio jogador quem escolhe a rota pela parte alta
 - Câmera isométrica que segue o personagem
-- WASD ou setas movem a câmera livremente (como na referência). Ao clicar para andar, a câmera volta a seguir o personagem
+- WASD ou setas movem a câmera livremente (como na referência). Ao jogar o dado, a câmera volta a seguir o personagem
 - Scroll do mouse ou pinça no celular para zoom, com limites
 - Instituições têm um marcador flutuante acima. A instituição da missão atual tem marcador destacado e animado
 - Uma seta discreta na borda da tela aponta para o destino quando ele está fora da visão
@@ -185,7 +189,7 @@ Trabalhe em fases. Ao final de cada fase, rode o projeto, confira se não tem er
 
 1. **Base** — projeto Vite + TS + Three.js, cena com chão, câmera isométrica, controles de câmera e resize
 2. **Cidade** — mapa de tiles, ruas, rio, morro, prédios das instituições e decoração
-3. **Personagem** — personagem low-poly, clique ou toque para andar, pathfinding A*
+3. **Personagem** — personagem low-poly, movimento por dado (casas destacadas), caminho em grade de tiles
 4. **Missões** — sistema de missões lendo os JSONs, marcadores, diálogo, pergunta, pins, save
 5. **Clima e fases** — chuva, céu, nível do rio e ruas bloqueadas na fase Durante o evento
 6. **Minijogo do kit**

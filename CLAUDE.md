@@ -121,10 +121,10 @@ O único lugar onde mora texto educativo. **Nunca** tocar no código de renderiz
 
 ## Mecânica — o que não pode quebrar
 
-- **Loop:** missão → andar até a instituição → diálogo → pergunta → pin → próxima missão
+- **Loop:** missão → andar até a instituição (jogando o dado) → diálogo → pergunta → pin → próxima missão
 - **Eixos em ordem fixa.** Clima, nível do rio e ruas bloqueadas mudam por eixo. Na fase `durante`, ruas baixas alagadas obrigam rota pela parte alta
 - **Errar não reprova.** Explica e deixa tentar de novo. Sem cronômetro, sem penalidade
-- **Movimento por clique ou toque** com A* em grade de tiles. WASD e setas movem a câmera
+- **Movimento por dado**, como jogo de tabuleiro: o jogador joga um dado (1 a 6) e escolhe uma das casas destacadas a até N passos (o número é o máximo; pode parar antes, inclusive na porta da instituição). Uma casa por passo, em grade de tiles com 4 direções. Ruas bloqueadas (ex.: alagadas) não entram nas casas destacadas. WASD e setas movem a câmera
 - **`localStorage` pode não existir.** Dentro de iframe cross-origin o Safari bloqueia e o Chrome particiona. Todo acesso em `try/catch`, degradando para estado em memória. Nunca deixar isso derrubar o jogo
 
 ---
