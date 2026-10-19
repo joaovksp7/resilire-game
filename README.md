@@ -2,7 +2,7 @@
 
 Jogo educativo para navegador sobre **enchentes e deslizamentos**, para estudantes do ensino fundamental II e médio dos Vales do Rio Pardo e Taquari (RS). O jogador anda por uma cidade 3D, recebe missões e visita instituições que ensinam como agir antes e durante um evento climático extremo.
 
-- Game design completo: [`prompt-jogo-desastres-climaticos.md`](prompt-jogo-desastres-climaticos.md)
+- Game design completo:
 - Regras para quem desenvolve: [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)
 
 > **Status:** Fase 4 (Missões) — as 10 missões jogáveis do começo ao fim: dado até a instituição, diálogo, pergunta, pin e próxima missão, com progresso salvo. O clima (chuva, rio subindo, ruas alagadas) entra na Fase 5. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`).
