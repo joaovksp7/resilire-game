@@ -8,7 +8,7 @@ import { Water } from './water';
 
 export interface City {
   readonly map: CityMap;
-  /** Água do rio. O nível sobe por eixo na Fase 5. */
+  /** Água do rio. O nível muda por eixo (src/world/climate.ts). */
   readonly water: Water;
   readonly root: Group;
   /** Ponto acima da placa de cada instituição (onde fica o marcador da missão). */

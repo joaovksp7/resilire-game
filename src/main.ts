@@ -7,6 +7,7 @@ import { GameRenderer, isWebGLAvailable } from './core/renderer';
 import { SaveStore } from './core/save';
 import { ContentError, type GameContent, loadContent } from './missions/content';
 import { MissionFlow } from './missions/missionFlow';
+import { KitMinigame } from './minigames/kitMinigame';
 import { MissionManager } from './missions/missionManager';
 import { Character } from './player/character';
 import { TapPicker } from './player/clickToMove';
@@ -20,7 +21,9 @@ import { DialogueBox } from './ui/dialogue';
 import { EdgeArrow } from './ui/edgeArrow';
 import { MissionHud } from './ui/missionHud';
 import { createCity } from './world/city';
+import { Climate, floodedDoorProblem } from './world/climate';
 import { MissionMarker } from './world/markers';
+import { Rain } from './world/rain';
 import { createScene } from './world/scene';
 
 function showWebGLError(): void {
@@ -44,9 +47,24 @@ function showContentError(message: string): void {
 }
 
 function start(container: HTMLElement, hudRoot: HTMLElement, content: GameContent): void {
-  const gameRenderer = new GameRenderer(container);
-  const scene = createScene();
+  const { scene, lights } = createScene();
   const city = createCity(scene);
+
+  // Missão do eixo "Durante o evento" numa porta alagada deixaria o jogador sem caminho.
+  const floodProblem = floodedDoorProblem(city.map, content);
+  if (floodProblem) {
+    console.error(new ContentError(floodProblem));
+    showContentError(floodProblem);
+    return;
+  }
+
+  const gameRenderer = new GameRenderer(container);
+
+  // Clima por eixo: céu, luzes, rio, chuva e ruas alagadas. O eixo certo é posto em MissionFlow.start().
+  const rain = new Rain();
+  scene.add(rain.mesh);
+  const climate = new Climate({ scene, lights, water: city.water, rain, map: city.map }, content.eixos[0].id);
+
   const iso = new IsoCamera(city.map.halfSize);
   const input = new Input(gameRenderer.canvas);
 
@@ -76,6 +94,8 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     dice,
     highlight,
     picker: new TapPicker({ map: city.map, camera: iso.camera, canvas: gameRenderer.canvas, pickRoot: city.root }),
+    // Ruas alagadas não entram nas casas destacadas: o caminho tem que ser pela parte alta.
+    isBlocked: (col, row) => climate.isFlooded(col, row),
     // A porta da missão aparece em amarelo entre as casas destacadas.
     isSpecial: (cell) => {
       const mission = manager.current;
@@ -113,7 +133,9 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     turn,
     marker,
     markerAnchors: city.markerAnchors,
+    climate,
     dialogue,
+    kit: new KitMinigame(hudRoot, content.kit),
     diceHud,
     edgeArrow,
     uiRoot: hudRoot,
@@ -129,7 +151,9 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     dice.update(dt);
     highlight.update(dt);
     marker.update(dt);
+    climate.update(dt);
     iso.update(dt);
+    rain.update(dt, iso.focus, iso.camera);
     edgeArrow.update();
     gameRenderer.renderer.render(scene, iso.camera);
   });

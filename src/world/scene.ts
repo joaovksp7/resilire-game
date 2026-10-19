@@ -1,8 +1,14 @@
 import { Color, DirectionalLight, HemisphereLight, Scene } from 'three';
 import { RENDER } from '../config';
 
+/** Luzes da cena. O clima de cada eixo muda a força delas (src/world/climate.ts). */
+export interface SceneLights {
+  readonly hemi: HemisphereLight;
+  readonly sun: DirectionalLight;
+}
+
 /** Cena base: céu e luzes. A cidade é montada em src/world/city.ts. */
-export function createScene(): Scene {
+export function createScene(): { scene: Scene; lights: SceneLights } {
   const scene = new Scene();
   scene.background = new Color(RENDER.skyColor);
 
@@ -14,5 +20,5 @@ export function createScene(): Scene {
   sun.position.set(10, 30, 18);
   scene.add(sun);
 
-  return scene;
+  return { scene, lights: { hemi, sun } };
 }

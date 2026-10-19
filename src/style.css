@@ -414,7 +414,8 @@ body {
 
 .cartao,
 .painel,
-.dialogo {
+.dialogo,
+.kit {
   width: 100%;
   max-height: 100%;
   overflow-y: auto;
@@ -656,4 +657,350 @@ body {
   border-top: 0.6rem solid transparent;
   border-bottom: 0.6rem solid transparent;
   border-left: 0.8rem solid var(--cor-borda);
+}
+
+/* ---------- Minijogo da mochila ---------- */
+
+.kit {
+  max-width: 60rem;
+  padding: 1.25rem 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.kit p,
+.kit h2,
+.kit h3,
+.kit ul {
+  margin: 0;
+}
+
+.kit__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.kit__titulo {
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.kit__corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.kit__instrucao {
+  font-size: 1.05rem;
+}
+
+.kit__mesa {
+  display: grid;
+  gap: 0.85rem;
+}
+
+/* Tela larga: mochila e prateleira lado a lado. */
+@media (min-width: 52rem) {
+  .kit__mesa {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: start;
+  }
+}
+
+.kit__secao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border-radius: var(--raio);
+  background: var(--cor-fundo-suave);
+}
+
+.kit__mochila {
+  border: 3px dashed var(--cor-inst, var(--cor-linha));
+}
+
+.kit__secao-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.kit__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  list-style: none;
+}
+
+.kit__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+  padding: 0.2rem 0.65rem 0.2rem 0.45rem;
+  border: 2px solid var(--cor-borda);
+  border-radius: 999px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* "×": tocar tira da mochila. */
+.kit__chip::after {
+  content: '\00d7';
+  margin-left: 0.15rem;
+  color: var(--cor-texto-suave);
+  font-size: 1.25em;
+  line-height: 1;
+}
+
+.kit__vazia {
+  color: var(--cor-texto-suave);
+}
+
+.kit__itens {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: 0.6rem 0.5rem;
+  padding: 0.4rem 0 0;
+  list-style: none;
+}
+
+.kit__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.25rem;
+  width: 100%;
+  height: 100%;
+  min-height: 3.5rem;
+  padding: 0.55rem 0.4rem;
+  border: 2px solid var(--cor-linha);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.kit__item .icone {
+  width: 2rem;
+  height: 2rem;
+}
+
+.kit__item-texto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.kit__item-nome {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+}
+
+.kit__item-espaco {
+  color: var(--cor-texto-suave);
+  font-size: 0.8rem;
+}
+
+/* Item que já está na mochila (estado neutro: não diz se está certo ou errado). */
+.kit__item[aria-pressed='true'] {
+  border: 3px solid var(--cor-borda);
+  background: var(--cor-fundo-suave);
+}
+
+.kit__item-marca {
+  position: absolute;
+  top: -0.65rem;
+  right: 0.4rem;
+  display: none;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: var(--cor-borda);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.kit__item[aria-pressed='true'] .kit__item-marca {
+  display: block;
+}
+
+/* Rodapé fixo: espaço usado, aviso e botão sempre à vista enquanto a lista rola. */
+.kit__rodape {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem 1rem;
+  margin: 0 -1.25rem;
+  padding: 0.75rem 1.25rem max(1.25rem, env(safe-area-inset-bottom));
+  border-top: 2px solid var(--cor-fundo-suave);
+  background: var(--cor-superficie);
+}
+
+.kit__espaco {
+  flex: 1 1 12rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.kit__espaco-texto {
+  font-weight: 800;
+}
+
+.kit__barra {
+  height: 0.85rem;
+  overflow: hidden;
+  border: 2px solid var(--cor-borda);
+  border-radius: 999px;
+  background: var(--cor-fundo-suave);
+}
+
+.kit__barra-cheio {
+  width: 0;
+  height: 100%;
+  background: var(--cor-inst, var(--cor-destaque));
+  transition: width 0.2s ease;
+}
+
+.kit__barra--cheia {
+  animation: kit-cheia 0.35s ease;
+}
+
+@keyframes kit-cheia {
+  25% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+}
+
+.kit__aviso {
+  flex-basis: 100%;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.kit__aviso:empty {
+  display: none;
+}
+
+/* "Foi para a mochila" só para leitor de tela (a barra e o selo já mostram); "não cabe" aparece. */
+.kit__aviso:not(.kit__aviso--alerta) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.kit__aviso--alerta {
+  color: var(--cor-errado);
+}
+
+.kit__grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.kit__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.kit__lista li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-left: 6px solid var(--cor-linha);
+  border-radius: var(--raio);
+  background: var(--cor-fundo-suave);
+}
+
+.kit__lista--faltou li,
+.kit__lista--sobrou li {
+  border-left-color: var(--cor-errado);
+}
+
+.kit__lista--bom li {
+  border-left-color: var(--cor-certo);
+}
+
+.kit__lista .icone {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.kit__lista-nome {
+  font-weight: 800;
+}
+
+/* Celular: margens menores e prateleira sempre em duas colunas. */
+@media (max-width: 30rem) {
+  .kit {
+    padding: 1rem 1rem 0;
+  }
+
+  .kit__titulo {
+    font-size: 1.2rem;
+  }
+
+  .kit__secao {
+    padding: 0.6rem;
+  }
+
+  .kit__itens {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kit__rodape {
+    margin: 0 -1rem;
+    padding: 0.6rem 1rem max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kit__barra--cheia {
+    animation: none;
+  }
+
+  .kit__barra-cheio {
+    transition: none;
+  }
 }

@@ -4,6 +4,7 @@
 
 import dialoguesJson from '../../content/dialogues.json';
 import institutionsJson from '../../content/institutions.json';
+import kitJson from '../../content/kit-items.json';
 import missionsJson from '../../content/missions.json';
 import questionsJson from '../../content/questions.json';
 import { INSTITUTION_IDS, type InstitutionId } from '../world/institutions';
@@ -14,6 +15,10 @@ export type EixoId = (typeof EIXO_IDS)[number];
 
 export const QUESTION_TYPES = ['multipla-escolha', 'acao'] as const;
 export type QuestionType = (typeof QUESTION_TYPES)[number];
+
+/** Minijogos que uma missão pode ter no lugar da pergunta. */
+export const MINIGAME_IDS = ['kit'] as const;
+export type MinigameId = (typeof MINIGAME_IDS)[number];
 
 // Formato bruto dos arquivos (o que a equipe edita). `todoValidar` é opcional em qualquer item.
 interface RawInstitution {
@@ -36,7 +41,9 @@ interface RawMission {
   descricao: string;
   instituicao: string;
   dialogo: string;
-  pergunta: string;
+  /** Pergunta OU minijogo: cada missão tem um dos dois. */
+  pergunta?: string;
+  minijogo?: string;
   aprendizado: string;
   todoValidar?: string;
 }
@@ -53,12 +60,25 @@ interface RawQuestion {
   correta: number;
   todoValidar?: string;
 }
+interface RawKitItem {
+  id: string;
+  nome: string;
+  espaco: number;
+  levar: boolean;
+  explicacao: string;
+  todoValidar?: string;
+}
+interface RawKit {
+  mochila: { titulo: string; instrucao: string; todoValidar?: string };
+  itens: RawKitItem[];
+}
 
 // Estas atribuições fazem o TypeScript conferir o formato dos JSON no build.
 const rawInstitutions: RawInstitution[] = institutionsJson;
 const rawMissions: { eixos: RawEixo[]; missoes: RawMission[] } = missionsJson;
 const rawDialogues: RawDialogue[] = dialoguesJson;
 const rawQuestions: RawQuestion[] = questionsJson;
+const rawKit: RawKit = kitJson;
 
 export interface InstitutionContent extends RawInstitution {
   id: InstitutionId;
@@ -69,10 +89,19 @@ export interface Eixo extends RawEixo {
 export interface Mission extends RawMission {
   eixo: EixoId;
   instituicao: InstitutionId;
+  minijogo?: MinigameId;
 }
 export type Dialogue = RawDialogue;
 export interface Question extends RawQuestion {
   tipo: QuestionType;
+}
+export type KitItem = RawKitItem;
+export interface KitContent {
+  readonly titulo: string;
+  readonly instrucao: string;
+  readonly itens: readonly KitItem[];
+  /** Espaço da mochila: a soma dos itens com "levar": true (cabem todos, e só eles). */
+  readonly capacidade: number;
 }
 
 export interface GameContent {
@@ -81,6 +110,7 @@ export interface GameContent {
   readonly missions: readonly Mission[];
   readonly dialogues: ReadonlyMap<string, Dialogue>;
   readonly questions: ReadonlyMap<string, Question>;
+  readonly kit: KitContent;
 }
 
 /** Erro de conteúdo, com mensagem em português dizendo o arquivo e o item a corrigir. */
@@ -112,6 +142,7 @@ export function loadContent(
   missionsFile: { eixos: readonly RawEixo[]; missoes: readonly RawMission[] } = rawMissions,
   dialogues: readonly RawDialogue[] = rawDialogues,
   questions: readonly RawQuestion[] = rawQuestions,
+  kitFile: RawKit = rawKit,
 ): GameContent {
   // Instituições: todas as do mapa precisam ter nome e personagem.
   const institutionMap = indexById('institutions.json', institutions, 'a instituição');
@@ -167,6 +198,26 @@ export function loadContent(
     }
   }
 
+  // Kit de emergência: itens com espaço e "levar" (true = útil, false = não é prioridade).
+  requireText('kit-items.json', 'mochila', 'titulo', kitFile.mochila?.titulo);
+  requireText('kit-items.json', 'mochila', 'instrucao', kitFile.mochila?.instrucao);
+  const kitItems = kitFile.itens;
+  if (!Array.isArray(kitItems) || kitItems.length === 0) fail('kit-items.json', 'não há nenhum item.');
+  indexById('kit-items.json', kitItems, 'o item');
+  for (const item of kitItems) {
+    const where = `item "${item.id}"`;
+    requireText('kit-items.json', where, 'nome', item.nome);
+    requireText('kit-items.json', where, 'explicacao', item.explicacao);
+    if (!Number.isInteger(item.espaco) || item.espaco < 1) {
+      fail('kit-items.json', `${where}: "espaco" precisa ser um número inteiro, de 1 para cima.`);
+    }
+    if (typeof item.levar !== 'boolean') {
+      fail('kit-items.json', `${where}: "levar" precisa ser true (vai na mochila) ou false (não vai).`);
+    }
+  }
+  const capacidade = kitItems.reduce((sum, item) => sum + (item.levar ? item.espaco : 0), 0);
+  if (capacidade === 0) fail('kit-items.json', 'nenhum item tem "levar": true.');
+
   // Missões: ligações por id e eixos em ordem.
   const missions = missionsFile.missoes;
   if (missions.length === 0) fail('missions.json', 'não há nenhuma missão.');
@@ -183,7 +234,15 @@ export function loadContent(
       fail('missions.json', `${where}: a instituição "${m.instituicao}" não existe em institutions.json.`);
     }
     if (!dialogueMap.has(m.dialogo)) fail('missions.json', `${where}: o diálogo "${m.dialogo}" não existe em dialogues.json.`);
-    if (!questionMap.has(m.pergunta)) fail('missions.json', `${where}: a pergunta "${m.pergunta}" não existe em questions.json.`);
+    if ((m.pergunta === undefined) === (m.minijogo === undefined)) {
+      fail('missions.json', `${where}: use "pergunta" ou "minijogo" (um dos dois, não os dois).`);
+    }
+    if (m.pergunta !== undefined && !questionMap.has(m.pergunta)) {
+      fail('missions.json', `${where}: a pergunta "${m.pergunta}" não existe em questions.json.`);
+    }
+    if (m.minijogo !== undefined && !(MINIGAME_IDS as readonly string[]).includes(m.minijogo)) {
+      fail('missions.json', `${where}: o minijogo "${m.minijogo}" não existe. Use ${MINIGAME_IDS.join(', ')}.`);
+    }
   }
 
   return {
@@ -192,5 +251,6 @@ export function loadContent(
     missions: missions as readonly Mission[],
     dialogues: dialogueMap,
     questions: questionMap as Map<string, Question>,
+    kit: { titulo: kitFile.mochila.titulo, instrucao: kitFile.mochila.instrucao, itens: kitItems, capacidade },
   };
 }

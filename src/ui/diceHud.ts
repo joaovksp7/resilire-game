@@ -12,6 +12,7 @@ const TEXT = {
     'pick-highlighted': 'Escolha uma das casas destacadas.',
     'door-too-far': 'Essa porta ainda está longe. Escolha uma das casas destacadas.',
     'nothing-in-reach': 'Nenhuma casa ao alcance. Jogue o dado de novo.',
+    flooded: 'Essa rua está alagada. Escolha uma das casas destacadas.',
   } satisfies Record<TurnHint, string>,
 } as const;
 

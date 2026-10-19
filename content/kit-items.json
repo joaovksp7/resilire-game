@@ -1,0 +1,114 @@
+{
+  "mochila": {
+    "titulo": "Monte sua mochila de emergência",
+    "instrucao": "Toque nos itens da prateleira para colocar na mochila. O espaço é limitado: leve só o que ajuda numa emergência.",
+    "todoValidar": "Lista de itens, espaço de cada um e explicações em rascunho: validar com a Defesa Civil."
+  },
+  "itens": [
+    {
+      "id": "documentos",
+      "nome": "Documentos em saco plástico",
+      "espaco": 1,
+      "levar": true,
+      "explicacao": "Os documentos da família são importantes e difíceis de refazer. O saco plástico protege da água."
+    },
+    {
+      "id": "lanterna",
+      "nome": "Lanterna",
+      "espaco": 1,
+      "levar": true,
+      "explicacao": "Se faltar luz, a lanterna ajuda a enxergar o caminho."
+    },
+    {
+      "id": "pilhas",
+      "nome": "Pilhas",
+      "espaco": 1,
+      "levar": true,
+      "explicacao": "Pilhas de reserva mantêm a lanterna e o rádio funcionando."
+    },
+    {
+      "id": "radio",
+      "nome": "Rádio a pilha",
+      "espaco": 1,
+      "levar": true,
+      "explicacao": "Com o rádio a pilha dá para ouvir as informações oficiais mesmo sem energia elétrica."
+    },
+    {
+      "id": "agua",
+      "nome": "Água",
+      "espaco": 2,
+      "levar": true,
+      "explicacao": "Água para beber é uma das coisas mais importantes da mochila."
+    },
+    {
+      "id": "comida",
+      "nome": "Comida que não estraga",
+      "espaco": 2,
+      "levar": true,
+      "explicacao": "Comida que não estraga dura bastante, mesmo sem geladeira."
+    },
+    {
+      "id": "remedios",
+      "nome": "Remédios",
+      "espaco": 1,
+      "levar": true,
+      "explicacao": "Os remédios de uso contínuo da família não podem faltar, junto com cópias das receitas."
+    },
+    {
+      "id": "carregador",
+      "nome": "Carregador portátil",
+      "espaco": 1,
+      "levar": true,
+      "explicacao": "Com o carregador portátil, o celular continua funcionando para receber alertas e falar com a família."
+    },
+    {
+      "id": "apito",
+      "nome": "Apito",
+      "espaco": 1,
+      "levar": true,
+      "explicacao": "O apito ajuda a chamar atenção e pedir ajuda."
+    },
+    {
+      "id": "capa-de-chuva",
+      "nome": "Capa de chuva",
+      "espaco": 1,
+      "levar": true,
+      "explicacao": "A capa de chuva ajuda a ficar seco no caminho."
+    },
+    {
+      "id": "roupa-extra",
+      "nome": "Roupa extra",
+      "espaco": 2,
+      "levar": true,
+      "explicacao": "Uma troca de roupa seca ajuda a ficar aquecido e confortável."
+    },
+    {
+      "id": "videogame",
+      "nome": "Videogame",
+      "espaco": 2,
+      "levar": false,
+      "explicacao": "O videogame ocupa espaço e não ajuda numa emergência."
+    },
+    {
+      "id": "haltere",
+      "nome": "Haltere de academia",
+      "espaco": 3,
+      "levar": false,
+      "explicacao": "Objetos pesados deixam a mochila difícil de carregar e atrasam a saída."
+    },
+    {
+      "id": "liquidificador",
+      "nome": "Liquidificador",
+      "espaco": 3,
+      "levar": false,
+      "explicacao": "Eletrodomésticos são grandes, pesados e precisam de tomada. Não ajudam numa emergência."
+    },
+    {
+      "id": "vaso-de-vidro",
+      "nome": "Vaso de vidro",
+      "espaco": 2,
+      "levar": false,
+      "explicacao": "Coisas de vidro podem quebrar no caminho e machucar."
+    }
+  ]
+}

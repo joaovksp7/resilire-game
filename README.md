@@ -5,7 +5,7 @@ Jogo educativo para navegador sobre **enchentes e deslizamentos**, para estudant
 - Game design completo:
 - Regras para quem desenvolve: [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)
 
-> **Status:** Fase 4 (Missões) — as 10 missões jogáveis do começo ao fim: dado até a instituição, diálogo, pergunta, pin e próxima missão, com progresso salvo. O clima (chuva, rio subindo, ruas alagadas) entra na Fase 5. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`).
+> **Status:** Fase 6 (Minijogo do kit) — as 10 missões jogáveis do começo ao fim, com progresso salvo; o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); e no mercado o jogador monta a mochila de emergência. Tela inicial, pausa e tela final entram na Fase 7. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`).
 
 ---
 
@@ -40,7 +40,19 @@ O personagem anda **por dado**, como num jogo de tabuleiro:
 
 A cada jogada, a câmera volta a seguir o personagem. A instituição da missão tem uma seta flutuando em cima; quando ela está fora da tela, uma seta na borda aponta para onde ir. A porta da missão aparece em amarelo entre as casas destacadas.
 
-Diálogos, perguntas, cartões e o painel de pins funcionam só com teclado (`Tab`, `Enter`, `Espaço` e `Esc` para fechar o painel).
+Diálogos, perguntas, o minijogo da mochila, cartões e o painel de pins funcionam só com teclado (`Tab`, `Enter`, `Espaço` e `Esc` para fechar o painel).
+
+### Clima em cada eixo
+
+| Eixo | Na cidade |
+|---|---|
+| Alerta | Céu nublado, chuva fraca |
+| Preparação | Chuva moderada, o rio sobe um pouco |
+| Durante o evento | Chuva forte, o rio transborda e alaga a parte baixa da cidade (a beira-rio, a baixada no meio da rua principal, a ponte e o outro lado do rio) |
+
+Ao passar para um novo eixo, o clima piora aos poucos atrás do cartão do eixo. Em "Durante o evento", as ruas alagadas não aparecem entre as casas destacadas pelo dado: o caminho tem que ser pela parte alta. Tocar numa rua alagada mostra um aviso.
+
+Para quem pediu menos animação no sistema (`prefers-reduced-motion`), a chuva é mais calma e o clima muda na hora. No celular, a chuva tem menos gotas, para não pesar. As cores, a luz, o nível da água e a quantidade de chuva de cada eixo ficam em [`src/config.ts`](src/config.ts) (`CLIMATE` e `RAIN`).
 
 ### Progresso salvo
 
@@ -124,7 +136,10 @@ Tem duas listas:
 | `instituicao` | `id` da instituição de destino (de `institutions.json`) |
 | `dialogo` | `id` do diálogo (de `dialogues.json`) |
 | `pergunta` | `id` da pergunta (de `questions.json`) |
+| `minijogo` | No lugar da `pergunta`: `"kit"` abre o minijogo da mochila (de `kit-items.json`). Cada missão tem **ou** `pergunta` **ou** `minijogo`, nunca os dois |
 | `aprendizado` | Um tópico curto com o que foi aprendido, para o resumo da tela final |
+
+**Atenção no eixo `durante`:** a parte baixa da cidade fica alagada, então as missões desse eixo precisam ir para instituições da parte alta. Hoje, o Mercado e a Rádio ficam na parte alagada. Se uma missão de `durante` apontar para uma delas, o jogo avisa qual missão corrigir.
 
 ### `dialogues.json` — falas dos personagens
 
@@ -142,6 +157,25 @@ Uma lista de diálogos, cada um com `id` e `falas`: uma lista de frases, mostrad
 
 A `explicacao` da alternativa certa aparece quando o jogador acerta; a das erradas explica por que aquela não era a melhor escolha, e o jogador tenta de novo. **As alternativas aparecem embaralhadas no jogo**, então a ordem no arquivo não importa para o jogador.
 
+### `kit-items.json` — minijogo da mochila de emergência
+
+O jogador toca nos itens da prateleira para colocar ou tirar da mochila. A mochila tem espaço exato para **todos os itens com `"levar": true`, e só eles**: cada item que não é prioridade ocupa o lugar de um útil. Ao fechar a mochila, o jogo mostra o que faltou, o que não precisava levar e o que ficou bom, com a `explicacao` de cada item. Se não estiver tudo certo, o jogador arruma de novo; conta como acerto de primeira quando a primeira mochila fechada já está certa.
+
+Tem duas partes:
+
+- **`mochila`**: o `titulo` e a `instrucao` que aparecem no alto da tela do minijogo.
+- **`itens`**: a lista de itens (aparecem embaralhados na prateleira).
+
+| Campo do item | O que é |
+|---|---|
+| `id` | Id do item. Também escolhe o desenho (veja abaixo) |
+| `nome` | Nome que aparece no jogo |
+| `espaco` | Quanto ocupa na mochila: um número inteiro, de `1` para cima |
+| `levar` | `true` = é útil e precisa ir na mochila; `false` = não é prioridade ou atrapalha |
+| `explicacao` | Uma frase curta sobre o item, mostrada no resultado |
+
+Para mudar o tamanho da mochila, mude o `espaco` dos itens úteis: o espaço total é a soma deles. Os desenhos dos itens ficam em [`src/minigames/kitIcons.ts`](src/minigames/kitIcons.ts), pelo `id`. Um item novo, sem desenho próprio, aparece com o desenho de uma caixa.
+
 O nome do jogo fica em [`src/config.ts`](src/config.ts) (`GAME_NAME`).
 
 ## Como mexer no mapa da cidade
@@ -149,7 +183,7 @@ O nome do jogo fica em [`src/config.ts`](src/config.ts) (`GAME_NAME`).
 A cidade é fixa (não muda a cada partida), para o professor saber onde fica cada coisa. O mapa é um desenho em texto no arquivo [`src/world/layout.ts`](src/world/layout.ts), com duas grades do mesmo tamanho (30 × 30):
 
 - **`LAYOUT_TYPES`**: o que tem em cada quadradinho. Cada letra ou símbolo tem um significado, listado no começo do arquivo: rua, casa, árvore, rio e assim por diante. Cada instituição é um retângulo de letras iguais, por exemplo `A` para o Abrigo, e precisa de exatamente um `*` encostado nele. O `*` marca a rua em frente à porta.
-- **`LAYOUT_LEVELS`**: a altura do terreno em cada quadradinho, de `0` (fundo do rio) a `9` (topo do morro). O nível `1` é a parte baixa, que alaga na fase "Durante o evento".
+- **`LAYOUT_LEVELS`**: a altura do terreno em cada quadradinho, de `0` (fundo do rio) a `9` (topo do morro). O nível `1` é a parte baixa, que alaga na fase "Durante o evento". A ponte fica na altura das ruas das pontas, então também alaga. Rua de nível `2` ou mais fica seca.
 
 Regras:
 - Todas as linhas precisam ter o mesmo número de caracteres.
@@ -165,13 +199,16 @@ index.html            página principal
 content/              texto educativo (ver "Como editar o conteúdo")
 src/
   main.ts             liga tudo: conteúdo, cidade, câmera, personagem, missões e interface
-  config.ts           nome do jogo e constantes (câmera, render, mundo, personagem, cores)
+  config.ts           nome do jogo e constantes (câmera, render, mundo, personagem, cores, clima e chuva)
   style.css           cores e fontes (variáveis CSS) e estilos da interface
   core/               loop, entrada (teclado/mouse/toque), câmera, renderer, save (progresso)
   missions/
     content.ts        lê content/*.json e confere as ligações por id
     missionManager.ts missão atual, pins e acertos de primeira
-    missionFlow.ts    o loop: missão → porta → diálogo → pergunta → pin → próxima
+    missionFlow.ts    o loop: missão → porta → diálogo → pergunta (ou minijogo) → pin → próxima
+  minigames/
+    kitMinigame.ts    minijogo da mochila de emergência (prateleira, mochila, resultado)
+    kitIcons.ts       desenhos dos itens da mochila
   player/
     character.ts      personagem low-poly e animação de andar
     player.ts         movimento casa por casa (com pulinho), altura do chão e da ponte
@@ -191,7 +228,9 @@ src/
     cityMap.ts        lê o mapa: tiles, alturas, instituições e portas
     city.ts           monta a cidade inteira
     terrain.ts        terreno e laterais da maquete
-    water.ts          água do rio (o nível sobe nas próximas fases)
+    water.ts          água do rio (nível e cor)
+    climate.ts        clima de cada eixo (céu, luzes, rio, chuva) e ruas alagadas
+    rain.ts           chuva (riscos que acompanham a câmera)
     buildings.ts      prédios das instituições e placas com ícone
     institutions.ts   cor, ícone e formato de cada instituição
     icons.ts          desenhos dos ícones (placas 3D e interface)

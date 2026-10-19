@@ -1,5 +1,6 @@
 import type { Vector3 } from 'three';
 import type { SaveStore } from '../core/save';
+import type { KitMinigame } from '../minigames/kitMinigame';
 import { faceYawFor } from '../player/clickToMove';
 import type { DiceTurn } from '../player/diceTurn';
 import type { Cell } from '../player/pathfinding';
@@ -9,11 +10,15 @@ import type { DialogueBox } from '../ui/dialogue';
 import type { DiceHud } from '../ui/diceHud';
 import type { EdgeArrow } from '../ui/edgeArrow';
 import type { CityMap } from '../world/cityMap';
+import type { Climate } from '../world/climate';
 import type { InstitutionId } from '../world/institutions';
 import { INSTITUTION_STYLES } from '../world/institutions';
 import type { MissionMarker } from '../world/markers';
-import type { GameContent, Mission } from './content';
+import type { EixoId, GameContent, Mission } from './content';
 import type { MissionManager } from './missionManager';
+
+/** Até quantas casas em volta procurar uma rua seca, se a água cobrir a casa do personagem. */
+const DRY_SEARCH_RADIUS = 10;
 
 // Textos da interface (não são conteúdo educativo).
 const TEXT = {
@@ -40,7 +45,10 @@ export interface MissionFlowDeps {
   turn: DiceTurn;
   marker: MissionMarker;
   markerAnchors: ReadonlyMap<InstitutionId, Vector3>;
+  climate: Climate;
   dialogue: DialogueBox;
+  /** Minijogo da mochila (missões com "minijogo": "kit"). */
+  kit: KitMinigame;
   diceHud: DiceHud;
   edgeArrow: EdgeArrow;
   /** Onde ficam os cartões. */
@@ -63,8 +71,10 @@ export class MissionFlow {
     deps.diceHud.setGoTowards(() => this.goTowardsMission());
   }
 
-  /** Começa (ou continua) o jogo: mostra a missão atual e confere se já está na porta. */
+  /** Começa (ou continua) o jogo: põe o clima do eixo, mostra a missão atual e confere se já está na porta. */
   async start(): Promise<void> {
+    this.d.climate.set(this.climateEixo(), false);
+    if (this.moveOutOfWater()) this.persist();
     this.refreshTarget();
     if (!this.d.manager.current) return;
     await this.showMissionCard();
@@ -73,9 +83,10 @@ export class MissionFlow {
 
   /** Apaga o progresso e volta para a primeira missão, em casa. */
   async restart(): Promise<void> {
-    const { manager, save, map, player, turn } = this.d;
+    const { manager, save, map, player, turn, climate } = this.d;
     manager.reset();
     save.clear();
+    climate.set(this.climateEixo(), false);
     const home = map.sites.get('casa');
     if (home) player.placeAt(home.door.col, home.door.row, Math.PI / 4);
     turn.reset();
@@ -115,24 +126,28 @@ export class MissionFlow {
   }
 
   private async visit(mission: Mission): Promise<void> {
-    const { content, manager, dialogue, map, player, uiRoot } = this.d;
+    const { content, manager, dialogue, kit, map, player, uiRoot } = this.d;
     this.visiting = true;
     try {
       const inst = content.institutions.get(mission.instituicao);
       const dialog = content.dialogues.get(mission.dialogo);
-      const question = content.questions.get(mission.pergunta);
-      if (!inst || !dialog || !question) return;
+      // Missão com minijogo não tem pergunta (null); undefined = id que não existe.
+      const question = mission.pergunta !== undefined ? content.questions.get(mission.pergunta) : null;
+      if (!inst || !dialog || question === undefined) return;
       const style = INSTITUTION_STYLES[mission.instituicao];
 
       // De frente para o prédio durante a conversa.
       const site = map.sites.get(mission.instituicao);
       if (site) player.placeAt(site.door.col, site.door.row, faceYawFor(map, site));
 
-      const { firstTry } = await dialogue.run(
+      // Conversa (com a pergunta, se houver) e, depois, o minijogo, se a missão tiver.
+      const talk = await dialogue.run(
         { nome: inst.personagem.nome, funcao: inst.personagem.funcao, color: style.color, icon: style.icon },
         dialog.falas,
         question,
       );
+      const firstTry =
+        mission.minijogo === 'kit' ? (await kit.run({ color: style.color, icon: style.icon })).firstTry : talk.firstTry;
 
       const result = manager.complete(firstTry);
       this.persist();
@@ -157,7 +172,12 @@ export class MissionFlow {
       }
       if (result.eixoChanged) {
         const eixo = manager.currentEixo;
-        if (eixo) await showCard(uiRoot, { kicker: TEXT.eixoKicker, title: eixo.nome, text: eixo.descricao, button: TEXT.next });
+        if (eixo) {
+          // O clima piora aos poucos atrás do cartão do novo eixo.
+          this.d.climate.set(eixo.id, true);
+          if (this.moveOutOfWater()) this.persist();
+          await showCard(uiRoot, { kicker: TEXT.eixoKicker, title: eixo.nome, text: eixo.descricao, button: TEXT.next });
+        }
       }
       this.refreshTarget();
       await this.showMissionCard();
@@ -208,6 +228,30 @@ export class MissionFlow {
     const mission = manager.current;
     const site = mission ? map.sites.get(mission.instituicao) : undefined;
     if (site) turn.goTowards(site.door, faceYawFor(map, site));
+  }
+
+  /** Clima a mostrar: o do eixo da missão atual; depois da última missão, fica o do último eixo. */
+  private climateEixo(): EixoId {
+    const { manager, content } = this.d;
+    return manager.currentEixo?.id ?? content.eixos[content.eixos.length - 1].id;
+  }
+
+  /**
+   * Se a água cobriu a casa onde o personagem está, leva ele para a rua seca mais perto
+   * (ou para a porta de casa). Evita ficar preso sem casa nenhuma ao alcance do dado.
+   */
+  private moveOutOfWater(): boolean {
+    const { player, map, climate } = this.d;
+    const cell = player.cell;
+    if (!cell || !climate.isFlooded(cell.col, cell.row)) return false;
+    const { x, z } = player.position;
+    const dry =
+      map.nearestWalkable(x, z, DRY_SEARCH_RADIUS, (col, row) => climate.isFlooded(col, row)) ??
+      map.sites.get('casa')?.door ??
+      null;
+    if (!dry) return false;
+    player.placeAt(dry.col, dry.row);
+    return true;
   }
 
   private persist(): void {

@@ -24,7 +24,7 @@ const TEXT = {
 } as const;
 
 /** Embaralha uma cópia da lista (Fisher–Yates). */
-function shuffled<T>(list: readonly T[]): T[] {
+export function shuffled<T>(list: readonly T[]): T[] {
   const out = [...list];
   for (let i = out.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -41,7 +41,7 @@ function button(label: string, className: string): HTMLButtonElement {
 
 /**
  * Caixa de diálogo no rodapé, estilo visual novel: falas do personagem,
- * depois a pergunta. Errar mostra a explicação e deixa tentar de novo.
+ * depois a pergunta (se houver). Errar mostra a explicação e deixa tentar de novo.
  */
 export class DialogueBox {
   private readonly root: HTMLElement;
@@ -50,8 +50,11 @@ export class DialogueBox {
     this.root = root;
   }
 
-  /** Mostra as falas e a pergunta. Resolve com `firstTry` = acertou na primeira tentativa. */
-  run(speaker: Speaker, falas: readonly string[], question: Question): Promise<{ firstTry: boolean }> {
+  /**
+   * Mostra as falas e a pergunta. Resolve com `firstTry` = acertou na primeira tentativa.
+   * Sem pergunta (missão com minijogo), fecha depois da última fala, com `firstTry` = true.
+   */
+  run(speaker: Speaker, falas: readonly string[], question: Question | null): Promise<{ firstTry: boolean }> {
     return new Promise((resolve) => {
       const box = document.createElement('div');
       box.className = 'dialogo';
@@ -80,12 +83,18 @@ export class DialogueBox {
       const showLine = (): void => {
         body.replaceChildren(textEl('p', 'dialogo__texto', falas[line]));
         const last = line === falas.length - 1;
-        const next = button(last ? TEXT.answer : TEXT.next, 'botao botao--primario');
+        const next = button(last && question ? TEXT.answer : TEXT.next, 'botao botao--primario');
         next.dataset.autofocus = '';
         next.addEventListener('click', () => {
           line += 1;
-          if (line < falas.length) showLine();
-          else showQuestion();
+          if (line < falas.length) {
+            showLine();
+          } else if (question) {
+            showQuestion(question);
+          } else {
+            modal.close();
+            resolve({ firstTry: true });
+          }
         });
         actions.replaceChildren(next);
         modal.focusFirst();
@@ -93,7 +102,7 @@ export class DialogueBox {
 
       // 2) Pergunta com alternativas embaralhadas.
       let attempts = 0;
-      const showQuestion = (): void => {
+      const showQuestion = (question: Question): void => {
         const kicker = textEl('p', 'dialogo__kicker', question.tipo === 'acao' ? TEXT.action : TEXT.question);
         const statement = textEl('p', 'dialogo__texto', question.enunciado);
         const list = document.createElement('div');

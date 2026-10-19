@@ -60,27 +60,6 @@
     "correta": 2
   },
   {
-    "id": "q04-mochila",
-    "tipo": "acao",
-    "enunciado": "Sua mochila de emergência tem espaço para só mais um item. O que você coloca?",
-    "alternativas": [
-      {
-        "texto": "O videogame",
-        "explicacao": "O videogame ocupa espaço e não ajuda numa emergência. Prefira algo útil, como a lanterna."
-      },
-      {
-        "texto": "Uma lanterna com pilhas",
-        "explicacao": "Ótima escolha! A lanterna é um dos itens úteis da mochila, e as pilhas mantêm ela funcionando."
-      },
-      {
-        "texto": "Um copo de vidro",
-        "explicacao": "Coisas de vidro não são prioridade e podem quebrar. Prefira algo útil, como a lanterna."
-      }
-    ],
-    "correta": 1,
-    "todoValidar": "Pergunta provisória: na Fase 6 o minijogo da mochila entra no lugar dela."
-  },
-  {
     "id": "q05-remedio",
     "tipo": "multipla-escolha",
     "enunciado": "O que a família deve separar para quem toma remédio todo dia?",

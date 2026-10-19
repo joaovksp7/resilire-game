@@ -1,7 +1,7 @@
 // Configurações gerais do jogo. Texto educativo NÃO entra aqui: ele mora em content/.
 
 /** Nome exibido no título da aba e nas telas do jogo. */
-export const GAME_NAME = 'Missão Clima — Caminhos da Prevenção';
+export const GAME_NAME = 'Resilire — Cidade Resiliente';
 
 export const RENDER = {
   /** Limite do devicePixelRatio, para não pesar em telas de alta densidade. */
@@ -40,8 +40,69 @@ export const WORLD = {
   levelHeight: 1,
   /** Quanto a "maquete" desce abaixo do fundo do rio. */
   baseDepth: 2,
-  /** Nível da água no começo do jogo (em níveis do terreno; 0 = fundo do rio). */
+  /** Nível da água antes de o clima do eixo ser aplicado (em níveis do terreno; 0 = fundo do rio). */
   initialWaterLevel: 0.55,
+} as const;
+
+/**
+ * Clima de cada eixo: céu, luzes, rio e chuva. As chaves são os ids dos eixos (content/missions.json).
+ * A rua, praça ou ponte cujo chão fica abaixo de `waterLevel` alaga e sai das casas destacadas pelo dado.
+ */
+export const CLIMATE = {
+  /** Duração da mudança de clima ao trocar de eixo (segundos). Com prefers-reduced-motion, muda na hora. */
+  transitionSeconds: 3,
+  eixos: {
+    // Céu nublado, chuva fraca.
+    alerta: {
+      /** Cor do céu (fundo da cena). */
+      sky: 0xb4c7d4,
+      /** Força da luz do céu (ambiente) e do sol. */
+      ambient: 1.45,
+      sun: 1.15,
+      /** Nível da água, em níveis do terreno. O nível 1 é a parte baixa: acima de ~1,3 ela alaga. */
+      waterLevel: 0.55,
+      waterColor: 0x4aa3df,
+      /** Quantidade de chuva, de 0 (nada) a 1 (o máximo de RAIN). */
+      rain: 0.25,
+    },
+    // Chuva moderada, rio subindo um pouco.
+    preparacao: {
+      sky: 0x9fb3c2,
+      ambient: 1.32,
+      sun: 0.85,
+      waterLevel: 0.85,
+      waterColor: 0x4f94c2,
+      rain: 0.55,
+    },
+    // Chuva forte, rio transbordando: a parte baixa (nível 1) e a ponte ficam embaixo d'água.
+    durante: {
+      sky: 0x8a9eae,
+      ambient: 1.22,
+      sun: 0.6,
+      waterLevel: 1.35,
+      waterColor: 0x6a90a6,
+      rain: 1,
+    },
+  },
+} as const;
+
+export const RAIN = {
+  /** Máximo de gotas com chuva forte, no computador. */
+  maxDrops: 1200,
+  /** Máximo de gotas no celular e no tablet (tela de toque), para não pesar. */
+  maxDropsMobile: 500,
+  /** Velocidade da queda com chuva fraca e com chuva forte (unidades por segundo com zoom 1). */
+  speedMin: 22,
+  speedMax: 34,
+  /** Comprimento e largura de cada risco de chuva (unidades com zoom 1). */
+  length: 0.9,
+  width: 0.06,
+  /** Inclinação pelo vento com chuva forte (quanto o risco anda para o lado a cada unidade de queda). */
+  slant: 0.16,
+  /** Com prefers-reduced-motion: fração das gotas e da velocidade (e sem inclinação). */
+  reducedMotionFactor: 0.5,
+  color: 0xeaf3fa,
+  opacity: 0.55,
 } as const;
 
 export const PLAYER = {

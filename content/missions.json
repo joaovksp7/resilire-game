@@ -54,9 +54,8 @@
       "descricao": "Vá até o mercado e descubra o que levar numa mochila de emergência.",
       "instituicao": "mercado",
       "dialogo": "d04-mochila",
-      "pergunta": "q04-mochila",
-      "aprendizado": "Na mochila de emergência vão documentos num saco plástico, lanterna, pilhas, água, comida que não estraga e remédios.",
-      "todoValidar": "A pergunta desta missão é provisória: na Fase 6 entra o minijogo da mochila."
+      "minijogo": "kit",
+      "aprendizado": "Na mochila de emergência vão documentos num saco plástico, lanterna, pilhas, água, comida que não estraga e remédios."
     },
     {
       "id": "m05-remedio",

@@ -10,7 +10,7 @@ import type { ReachHighlight } from './reachHighlight';
 export type TurnState = 'waiting' | 'rolling' | 'choosing' | 'walking';
 
 /** Avisos para a interface mostrar (os textos ficam na interface). */
-export type TurnHint = 'pick-highlighted' | 'door-too-far' | 'nothing-in-reach';
+export type TurnHint = 'pick-highlighted' | 'door-too-far' | 'nothing-in-reach' | 'flooded';
 
 export interface TurnEvent {
   state: TurnState;
@@ -27,7 +27,7 @@ export interface DiceTurnOptions {
   dice: Dice3D;
   highlight: ReachHighlight;
   picker: TapPicker;
-  /** Casas bloqueadas além das não caminháveis (ex.: ruas alagadas, na Fase 5). */
+  /** Casas bloqueadas além das não caminháveis (ex.: ruas alagadas no eixo "Durante o evento"). */
   isBlocked?: (col: number, row: number) => boolean;
   /** Casas pintadas de outra cor quando ao alcance (ex.: porta da missão, na Fase 4). */
   isSpecial?: (cell: Cell) => boolean;
@@ -121,7 +121,7 @@ export class DiceTurn {
     if (target.kind === 'institution') {
       const { door } = target.site;
       if (this.reach.stepsTo(door.col, door.row) === undefined) {
-        this.setState('choosing', 'door-too-far');
+        this.setState('choosing', this.isFlooded(door.col, door.row) ? 'flooded' : 'door-too-far');
         return;
       }
       this.walkTo(door, target.faceYaw);
@@ -142,8 +142,17 @@ export class DiceTurn {
         best = cell;
       }
     }
-    if (best) this.walkTo(best, null);
-    else this.setState('choosing', 'pick-highlighted');
+    if (best) {
+      this.walkTo(best, null);
+      return;
+    }
+    const tapped = map.worldToTile(x, z);
+    this.setState('choosing', tapped && this.isFlooded(tapped.col, tapped.row) ? 'flooded' : 'pick-highlighted');
+  }
+
+  /** Rua, praça ou ponte que existe mas está bloqueada (ex.: alagada). */
+  private isFlooded(col: number, row: number): boolean {
+    return !!this.opts.map.tile(col, row)?.walkable && !!this.opts.isBlocked?.(col, row);
   }
 
   /**
