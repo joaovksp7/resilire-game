@@ -42,8 +42,11 @@ export interface ModalHandle {
 export interface ModalOptions {
   /** id do título da janela (aria-labelledby). */
   labelledBy: string;
-  /** 'card' e 'panel' ficam no centro com fundo escurecido; 'dialogue' fica no rodapé. */
-  variant: 'card' | 'panel' | 'dialogue';
+  /**
+   * 'card' e 'panel' ficam no centro com fundo escurecido; 'dialogue' fica no rodapé;
+   * 'tela' cobre a tela toda com um fundo mais forte (tela inicial e tela final).
+   */
+  variant: 'card' | 'panel' | 'dialogue' | 'tela';
   /** Chamado com Esc. Sem isso, Esc não fecha. */
   onEscape?: () => void;
 }
@@ -82,7 +85,9 @@ export function openModal(root: HTMLElement, content: HTMLElement, opts: ModalOp
     if (list.length === 0) return;
     const first = list[0];
     const last = list[list.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
+    // Foco fora da lista (ex.: no título de uma tela longa, com tabindex="-1") conta como o começo.
+    const index = list.indexOf(document.activeElement as HTMLElement);
+    if (event.shiftKey && index <= 0) {
       event.preventDefault();
       last.focus();
     } else if (!event.shiftKey && document.activeElement === last) {
@@ -160,4 +165,69 @@ export function showCard(root: HTMLElement, opts: CardOptions): Promise<void> {
       resolve();
     });
   });
+}
+
+/** Botão comum da interface (sempre type="button"). */
+export function uiButton(label: string, className: string): HTMLButtonElement {
+  const b = textEl('button', className, label);
+  b.type = 'button';
+  return b;
+}
+
+/**
+ * Título de uma janela longa (tela final, Como jogar, créditos). Recebe o foco ao abrir,
+ * para o leitor de tela ler do começo e a janela não rolar até os botões do fim.
+ */
+export function screenTitle(tag: 'h1' | 'h2', className: string, text: string): HTMLHeadingElement {
+  const title = textEl(tag, className, text);
+  title.id = uid('tela-titulo');
+  title.tabIndex = -1;
+  title.dataset.autofocus = '';
+  return title;
+}
+
+export interface ConfirmOptions {
+  title: string;
+  text: string;
+  yes: string;
+  no: string;
+}
+
+/** Pergunta de confirmação. Resolve true no "sim"; "não" ou Esc resolvem false. */
+export function showConfirm(root: HTMLElement, opts: ConfirmOptions): Promise<boolean> {
+  return new Promise((resolve) => {
+    const card = document.createElement('div');
+    card.className = 'cartao';
+    const titleId = uid('confirmar-titulo');
+    const title = textEl('h2', 'cartao__titulo', opts.title);
+    title.id = titleId;
+    const yes = uiButton(opts.yes, 'botao botao--perigo');
+    const no = uiButton(opts.no, 'botao botao--secundario');
+    no.dataset.autofocus = '';
+    const actions = document.createElement('div');
+    actions.className = 'cartao__acoes';
+    actions.append(no, yes);
+    card.append(title, textEl('p', 'cartao__texto', opts.text), actions);
+
+    const finish = (answer: boolean): void => {
+      modal.close();
+      resolve(answer);
+    };
+    const modal = openModal(root, card, { labelledBy: titleId, variant: 'card', onEscape: () => finish(false) });
+    yes.addEventListener('click', () => finish(true));
+    no.addEventListener('click', () => finish(false));
+  });
+}
+
+// Textos da interface (não são conteúdo educativo).
+const RESTART_TEXT: ConfirmOptions = {
+  title: 'Começar de novo?',
+  text: 'Todo o progresso, os pins e os acertos serão apagados.',
+  yes: 'Sim, começar de novo',
+  no: 'Cancelar',
+};
+
+/** "Começar de novo?" — a mesma pergunta na tela inicial, na pausa e na tela final. */
+export function confirmRestart(root: HTMLElement): Promise<boolean> {
+  return showConfirm(root, RESTART_TEXT);
 }

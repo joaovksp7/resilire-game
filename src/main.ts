@@ -19,7 +19,10 @@ import { modals } from './ui/cards';
 import { DiceHud } from './ui/diceHud';
 import { DialogueBox } from './ui/dialogue';
 import { EdgeArrow } from './ui/edgeArrow';
+import { EndScreen } from './ui/endScreen';
 import { MissionHud } from './ui/missionHud';
+import { PauseMenu } from './ui/pauseMenu';
+import { TitleScreen, type TitleMode } from './ui/titleScreen';
 import { createCity } from './world/city';
 import { Climate, floodedDoorProblem } from './world/climate';
 import { MissionMarker } from './world/markers';
@@ -60,18 +63,20 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
 
   const gameRenderer = new GameRenderer(container);
 
-  // Clima por eixo: céu, luzes, rio, chuva e ruas alagadas. O eixo certo é posto em MissionFlow.start().
-  const rain = new Rain();
-  scene.add(rain.mesh);
-  const climate = new Climate({ scene, lights, water: city.water, rain, map: city.map }, content.eixos[0].id);
-
-  const iso = new IsoCamera(city.map.halfSize);
-  const input = new Input(gameRenderer.canvas);
-
   // Progresso salvo (ou só em memória, se o navegador bloquear o armazenamento).
   const save = new SaveStore();
   const saved = save.load();
   const manager = new MissionManager(content, saved);
+
+  // Clima por eixo: céu, luzes, rio, chuva e ruas alagadas. Já começa no eixo salvo,
+  // para a tela inicial mostrar a cidade como o jogador deixou (MissionFlow.start() confirma).
+  const rain = new Rain();
+  scene.add(rain.mesh);
+  const initialEixo = manager.currentEixo?.id ?? content.eixos[content.eixos.length - 1].id;
+  const climate = new Climate({ scene, lights, water: city.water, rain, map: city.map }, initialEixo);
+
+  const iso = new IsoCamera(city.map.halfSize);
+  const input = new Input(gameRenderer.canvas);
 
   // Personagem: volta para a casa salva; senão começa na porta de casa, virado para a câmera.
   const player = new Player(city.map, new Character());
@@ -111,10 +116,11 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
 
   // Interface.
   const diceHud = new DiceHud(hudRoot, turn);
-  let flow: MissionFlow | null = null;
-  const missionHud = new MissionHud(hudRoot, content, manager, () => void flow?.restart());
+  const missionHud = new MissionHud(hudRoot, content, manager);
   const edgeArrow = new EdgeArrow(hudRoot, iso.camera, { top: missionHud.element, bottom: diceHud.element });
   const dialogue = new DialogueBox(hudRoot);
+  const endScreen = new EndScreen(hudRoot, content, manager);
+  const eixoNames = content.eixos.map((e) => e.nome);
 
   // Com diálogo, cartão ou painel aberto, o jogo fica parado.
   modals.onChange((open) => {
@@ -124,7 +130,12 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     edgeArrow.setEnabled(!open);
   });
 
-  flow = new MissionFlow({
+  /** Tela final. "Jogar de novo" apaga o progresso e volta para a primeira missão. */
+  const showEnd = async (): Promise<void> => {
+    if ((await endScreen.open()) === 'jogar-de-novo') await flow.restart();
+  };
+
+  const flow = new MissionFlow({
     content,
     manager,
     save,
@@ -139,6 +150,32 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     diceHud,
     edgeArrow,
     uiRoot: hudRoot,
+    showEnd,
+  });
+
+  // Tela inicial e pausa. Enquanto estão abertas, o personagem e o dado ficam parados.
+  const title = new TitleScreen(hudRoot, {
+    credits: content.credits,
+    eixoNames,
+    persistent: save.persistent,
+    play: () => void flow.start(),
+    restart: () => void flow.restart(),
+    showResult: () => {
+      void flow.start();
+      void showEnd();
+    },
+    onToggle: (open) => missionHud.setVisible(!open),
+  });
+  const openTitle = (): void => {
+    const mode: TitleMode = !manager.current ? 'fim' : flow.started || saved !== null ? 'continuar' : 'novo';
+    title.open({ mode, pins: manager.completedCount, total: manager.total });
+  };
+  const pause = new PauseMenu(hudRoot, missionHud.element, {
+    eixoNames,
+    isFinished: () => !manager.current,
+    showResult: () => void showEnd(),
+    restart: () => void flow.restart(),
+    goToTitle: openTitle,
   });
 
   gameRenderer.onResize((width, height) => iso.resize(width, height));
@@ -147,8 +184,11 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     const pan = input.panAxis();
     iso.pan(pan.x, pan.y, dt);
     iso.zoomBy(input.consumeZoom());
-    player.update(dt);
-    dice.update(dt);
+    // Na tela inicial e na pausa, o jogo para; a chuva e o rio continuam.
+    if (!title.isOpen && !pause.isOpen) {
+      player.update(dt);
+      dice.update(dt);
+    }
     highlight.update(dt);
     marker.update(dt);
     climate.update(dt);
@@ -158,7 +198,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     gameRenderer.renderer.render(scene, iso.camera);
   });
   loop.start();
-  void flow.start();
+  openTitle();
 }
 
 document.title = GAME_NAME;

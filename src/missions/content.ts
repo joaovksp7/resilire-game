@@ -1,7 +1,8 @@
-// Lê o conteúdo educativo de content/*.json e confere se está tudo ligado certo.
+// Lê o conteúdo educativo de content/*.json (e os créditos) e confere se está tudo ligado certo.
 // Os JSON entram no build: um campo com tipo errado já dá erro no `npm run build`;
 // ids que não existem são conferidos aqui, ao abrir o jogo.
 
+import creditsJson from '../../content/creditos.json';
 import dialoguesJson from '../../content/dialogues.json';
 import institutionsJson from '../../content/institutions.json';
 import kitJson from '../../content/kit-items.json';
@@ -72,6 +73,11 @@ interface RawKit {
   mochila: { titulo: string; instrucao: string; todoValidar?: string };
   itens: RawKitItem[];
 }
+interface RawCreditSection {
+  titulo: string;
+  linhas: string[];
+  todoValidar?: string;
+}
 
 // Estas atribuições fazem o TypeScript conferir o formato dos JSON no build.
 const rawInstitutions: RawInstitution[] = institutionsJson;
@@ -79,6 +85,7 @@ const rawMissions: { eixos: RawEixo[]; missoes: RawMission[] } = missionsJson;
 const rawDialogues: RawDialogue[] = dialoguesJson;
 const rawQuestions: RawQuestion[] = questionsJson;
 const rawKit: RawKit = kitJson;
+const rawCredits: RawCreditSection[] = creditsJson;
 
 export interface InstitutionContent extends RawInstitution {
   id: InstitutionId;
@@ -96,6 +103,8 @@ export interface Question extends RawQuestion {
   tipo: QuestionType;
 }
 export type KitItem = RawKitItem;
+/** Uma seção da tela de créditos (título e linhas). */
+export type CreditSection = RawCreditSection;
 export interface KitContent {
   readonly titulo: string;
   readonly instrucao: string;
@@ -111,6 +120,7 @@ export interface GameContent {
   readonly dialogues: ReadonlyMap<string, Dialogue>;
   readonly questions: ReadonlyMap<string, Question>;
   readonly kit: KitContent;
+  readonly credits: readonly CreditSection[];
 }
 
 /** Erro de conteúdo, com mensagem em português dizendo o arquivo e o item a corrigir. */
@@ -143,6 +153,7 @@ export function loadContent(
   dialogues: readonly RawDialogue[] = rawDialogues,
   questions: readonly RawQuestion[] = rawQuestions,
   kitFile: RawKit = rawKit,
+  credits: readonly RawCreditSection[] = rawCredits,
 ): GameContent {
   // Instituições: todas as do mapa precisam ter nome e personagem.
   const institutionMap = indexById('institutions.json', institutions, 'a instituição');
@@ -218,6 +229,15 @@ export function loadContent(
   const capacidade = kitItems.reduce((sum, item) => sum + (item.levar ? item.espaco : 0), 0);
   if (capacidade === 0) fail('kit-items.json', 'nenhum item tem "levar": true.');
 
+  // Créditos: cada seção com título e pelo menos uma linha.
+  if (!Array.isArray(credits) || credits.length === 0) fail('creditos.json', 'não há nenhuma seção.');
+  for (const [i, s] of credits.entries()) {
+    const where = `seção ${i + 1}`;
+    requireText('creditos.json', where, 'titulo', s.titulo);
+    if (!Array.isArray(s.linhas) || s.linhas.length === 0) fail('creditos.json', `${where} ("${s.titulo}") não tem linhas.`);
+    for (const [j, linha] of s.linhas.entries()) requireText('creditos.json', `${where} ("${s.titulo}")`, `linhas[${j}]`, linha);
+  }
+
   // Missões: ligações por id e eixos em ordem.
   const missions = missionsFile.missoes;
   if (missions.length === 0) fail('missions.json', 'não há nenhuma missão.');
@@ -252,5 +272,6 @@ export function loadContent(
     dialogues: dialogueMap,
     questions: questionMap as Map<string, Question>,
     kit: { titulo: kitFile.mochila.titulo, instrucao: kitFile.mochila.instrucao, itens: kitItems, capacidade },
+    credits,
   };
 }

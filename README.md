@@ -1,11 +1,11 @@
-# Missão Clima — Caminhos da Prevenção
+# Resilire — Cidade Resiliente
 
 Jogo educativo para navegador sobre **enchentes e deslizamentos**, para estudantes do ensino fundamental II e médio dos Vales do Rio Pardo e Taquari (RS). O jogador anda por uma cidade 3D, recebe missões e visita instituições que ensinam como agir antes e durante um evento climático extremo.
 
 - Game design completo:
 - Regras para quem desenvolve: [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)
 
-> **Status:** Fase 6 (Minijogo do kit) — as 10 missões jogáveis do começo ao fim, com progresso salvo; o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); e no mercado o jogador monta a mochila de emergência. Tela inicial, pausa e tela final entram na Fase 7. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`).
+> **Status:** Fase 7 (Interface completa) — as 10 missões jogáveis do começo ao fim, com progresso salvo; o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); no mercado o jogador monta a mochila de emergência; e o jogo tem tela inicial, Como jogar, pausa, tela final e créditos. Áudio (e o botão de mudo) entram na Fase 8. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`).
 
 ---
 
@@ -20,7 +20,15 @@ npm run dev     # abre o servidor de desenvolvimento
 
 Depois, abra o endereço que aparecer no terminal (normalmente `http://localhost:5173`).
 
-### Controles (até agora)
+### Telas
+
+- **Tela inicial:** o nome do jogo com a cidade ao fundo. Na primeira vez, mostra **Jogar**. Se já houver progresso, mostra **Continuar** e **Começar de novo**; depois de completar tudo, **Ver resultado** e **Jogar de novo**. Sempre tem **Como jogar** e **Créditos**. Se o navegador não deixar salvar o progresso, uma linha avisa.
+- **Pausa:** botão ⏸ no alto da tela (ou `Esc`). Tem **Continuar**, **Como jogar**, **Ver resultado** (só depois de completar tudo), **Começar de novo** e **Tela inicial**. Na pausa e na tela inicial, o personagem e o dado ficam parados.
+- **Tela final:** aparece depois da última missão, com os pins, os acertos de primeira e um resumo do que foi aprendido em cada eixo (o campo `aprendizado` de cada missão). Dá para **Jogar de novo** ou **Fechar** e continuar andando pela cidade.
+
+"Começar de novo" e "Jogar de novo" sempre pedem confirmação antes de apagar o progresso.
+
+### Controles
 
 O personagem anda **por dado**, como num jogo de tabuleiro:
 
@@ -34,13 +42,15 @@ O personagem anda **por dado**, como num jogo de tabuleiro:
 | Escolher a casa | Clicar numa casa destacada | Tocar numa casa destacada |
 | Ir até uma instituição | Clicar no prédio (se a porta estiver destacada) | Tocar no prédio |
 | Ir rumo ao objetivo (só teclado) | Depois de jogar o dado, `Tab` até "Ir rumo ao objetivo" e `Enter` | — |
-| Ver os pins / começar de novo | Botão de pins no canto de cima | Tocar no botão de pins |
+| Ver os pins | Botão de pins no canto de cima | Tocar no botão de pins |
+| Pausar | Botão de pausa (⏸) ou `Esc` | Tocar no botão de pausa |
+| Começar de novo | Menu de pausa ou tela inicial | Menu de pausa ou tela inicial |
 | Mover a câmera | `W` `A` `S` `D` ou setas | — |
 | Zoom | Roda do mouse | Pinça com dois dedos |
 
 A cada jogada, a câmera volta a seguir o personagem. A instituição da missão tem uma seta flutuando em cima; quando ela está fora da tela, uma seta na borda aponta para onde ir. A porta da missão aparece em amarelo entre as casas destacadas.
 
-Diálogos, perguntas, o minijogo da mochila, cartões e o painel de pins funcionam só com teclado (`Tab`, `Enter`, `Espaço` e `Esc` para fechar o painel).
+Telas, menus, diálogos, perguntas, o minijogo da mochila, cartões e o painel de pins funcionam só com teclado (`Tab`, `Enter`, `Espaço`; `Esc` fecha o painel de pins, a pausa, Como jogar, os créditos e a tela final).
 
 ### Clima em cada eixo
 
@@ -56,7 +66,7 @@ Para quem pediu menos animação no sistema (`prefers-reduced-motion`), a chuva 
 
 ### Progresso salvo
 
-O jogo salva sozinho a missão atual, os pins, os acertos de primeira e onde o personagem está. Ao recarregar a página, continua de onde parou. Se o navegador bloquear o armazenamento (acontece dentro de iframe em alguns navegadores), o jogo funciona normalmente, mas o progresso some ao recarregar. Para recomeçar, use "Começar de novo" no painel de pins.
+O jogo salva sozinho a missão atual, os pins, os acertos de primeira e onde o personagem está. Ao recarregar a página, continua de onde parou. Se o navegador bloquear o armazenamento (acontece dentro de iframe em alguns navegadores), o jogo funciona normalmente, mas o progresso some ao recarregar (a tela inicial avisa). Para recomeçar, use "Começar de novo" no menu de pausa ou na tela inicial.
 
 ## Como gerar o build
 
@@ -78,13 +88,13 @@ npm run typecheck   # só confere os tipos do TypeScript
 ## Como incorporar em uma página (iframe)
 
 1. Rode `npm run build`.
-2. Envie **todo o conteúdo** da pasta `dist/` para uma pasta da hospedagem, por exemplo `https://seusite.com.br/jogos/missao-clima/` (por FTP ou pelo gerenciador de arquivos da hospedagem — não pela biblioteca de mídia do WordPress).
+2. Envie **todo o conteúdo** da pasta `dist/` para uma pasta da hospedagem, por exemplo `https://seusite.com.br/jogos/resilire/` (por FTP ou pelo gerenciador de arquivos da hospedagem — não pela biblioteca de mídia do WordPress).
 3. No WordPress, adicione um bloco **HTML personalizado** com:
 
 ```html
 <iframe
-  src="https://seusite.com.br/jogos/missao-clima/"
-  title="Missão Clima — Caminhos da Prevenção"
+  src="https://seusite.com.br/jogos/resilire/"
+  title="Resilire — Cidade Resiliente"
   style="width: 100%; aspect-ratio: 16 / 9; min-height: 420px; border: 0;"
   allow="fullscreen"
   loading="lazy"
@@ -95,7 +105,7 @@ O jogo se ajusta sozinho ao tamanho do iframe. Rolar a roda do mouse sobre o jog
 
 ## Como editar o conteúdo
 
-Todo o texto educativo fica em arquivos JSON na pasta [`content/`](content/). Dá para editar sem programar, com qualquer editor de texto.
+Todo o texto educativo fica em arquivos JSON na pasta [`content/`](content/), junto com o texto dos créditos. Dá para editar sem programar, com qualquer editor de texto.
 
 **Depois de editar, rode `npm run build`** (o conteúdo vai junto no build). Se algo estiver errado, o build ou o jogo avisa em português qual arquivo e qual item corrigir.
 
@@ -176,7 +186,27 @@ Tem duas partes:
 
 Para mudar o tamanho da mochila, mude o `espaco` dos itens úteis: o espaço total é a soma deles. Os desenhos dos itens ficam em [`src/minigames/kitIcons.ts`](src/minigames/kitIcons.ts), pelo `id`. Um item novo, sem desenho próprio, aparece com o desenho de uma caixa.
 
-O nome do jogo fica em [`src/config.ts`](src/config.ts) (`GAME_NAME`).
+### `creditos.json` — tela de créditos
+
+Não é conteúdo educativo, mas fica aqui para a equipe editar sem programar. É uma lista de seções, mostradas na ordem do arquivo, embaixo do nome do jogo:
+
+| Campo da seção | O que é |
+|---|---|
+| `titulo` | Título da seção (ex.: `"Realização"`) |
+| `linhas` | Uma ou mais linhas de texto, cada uma num parágrafo (ex.: nomes de pessoas ou instituições) |
+
+Exemplo de seção:
+
+```json
+{
+  "titulo": "Realização",
+  "linhas": ["Nome da equipe", "Nome da escola"]
+}
+```
+
+As seções que estão com "A definir" têm um `todoValidar` dizendo o que falta preencher.
+
+O nome do jogo fica em [`src/config.ts`](src/config.ts) (`GAME_NAME`). Ele aparece na aba do navegador, na tela inicial e nos créditos.
 
 ## Como mexer no mapa da cidade
 
@@ -196,14 +226,14 @@ A aparência de cada instituição (cor, ícone e formato do prédio) fica em [`
 
 ```
 index.html            página principal
-content/              texto educativo (ver "Como editar o conteúdo")
+content/              texto educativo e créditos (ver "Como editar o conteúdo")
 src/
   main.ts             liga tudo: conteúdo, cidade, câmera, personagem, missões e interface
   config.ts           nome do jogo e constantes (câmera, render, mundo, personagem, cores, clima e chuva)
   style.css           cores e fontes (variáveis CSS) e estilos da interface
   core/               loop, entrada (teclado/mouse/toque), câmera, renderer, save (progresso)
   missions/
-    content.ts        lê content/*.json e confere as ligações por id
+    content.ts        lê content/*.json (e os créditos) e confere as ligações por id
     missionManager.ts missão atual, pins e acertos de primeira
     missionFlow.ts    o loop: missão → porta → diálogo → pergunta (ou minijogo) → pin → próxima
   minigames/
@@ -221,8 +251,12 @@ src/
     diceHud.ts        botão "Jogar dado", "Ir rumo ao objetivo" e avisos
     missionHud.ts     barra da missão no topo e painel de pins
     dialogue.ts       caixa de diálogo e pergunta
-    cards.ts          cartões (missão, pin, eixo, fim) e janelas com foco preso
+    cards.ts          cartões (missão, pin, eixo), confirmação e janelas com foco preso
     edgeArrow.ts      seta na borda da tela apontando o destino
+    titleScreen.ts    tela inicial e créditos
+    pauseMenu.ts      botão e menu de pausa
+    endScreen.ts      tela final (pins, acertos de primeira e resumo por eixo)
+    howToPlay.ts      janela "Como jogar"
   world/
     layout.ts         mapa da cidade em texto (tipos e alturas)
     cityMap.ts        lê o mapa: tiles, alturas, instituições e portas

@@ -17,6 +17,8 @@
   --cor-errado-fundo: #fff4e5;
   --cor-perigo: #b3261e;
   --cor-veu: rgba(27, 42, 53, 0.45);
+  /* Fundo da tela inicial e da tela final: a cidade aparece atrás, mais apagada. */
+  --cor-veu-tela: rgba(27, 42, 53, 0.6);
 
   --fonte-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --tamanho-texto: 1.125rem;
@@ -141,6 +143,11 @@ body {
   outline-offset: 2px;
 }
 
+/* Títulos que recebem o foco ao abrir uma tela longa não são clicáveis: sem contorno. */
+[tabindex='-1']:focus {
+  outline: none;
+}
+
 .aviso {
   position: absolute;
   inset: 0;
@@ -252,6 +259,11 @@ body {
   border-color: var(--cor-perigo);
   background: var(--cor-perigo);
   color: #ffffff;
+}
+
+.botao--grande {
+  min-height: 3.5rem;
+  font-size: 1.25rem;
 }
 
 .botao--alternativa {
@@ -371,7 +383,8 @@ body {
   font-size: 0.95rem;
 }
 
-.botao-pins {
+.botao-pins,
+.botao-pausa {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -387,6 +400,27 @@ body {
   font-weight: 800;
   cursor: pointer;
   pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.botao-pausa {
+  justify-content: center;
+  width: 3rem;
+  padding: 0;
+}
+
+/* Celular: pins e pausa empilhados à direita, para a barra da missão ficar mais larga. */
+@media (max-width: 30rem) {
+  .hud-topo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    justify-items: end;
+  }
+
+  .hud-missao {
+    grid-row: span 2;
+    justify-self: stretch;
+  }
 }
 
 /* ---------- Janelas (cartões, diálogo, painel) ---------- */
@@ -406,6 +440,12 @@ body {
   background: var(--cor-veu);
 }
 
+.modal--tela {
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-veu-tela);
+}
+
 .modal--dialogue {
   align-items: flex-end;
   justify-content: center;
@@ -415,7 +455,8 @@ body {
 .cartao,
 .painel,
 .dialogo,
-.kit {
+.kit,
+.inicio {
   width: 100%;
   max-height: 100%;
   overflow-y: auto;
@@ -465,6 +506,19 @@ body {
 .cartao .botao {
   margin-top: 0.4rem;
   min-width: 10rem;
+}
+
+/* Confirmação: botões empilhados, largura toda (o "Cancelar", mais seguro, vem primeiro). */
+.cartao__acoes {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.cartao__acoes .botao {
+  margin-top: 0;
 }
 
 .dialogo {
@@ -593,23 +647,174 @@ body {
   font-weight: 700;
 }
 
-.painel__acoes,
-.painel__confirmar {
+.painel__acoes {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
 }
 
-.painel__confirmar {
+/* ---------- Telas: inicial, pausa, final, Como jogar e créditos ---------- */
+
+.painel h3,
+.painel h4,
+.painel ul,
+.painel ol {
+  margin: 0;
+}
+
+/* Janelas com bastante texto (Como jogar, tela final). */
+.painel--largo {
+  max-width: 40rem;
+}
+
+.painel__secao {
+  display: flex;
   flex-direction: column;
-  align-items: stretch;
+  gap: 0.35rem;
+}
+
+.painel__subtitulo {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.painel__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-left: 1.4rem;
+}
+
+/* Rodapé fixo: o botão fica à vista enquanto o texto rola (como no minijogo da mochila). */
+.painel:has(> .painel__rodape) {
+  padding-bottom: 0;
+}
+
+.painel__rodape {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin: 0 -1.25rem;
+  padding: 0.75rem 1.25rem max(1.25rem, env(safe-area-inset-bottom));
+  border-top: 2px solid var(--cor-fundo-suave);
+  background: var(--cor-superficie);
+}
+
+.painel__rodape .botao {
+  min-width: 8rem;
+}
+
+/* Menu de pausa: botões empilhados, largura toda. */
+.painel--menu {
+  max-width: 22rem;
   text-align: center;
 }
 
-.painel__confirmar-titulo {
+.painel__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Tela inicial. */
+.inicio {
+  max-width: 24rem;
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  text-align: center;
+}
+
+.inicio p {
+  margin: 0;
+}
+
+.inicio__titulo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.inicio__nome {
+  font-size: 2.5rem;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.inicio__subtitulo {
+  color: var(--cor-texto-suave);
   font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.inicio__progresso {
+  font-weight: 700;
+}
+
+.inicio__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inicio__aviso {
+  color: var(--cor-texto-suave);
+  font-size: 0.95rem;
+}
+
+/* Tela final. */
+.fim__numeros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  font-size: 1.1rem;
   font-weight: 800;
+}
+
+.fim__resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fim__eixo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.6rem 0.75rem;
+  border-left: 6px solid var(--cor-destaque);
+  border-radius: var(--raio);
+  background: var(--cor-fundo-suave);
+}
+
+.fim__eixo-nome {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+/* Créditos. */
+.creditos__jogo {
+  color: var(--cor-texto-suave);
+  font-weight: 700;
+}
+
+@media (max-width: 30rem) {
+  .inicio__nome {
+    font-size: 2.1rem;
+  }
+
+  .painel__rodape .botao {
+    flex: 1 1 8rem;
+  }
 }
 
 /* ---------- Seta na borda da tela ---------- */

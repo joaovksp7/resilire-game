@@ -30,10 +30,6 @@ const TEXT = {
   next: 'Continuar',
   eixoKicker: 'Novo eixo',
   wrongDoor: (here: string, goal: string) => `Você está ${here}. Sua missão agora é ${goal}.`,
-  endTitle: 'Você completou todas as missões!',
-  endText: (pins: number, total: number, first: number) =>
-    `Pins: ${pins} de ${total}. Acertos de primeira: ${first} de ${total}.`,
-  close: 'Fechar',
 } as const;
 
 export interface MissionFlowDeps {
@@ -53,6 +49,8 @@ export interface MissionFlowDeps {
   edgeArrow: EdgeArrow;
   /** Onde ficam os cartões. */
   uiRoot: HTMLElement;
+  /** Mostra a tela final (depois da última missão). Resolve quando ela fecha. */
+  showEnd: () => Promise<void>;
 }
 
 const sameCell = (a: Cell | null, b: Cell): boolean => !!a && a.col === b.col && a.row === b.row;
@@ -64,6 +62,7 @@ const sameCell = (a: Cell | null, b: Cell): boolean => !!a && a.col === b.col &&
 export class MissionFlow {
   private readonly d: MissionFlowDeps;
   private visiting = false;
+  private begun = false;
 
   constructor(deps: MissionFlowDeps) {
     this.d = deps;
@@ -71,8 +70,18 @@ export class MissionFlow {
     deps.diceHud.setGoTowards(() => this.goTowardsMission());
   }
 
-  /** Começa (ou continua) o jogo: põe o clima do eixo, mostra a missão atual e confere se já está na porta. */
+  /** true depois do primeiro start() ou restart() (o jogo já saiu da tela inicial alguma vez). */
+  get started(): boolean {
+    return this.begun;
+  }
+
+  /**
+   * Começa (ou continua) o jogo: põe o clima do eixo, mostra a missão atual e confere se já está na porta.
+   * Só vale na primeira vez: voltar da tela inicial depois disso não repete nada.
+   */
   async start(): Promise<void> {
+    if (this.begun) return;
+    this.begun = true;
     this.d.climate.set(this.climateEixo(), false);
     if (this.moveOutOfWater()) this.persist();
     this.refreshTarget();
@@ -84,6 +93,7 @@ export class MissionFlow {
   /** Apaga o progresso e volta para a primeira missão, em casa. */
   async restart(): Promise<void> {
     const { manager, save, map, player, turn, climate } = this.d;
+    this.begun = true;
     manager.reset();
     save.clear();
     climate.set(this.climateEixo(), false);
@@ -163,11 +173,7 @@ export class MissionFlow {
 
       if (result.finished) {
         this.refreshTarget();
-        await showCard(uiRoot, {
-          title: TEXT.endTitle,
-          text: TEXT.endText(manager.completedCount, manager.total, manager.firstTryCount),
-          button: TEXT.close,
-        });
+        await this.d.showEnd();
         return;
       }
       if (result.eixoChanged) {

@@ -1,0 +1,21 @@
+[
+  {
+    "titulo": "Realização",
+    "linhas": ["A definir"],
+    "todoValidar": "Nome da equipe, da escola ou da instituição responsável pelo jogo."
+  },
+  {
+    "titulo": "Conteúdo educativo",
+    "linhas": ["A definir"],
+    "todoValidar": "Quem escreveu e quem revisou o conteúdo das missões (por exemplo, se houve validação com a Defesa Civil)."
+  },
+  {
+    "titulo": "Referência de jogabilidade",
+    "linhas": ["A definir"],
+    "todoValidar": "Decidir se e como citar o jogo “Caminhos da Cidadania” (itch.io), usado como referência de jogabilidade."
+  },
+  {
+    "titulo": "Tecnologia",
+    "linhas": ["Feito com TypeScript, Vite e Three.js."]
+  }
+]

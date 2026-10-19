@@ -14,11 +14,6 @@ const TEXT = {
   locked: (n: number) => `Missão ${n}`,
   lockedLabel: (n: number) => `Missão ${n}: ainda não conquistado`,
   close: 'Fechar',
-  restart: 'Começar de novo',
-  confirmTitle: 'Começar de novo?',
-  confirmText: 'Todo o progresso, os pins e os acertos serão apagados.',
-  confirmYes: 'Sim, começar de novo',
-  confirmNo: 'Cancelar',
 } as const;
 
 /** Desenho de pin (alfinete) para o botão do painel. */
@@ -27,23 +22,21 @@ const PIN_ICON =
 
 /**
  * Barra da missão no topo (missão, eixo, destino) e o botão/painel de pins.
- * O painel também tem o "Começar de novo".
+ * O "Começar de novo" fica no menu de pausa e na tela inicial.
  */
 export class MissionHud {
   private readonly root: HTMLElement;
   private readonly content: GameContent;
   private readonly manager: MissionManager;
-  private readonly onRestart: () => void;
   private readonly top: HTMLElement;
   private readonly bar: HTMLElement;
   private readonly pinsButton: HTMLButtonElement;
   private readonly pinsCount: HTMLSpanElement;
 
-  constructor(root: HTMLElement, content: GameContent, manager: MissionManager, onRestart: () => void) {
+  constructor(root: HTMLElement, content: GameContent, manager: MissionManager) {
     this.root = root;
     this.content = content;
     this.manager = manager;
-    this.onRestart = onRestart;
 
     this.bar = document.createElement('section');
     this.bar.className = 'hud-missao';
@@ -66,9 +59,14 @@ export class MissionHud {
     this.render();
   }
 
-  /** A barra do topo inteira (usada para a seta da borda não ficar por baixo). */
+  /** A barra do topo inteira (usada para a seta da borda não ficar por baixo e para o botão de pausa). */
   get element(): HTMLElement {
     return this.top;
+  }
+
+  /** Esconde a barra do topo (ex.: na tela inicial). */
+  setVisible(visible: boolean): void {
+    this.top.hidden = !visible;
   }
 
   render(): void {
@@ -131,33 +129,10 @@ export class MissionHud {
     const close = textEl('button', 'botao botao--primario', TEXT.close);
     close.type = 'button';
     close.dataset.autofocus = '';
-    const restart = textEl('button', 'botao botao--secundario', TEXT.restart);
-    restart.type = 'button';
-    actions.append(close, restart);
+    actions.append(close);
     panel.append(title, list, stats, actions);
 
     const modal = openModal(this.root, panel, { labelledBy: titleId, variant: 'panel', onEscape: () => modal.close() });
     close.addEventListener('click', () => modal.close());
-    restart.addEventListener('click', () => {
-      // Confirmação dentro do próprio painel.
-      const ask = document.createElement('div');
-      ask.className = 'painel__confirmar';
-      const yes = textEl('button', 'botao botao--perigo', TEXT.confirmYes);
-      yes.type = 'button';
-      const no = textEl('button', 'botao botao--secundario', TEXT.confirmNo);
-      no.type = 'button';
-      no.dataset.autofocus = '';
-      ask.append(textEl('p', 'painel__confirmar-titulo', TEXT.confirmTitle), textEl('p', 'painel__confirmar-texto', TEXT.confirmText), yes, no);
-      panel.replaceChildren(title, ask);
-      modal.focusFirst();
-      no.addEventListener('click', () => {
-        modal.close();
-        this.openPanel();
-      });
-      yes.addEventListener('click', () => {
-        modal.close();
-        this.onRestart();
-      });
-    });
   }
 }

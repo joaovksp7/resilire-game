@@ -97,6 +97,7 @@ content/
   dialogues.json
   questions.json
   kit-items.json
+  creditos.json        # texto da tela de créditos (não é educativo)
 public/
   fontes/
 prompt-jogo-desastres-climaticos.md
@@ -112,6 +113,7 @@ AGENTS.md
 O único lugar onde mora texto educativo. **Nunca** tocar no código de renderização para mudar conteúdo.
 
 - O formato de cada JSON fica documentado no `README.md`. Mudar formato = avisar antes, porque a equipe edita esses arquivos sem programar
+- `creditos.json` não é conteúdo educativo: fica aqui só para a equipe editar sem programar (seções com `titulo` e `linhas`)
 - Todo item tem `id` estável. Missão aponta para instituição, diálogo e pergunta (ou `minijogo`) pelo `id`, nunca pelo texto
 - Toda missão tem `eixo` com uma das três chaves fixas
 - Pergunta: `correta` é o **índice** dentro de `alternativas`, não o texto. Alternativas embaralhadas na exibição
