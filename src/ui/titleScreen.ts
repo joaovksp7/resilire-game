@@ -1,6 +1,6 @@
 import { GAME_NAME } from '../config';
 import type { CreditSection } from '../missions/content';
-import { confirmRestart, openModal, screenTitle, textEl, uid, uiButton } from './cards';
+import { confirmRestart, openModal, screenTitle, type SoundSwitch, soundButton, textEl, uid, uiButton } from './cards';
 import { showHowToPlay } from './howToPlay';
 
 // Textos da interface (não são conteúdo educativo; os créditos vêm de content/creditos.json).
@@ -37,6 +37,8 @@ export interface TitleScreenOptions {
   eixoNames: readonly string[];
   /** false quando o navegador bloqueia o armazenamento (o progresso some ao fechar). */
   persistent: boolean;
+  /** Para o botão "Som: ligado / desligado" (a barra do topo, com o botão de som, fica escondida aqui). */
+  sound: SoundSwitch;
   /** "Jogar" ou "Continuar". */
   play(): void;
   /** "Começar de novo" ou "Jogar de novo" (a confirmação já foi feita aqui). */
@@ -82,7 +84,7 @@ function showCredits(root: HTMLElement, credits: readonly CreditSection[]): Prom
 }
 
 /**
- * Tela inicial: nome do jogo, Jogar/Continuar, Começar de novo, Como jogar e Créditos.
+ * Tela inicial: nome do jogo, Jogar/Continuar, Começar de novo, Como jogar, Créditos e Som.
  * A cidade aparece ao fundo; enquanto a tela está aberta, o jogo fica parado (ver `isOpen`).
  */
 export class TitleScreen {
@@ -132,13 +134,15 @@ export class TitleScreen {
     }
     const how = uiButton(TEXT.howToPlay, 'botao botao--secundario');
     const credits = uiButton(TEXT.credits, 'botao botao--secundario');
-    menu.append(how, credits);
+    const sound = soundButton(opts.sound, 'botao botao--secundario');
+    menu.append(how, credits, sound.button);
     screen.append(menu);
     if (!opts.persistent) screen.append(textEl('p', 'inicio__aviso', TEXT.notSaved));
 
     const modal = openModal(this.root, screen, { labelledBy: titleId, variant: 'tela' });
     const close = (): void => {
       modal.close();
+      sound.dispose();
       this.opened = false;
       opts.onToggle(false);
     };

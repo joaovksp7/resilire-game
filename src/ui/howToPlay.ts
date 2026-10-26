@@ -26,12 +26,14 @@ const TEXT = {
     'Zoom: roda do mouse.',
     'Só com o teclado: depois de jogar o dado, aperte Tab até “Ir rumo ao objetivo”.',
     'Pausar: botão de pausa ou Esc.',
+    'Ligar ou desligar o som: botão de som (alto-falante) ou tecla M.',
   ],
   phoneTitle: 'No celular',
   phone: [
     'Toque em “Jogar dado” e depois numa casa destacada ou no prédio da missão.',
     'Zoom: pinça com dois dedos.',
     'Pausar: botão de pausa, no alto da tela.',
+    'Ligar ou desligar o som: botão de som (alto-falante), no alto da tela.',
   ],
   close: 'Fechar',
 } as const;

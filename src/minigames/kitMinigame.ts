@@ -63,10 +63,13 @@ function sectionTitle(text: string, iconId: string | null): HTMLHeadingElement {
 export class KitMinigame {
   private readonly root: HTMLElement;
   private readonly kit: KitContent;
+  private readonly onRight: () => void;
 
-  constructor(root: HTMLElement, kit: KitContent) {
+  /** `onRight`: chamado quando a mochila fechada está certa (ex.: tocar o som de acerto). */
+  constructor(root: HTMLElement, kit: KitContent, onRight: () => void = () => {}) {
     this.root = root;
     this.kit = kit;
+    this.onRight = onRight;
   }
 
   /** Abre o minijogo. Resolve com `firstTry` = a primeira mochila fechada já estava certa. */
@@ -218,6 +221,7 @@ export class KitMinigame {
         const extra = kit.itens.filter((i) => !i.levar && chosen.has(i.id));
         const good = kit.itens.filter((i) => i.levar && chosen.has(i.id));
         const right = missing.length === 0 && extra.length === 0;
+        if (right) this.onRight();
 
         const summary = el('div', `dialogo__retorno ${right ? 'dialogo__retorno--certo' : 'dialogo__retorno--errado'}`);
         const summaryTitle = textEl('p', 'dialogo__retorno-titulo', right ? TEXT.rightTitle : TEXT.wrongTitle);

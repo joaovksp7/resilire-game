@@ -1,4 +1,5 @@
 import type { Vector3 } from 'three';
+import type { GameSound } from '../audio/sound';
 import type { SaveStore } from '../core/save';
 import type { KitMinigame } from '../minigames/kitMinigame';
 import { faceYawFor } from '../player/clickToMove';
@@ -47,6 +48,8 @@ export interface MissionFlowDeps {
   kit: KitMinigame;
   diceHud: DiceHud;
   edgeArrow: EdgeArrow;
+  /** Som do pin conquistado. */
+  sound: GameSound;
   /** Onde ficam os cartões. */
   uiRoot: HTMLElement;
   /** Mostra a tela final (depois da última missão). Resolve quando ela fecha. */
@@ -161,6 +164,7 @@ export class MissionFlow {
 
       const result = manager.complete(firstTry);
       this.persist();
+      this.d.sound.pin();
       await showCard(uiRoot, {
         kicker: TEXT.pinKicker,
         title: inst.nome,
@@ -169,6 +173,7 @@ export class MissionFlow {
         icon: style.icon,
         color: style.color,
         button: TEXT.next,
+        celebrate: true,
       });
 
       if (result.finished) {

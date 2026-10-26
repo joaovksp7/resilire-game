@@ -89,6 +89,11 @@ export class Rain {
     this.amount = MathUtils.clamp(amount, 0, 1);
   }
 
+  /** Quantidade de chuva agora (muda aos poucos na troca de eixo). O som da chuva segue este valor. */
+  get intensity(): number {
+    return this.amount;
+  }
+
   update(dt: number, focus: Vector3, camera: OrthographicCamera): void {
     const reduced = prefersReducedMotion();
     const factor = reduced ? RAIN.reducedMotionFactor : 1;

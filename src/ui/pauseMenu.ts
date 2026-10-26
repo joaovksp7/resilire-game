@@ -1,4 +1,4 @@
-import { confirmRestart, modals, openModal, textEl, uid, uiButton } from './cards';
+import { confirmRestart, modals, openModal, type SoundSwitch, soundButton, textEl, uid, uiButton } from './cards';
 import { showHowToPlay } from './howToPlay';
 
 // Textos da interface (não são conteúdo educativo).
@@ -19,6 +19,8 @@ const PAUSE_ICON =
 export interface PauseMenuOptions {
   /** Nomes dos eixos, para a janela "Como jogar". */
   eixoNames: readonly string[];
+  /** Para o botão "Som: ligado / desligado" (o botão de som do topo fica atrás do menu). */
+  sound: SoundSwitch;
   /** true quando todas as missões foram concluídas (mostra "Ver resultado"). */
   isFinished(): boolean;
   showResult(): void;
@@ -82,12 +84,14 @@ export class PauseMenu {
     const result = uiButton(TEXT.result, 'botao botao--secundario');
     result.hidden = !opts.isFinished();
     const restart = uiButton(TEXT.restart, 'botao botao--secundario');
+    const sound = soundButton(opts.sound, 'botao botao--secundario');
     const home = uiButton(TEXT.home, 'botao botao--secundario');
-    menu.append(resume, how, result, restart, home);
+    menu.append(resume, how, result, restart, sound.button, home);
     panel.append(title, menu);
 
     const close = (): void => {
       modal.close();
+      sound.dispose();
       this.opened = false;
     };
     const modal = openModal(this.root, panel, { labelledBy: titleId, variant: 'panel', onEscape: close });

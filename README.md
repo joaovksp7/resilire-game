@@ -5,7 +5,7 @@ Jogo educativo para navegador sobre **enchentes e deslizamentos**, para estudant
 - Game design completo:
 - Regras para quem desenvolve: [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)
 
-> **Status:** Fase 7 (Interface completa) — as 10 missões jogáveis do começo ao fim, com progresso salvo; o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); no mercado o jogador monta a mochila de emergência; e o jogo tem tela inicial, Como jogar, pausa, tela final e créditos. Áudio (e o botão de mudo) entram na Fase 8. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`).
+> **Status:** Fase 8 (Polimento) — as 10 missões jogáveis do começo ao fim, com progresso salvo; o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); no mercado o jogador monta a mochila de emergência; o jogo tem tela inicial, Como jogar, pausa, tela final e créditos; e tem som gerado por código (chuva, pin, dado e acerto), com botão de som sempre à mão, e animação nos pins. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`).
 
 ---
 
@@ -22,8 +22,8 @@ Depois, abra o endereço que aparecer no terminal (normalmente `http://localhost
 
 ### Telas
 
-- **Tela inicial:** o nome do jogo com a cidade ao fundo. Na primeira vez, mostra **Jogar**. Se já houver progresso, mostra **Continuar** e **Começar de novo**; depois de completar tudo, **Ver resultado** e **Jogar de novo**. Sempre tem **Como jogar** e **Créditos**. Se o navegador não deixar salvar o progresso, uma linha avisa.
-- **Pausa:** botão ⏸ no alto da tela (ou `Esc`). Tem **Continuar**, **Como jogar**, **Ver resultado** (só depois de completar tudo), **Começar de novo** e **Tela inicial**. Na pausa e na tela inicial, o personagem e o dado ficam parados.
+- **Tela inicial:** o nome do jogo com a cidade ao fundo. Na primeira vez, mostra **Jogar**. Se já houver progresso, mostra **Continuar** e **Começar de novo**; depois de completar tudo, **Ver resultado** e **Jogar de novo**. Sempre tem **Como jogar**, **Créditos** e **Som** (liga e desliga). Se o navegador não deixar salvar o progresso, uma linha avisa.
+- **Pausa:** botão ⏸ no alto da tela (ou `Esc`). Tem **Continuar**, **Como jogar**, **Ver resultado** (só depois de completar tudo), **Começar de novo**, **Som** e **Tela inicial**. Na pausa e na tela inicial, o personagem e o dado ficam parados.
 - **Tela final:** aparece depois da última missão, com os pins, os acertos de primeira e um resumo do que foi aprendido em cada eixo (o campo `aprendizado` de cada missão). Dá para **Jogar de novo** ou **Fechar** e continuar andando pela cidade.
 
 "Começar de novo" e "Jogar de novo" sempre pedem confirmação antes de apagar o progresso.
@@ -44,6 +44,7 @@ O personagem anda **por dado**, como num jogo de tabuleiro:
 | Ir rumo ao objetivo (só teclado) | Depois de jogar o dado, `Tab` até "Ir rumo ao objetivo" e `Enter` | — |
 | Ver os pins | Botão de pins no canto de cima | Tocar no botão de pins |
 | Pausar | Botão de pausa (⏸) ou `Esc` | Tocar no botão de pausa |
+| Ligar ou desligar o som | Botão de som (alto-falante) ou `M` | Tocar no botão de som |
 | Começar de novo | Menu de pausa ou tela inicial | Menu de pausa ou tela inicial |
 | Mover a câmera | `W` `A` `S` `D` ou setas | — |
 | Zoom | Roda do mouse | Pinça com dois dedos |
@@ -62,7 +63,20 @@ Telas, menus, diálogos, perguntas, o minijogo da mochila, cartões e o painel d
 
 Ao passar para um novo eixo, o clima piora aos poucos atrás do cartão do eixo. Em "Durante o evento", as ruas alagadas não aparecem entre as casas destacadas pelo dado: o caminho tem que ser pela parte alta. Tocar numa rua alagada mostra um aviso.
 
-Para quem pediu menos animação no sistema (`prefers-reduced-motion`), a chuva é mais calma e o clima muda na hora. No celular, a chuva tem menos gotas, para não pesar. As cores, a luz, o nível da água e a quantidade de chuva de cada eixo ficam em [`src/config.ts`](src/config.ts) (`CLIMATE` e `RAIN`).
+Para quem pediu menos animação no sistema (`prefers-reduced-motion`), a chuva é mais calma, o clima muda na hora e os pins aparecem sem animação. No celular, a chuva tem menos gotas, para não pesar. As cores, a luz, o nível da água e a quantidade de chuva de cada eixo ficam em [`src/config.ts`](src/config.ts) (`CLIMATE` e `RAIN`).
+
+### Som
+
+Todo o som é gerado por código (Web Audio API), sem nenhum arquivo de áudio:
+
+- **Chuva:** acompanha a chuva de cada eixo — mais baixa em "Alerta", mais forte em "Durante o evento".
+- **Pin conquistado:** quatro notas subindo.
+- **Dado:** batidinhas ao jogar e quando ele para no chão.
+- **Acerto:** duas notas curtas quando a pergunta ou a mochila fica certa. Errar não tem som, para não soar como castigo.
+
+O som começa **ligado**, mas só toca depois do primeiro clique, toque ou tecla (regra dos navegadores). Para ligar ou desligar: o botão de som no alto da tela (ao lado dos pins e da pausa), a tecla `M`, ou o botão **Som** na tela inicial e no menu de pausa. A escolha fica guardada no navegador, à parte do progresso: "Começar de novo" não muda o som. Com a aba escondida, o som para.
+
+No iPhone, a chave de silencioso do aparelho também corta o som do jogo. Os volumes (geral, chuva e efeitos) ficam em [`src/config.ts`](src/config.ts) (`AUDIO`).
 
 ### Progresso salvo
 
@@ -231,7 +245,9 @@ src/
   main.ts             liga tudo: conteúdo, cidade, câmera, personagem, missões e interface
   config.ts           nome do jogo e constantes (câmera, render, mundo, personagem, cores, clima e chuva)
   style.css           cores e fontes (variáveis CSS) e estilos da interface
-  core/               loop, entrada (teclado/mouse/toque), câmera, renderer, save (progresso)
+  core/               loop, entrada (teclado/mouse/toque), câmera, renderer, save (progresso e escolha do som)
+  audio/
+    sound.ts          som gerado por código: chuva, pin, dado, acerto e o liga/desliga
   missions/
     content.ts        lê content/*.json (e os créditos) e confere as ligações por id
     missionManager.ts missão atual, pins e acertos de primeira
@@ -249,9 +265,9 @@ src/
     clickToMove.ts    descobre o que foi tocado na tela (chão ou prédio)
   ui/
     diceHud.ts        botão "Jogar dado", "Ir rumo ao objetivo" e avisos
-    missionHud.ts     barra da missão no topo e painel de pins
+    missionHud.ts     barra da missão no topo, painel de pins e botão de som
     dialogue.ts       caixa de diálogo e pergunta
-    cards.ts          cartões (missão, pin, eixo), confirmação e janelas com foco preso
+    cards.ts          cartões (missão, pin, eixo), confirmação, botão de som e janelas com foco preso
     edgeArrow.ts      seta na borda da tela apontando o destino
     titleScreen.ts    tela inicial e créditos
     pauseMenu.ts      botão e menu de pausa

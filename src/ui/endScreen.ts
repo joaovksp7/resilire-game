@@ -55,6 +55,8 @@ export class EndScreen {
         const style = INSTITUTION_STYLES[mission.instituicao];
         const item = document.createElement('li');
         item.className = 'pin pin--ganho';
+        // Os pins aparecem um depois do outro (o CSS usa a ordem para o atraso).
+        item.style.setProperty('--ordem', String(pins.childElementCount));
         item.append(badge(style.icon, style.color), textEl('span', 'pin__nome', mission.titulo));
         pins.append(item);
       }

@@ -105,6 +105,19 @@ export const RAIN = {
   opacity: 0.55,
 } as const;
 
+/**
+ * Som gerado por código (src/audio/sound.ts). Volumes de 0 a 1.
+ * O som só começa depois do primeiro clique, toque ou tecla (regra dos navegadores).
+ */
+export const AUDIO = {
+  /** Volume geral. */
+  master: 0.8,
+  /** Volume da chuva com chuva forte (com chuva fraca fica mais baixo). */
+  rain: 0.35,
+  /** Volume dos efeitos (pin, dado, acerto). */
+  effects: 0.6,
+} as const;
+
 export const PLAYER = {
   /** Velocidade de caminhada (unidades do mundo por segundo; 1 tile = 2 unidades). */
   speed: 4,

@@ -1,4 +1,5 @@
 import './style.css';
+import { GameSound } from './audio/sound';
 import { GAME_NAME } from './config';
 import { IsoCamera } from './core/camera';
 import { Input } from './core/input';
@@ -75,6 +76,14 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   const initialEixo = manager.currentEixo?.id ?? content.eixos[content.eixos.length - 1].id;
   const climate = new Climate({ scene, lights, water: city.water, rain, map: city.map }, initialEixo);
 
+  // Som: chuva e efeitos. Só começa no primeiro clique, toque ou tecla (regra dos navegadores).
+  const sound = new GameSound();
+  // Tecla M liga e desliga o som em qualquer tela.
+  window.addEventListener('keydown', (event) => {
+    if (event.code !== 'KeyM' || event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+    sound.toggle();
+  });
+
   const iso = new IsoCamera(city.map.halfSize);
   const input = new Input(gameRenderer.canvas);
 
@@ -112,13 +121,20 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   turn.onChange((e) => {
     if (e.state === 'rolling' || e.state === 'walking') iso.follow(player);
   });
+  // Som do dado: batidinhas ao jogar e uma batida quando ele para no chão.
+  let lastTurnState = turn.state;
+  turn.onChange((e) => {
+    if (e.state === 'rolling' && lastTurnState !== 'rolling') sound.diceShake();
+    else if (lastTurnState === 'rolling' && (e.state === 'choosing' || e.hint === 'nothing-in-reach')) sound.diceLand();
+    lastTurnState = e.state;
+  });
   input.onTap((x, y) => turn.handleTap(x, y));
 
   // Interface.
   const diceHud = new DiceHud(hudRoot, turn);
-  const missionHud = new MissionHud(hudRoot, content, manager);
+  const missionHud = new MissionHud(hudRoot, content, manager, sound);
   const edgeArrow = new EdgeArrow(hudRoot, iso.camera, { top: missionHud.element, bottom: diceHud.element });
-  const dialogue = new DialogueBox(hudRoot);
+  const dialogue = new DialogueBox(hudRoot, () => sound.right());
   const endScreen = new EndScreen(hudRoot, content, manager);
   const eixoNames = content.eixos.map((e) => e.nome);
 
@@ -146,9 +162,10 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     markerAnchors: city.markerAnchors,
     climate,
     dialogue,
-    kit: new KitMinigame(hudRoot, content.kit),
+    kit: new KitMinigame(hudRoot, content.kit, () => sound.right()),
     diceHud,
     edgeArrow,
+    sound,
     uiRoot: hudRoot,
     showEnd,
   });
@@ -158,6 +175,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     credits: content.credits,
     eixoNames,
     persistent: save.persistent,
+    sound,
     play: () => void flow.start(),
     restart: () => void flow.restart(),
     showResult: () => {
@@ -172,6 +190,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   };
   const pause = new PauseMenu(hudRoot, missionHud.element, {
     eixoNames,
+    sound,
     isFinished: () => !manager.current,
     showResult: () => void showEnd(),
     restart: () => void flow.restart(),
@@ -194,6 +213,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     climate.update(dt);
     iso.update(dt);
     rain.update(dt, iso.focus, iso.camera);
+    sound.setRain(rain.intensity);
     edgeArrow.update();
     gameRenderer.renderer.render(scene, iso.camera);
   });

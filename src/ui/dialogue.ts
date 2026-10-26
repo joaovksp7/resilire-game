@@ -45,9 +45,12 @@ function button(label: string, className: string): HTMLButtonElement {
  */
 export class DialogueBox {
   private readonly root: HTMLElement;
+  private readonly onRight: () => void;
 
-  constructor(root: HTMLElement) {
+  /** `onRight`: chamado quando o jogador acerta a pergunta (ex.: tocar o som de acerto). */
+  constructor(root: HTMLElement, onRight: () => void = () => {}) {
     this.root = root;
+    this.onRight = onRight;
   }
 
   /**
@@ -123,7 +126,8 @@ export class DialogueBox {
             const right = index === question.correta;
             for (const other of buttons) other.disabled = true;
             b.classList.add(right ? 'botao--certa' : 'botao--errada');
-            if (!right) b.dataset.tried = '';
+            if (right) this.onRight();
+            else b.dataset.tried = '';
 
             feedback.hidden = false;
             feedback.className = `dialogo__retorno ${right ? 'dialogo__retorno--certo' : 'dialogo__retorno--errado'}`;

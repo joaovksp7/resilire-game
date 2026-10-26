@@ -2,6 +2,27 @@
 // (Safari bloqueia, Chrome particiona): nesse caso o jogo segue funcionando só com a memória.
 
 const KEY = 'resilire-game:progresso:v1';
+/** Som ligado ou desligado. Fica à parte do progresso: "Começar de novo" não apaga. */
+const SOUND_KEY = 'resilire-game:som:v1';
+
+/** Preferência de som salva: true = ligado, false = desligado, null = nunca escolhido (ou sem armazenamento). */
+export function loadSoundOn(): boolean | null {
+  try {
+    const value = window.localStorage.getItem(SOUND_KEY);
+    return value === '1' ? true : value === '0' ? false : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Guarda a preferência de som. Sem armazenamento, ela vale só até fechar a página. */
+export function saveSoundOn(on: boolean): void {
+  try {
+    window.localStorage.setItem(SOUND_KEY, on ? '1' : '0');
+  } catch {
+    // Armazenamento bloqueado: o som continua funcionando, só não lembra a escolha.
+  }
+}
 
 export interface SaveData {
   readonly version: 1;

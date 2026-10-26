@@ -119,6 +119,8 @@ export interface CardOptions {
   icon?: IconId;
   color?: number;
   button: string;
+  /** Cartão do pin: o selo entra com um pulo e um brilho (parado com prefers-reduced-motion). */
+  celebrate?: boolean;
 }
 
 /** Elemento de texto com conteúdo seguro (textContent, nunca HTML vindo do conteúdo). */
@@ -142,7 +144,7 @@ export function badge(icon: IconId, color: number, className = 'selo'): HTMLElem
 export function showCard(root: HTMLElement, opts: CardOptions): Promise<void> {
   return new Promise((resolve) => {
     const card = document.createElement('div');
-    card.className = 'cartao';
+    card.className = opts.celebrate ? 'cartao cartao--pin' : 'cartao';
     if (opts.color !== undefined) card.style.setProperty('--cor-inst', cssColor(opts.color));
 
     if (opts.icon && opts.color !== undefined) card.append(badge(opts.icon, opts.color, 'selo selo--grande'));
@@ -230,4 +232,49 @@ const RESTART_TEXT: ConfirmOptions = {
 /** "Começar de novo?" — a mesma pergunta na tela inicial, na pausa e na tela final. */
 export function confirmRestart(root: HTMLElement): Promise<boolean> {
   return showConfirm(root, RESTART_TEXT);
+}
+
+// Textos da interface (não são conteúdo educativo).
+const SOUND_TEXT = {
+  on: 'Som: ligado',
+  off: 'Som: desligado',
+} as const;
+
+/** Desenho de alto-falante: com ondas (som ligado) ou com um X (som desligado). */
+const SPEAKER = '<path fill="currentColor" d="M3 9.5h4l5-4.5v14l-5-4.5H3z"/>';
+const SOUND_ON_ICON = `<svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${SPEAKER}<path d="M15.5 8.8a4.5 4.5 0 0 1 0 6.4M18.2 6.2a8.2 8.2 0 0 1 0 11.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+const SOUND_OFF_ICON = `<svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${SPEAKER}<path d="M15.5 9.5l5 5M20.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+
+/** Liga e desliga o som (src/audio/sound.ts). */
+export interface SoundSwitch {
+  readonly on: boolean;
+  toggle(): void;
+  /** Avisa quando o som liga ou desliga. Devolve a função que para de avisar. */
+  onChange(listener: (on: boolean) => void): () => void;
+}
+
+/**
+ * Botão "Som: ligado / desligado". Com `iconOnly`, mostra só o alto-falante e o texto vira o nome
+ * do botão para leitores de tela. `dispose` para de acompanhar o som (chamar ao fechar a janela do botão).
+ */
+export function soundButton(
+  sound: SoundSwitch,
+  className: string,
+  iconOnly = false,
+): { button: HTMLButtonElement; dispose: () => void } {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = className;
+  const render = (on: boolean): void => {
+    const label = on ? SOUND_TEXT.on : SOUND_TEXT.off;
+    if (iconOnly) {
+      button.innerHTML = on ? SOUND_ON_ICON : SOUND_OFF_ICON;
+      button.setAttribute('aria-label', label);
+    } else {
+      button.textContent = label;
+    }
+  };
+  render(sound.on);
+  button.addEventListener('click', () => sound.toggle());
+  return { button, dispose: sound.onChange(render) };
 }
