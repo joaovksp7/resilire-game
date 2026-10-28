@@ -5,7 +5,7 @@ Jogo educativo para navegador sobre **enchentes e deslizamentos**, para estudant
 - Game design completo:
 - Regras para quem desenvolve: [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)
 
-> **Status:** Fase 8 (Polimento) — as 10 missões jogáveis do começo ao fim, com progresso salvo; o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); no mercado o jogador monta a mochila de emergência; o jogo tem tela inicial, Como jogar, pausa, tela final e créditos; e tem som gerado por código (chuva, pin, dado e acerto), com botão de som sempre à mão, e animação nos pins. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`).
+> **Status:** Parte 2, Fase 9 (Cinco missões) — as 5 missões jogáveis do começo ao fim, com progresso salvo; o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); no mercado o jogador monta a mochila de emergência; o jogo tem tela inicial, Como jogar, pausa, tela final e créditos; e tem som gerado por código (chuva, pin, dado e acerto), com botão de som sempre à mão, e animação nos pins. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`).
 
 ---
 
@@ -52,6 +52,20 @@ O personagem anda **por dado**, como num jogo de tabuleiro:
 A cada jogada, a câmera volta a seguir o personagem. A instituição da missão tem uma seta flutuando em cima; quando ela está fora da tela, uma seta na borda aponta para onde ir. A porta da missão aparece em amarelo entre as casas destacadas.
 
 Telas, menus, diálogos, perguntas, o minijogo da mochila, cartões e o painel de pins funcionam só com teclado (`Tab`, `Enter`, `Espaço`; `Esc` fecha o painel de pins, a pausa, Como jogar, os créditos e a tela final).
+
+### As missões
+
+São 5 missões, feitas nesta ordem:
+
+| Ordem | Missão | Eixo | Instituição |
+|---|---|---|---|
+| 1 | Fique por dentro | Alerta | Defesa Civil |
+| 2 | Monte sua mochila | Preparação | Mercado (minijogo da mochila) |
+| 3 | O morro está avisando | Preparação | Bombeiros |
+| 4 | Água corrente não se atravessa | Durante o evento | Bombeiros |
+| 5 | Para o lugar seguro | Durante o evento | Abrigo |
+
+A Rádio, a Escola, a UBS e o CRAS continuam no mapa, mas não têm missão nesta versão. Parar na porta de uma delas só mostra um aviso. Os diálogos e as perguntas dessas instituições continuam guardados em `dialogues.json` e `questions.json`, e o jogo não reclama de diálogo ou pergunta sem missão.
 
 ### Clima em cada eixo
 
@@ -126,7 +140,7 @@ Todo o texto educativo fica em arquivos JSON na pasta [`content/`](content/), ju
 ### Regras gerais
 
 - **JSON é exigente:** textos entre aspas duplas `"…"`, vírgula entre os itens e **sem vírgula depois do último**. Para usar aspas dentro de um texto, prefira as aspas curvas “assim”.
-- Cada item tem um **`id`** (ex.: `"m03-combinado"`). Os arquivos se ligam pelo `id`, nunca pelo texto. Pode mudar os textos à vontade; mudar um `id` exige mudar também onde ele é usado.
+- Cada item tem um **`id`** (ex.: `"m04-mochila"`). Os arquivos se ligam pelo `id`, nunca pelo texto. Pode mudar os textos à vontade; mudar um `id` exige mudar também onde ele é usado.
 - **`todoValidar`** (opcional, em qualquer item): anota o que ainda precisa ser confirmado com a Defesa Civil. Não aparece no jogo. Apague o campo quando a informação for validada.
 - JSON não aceita comentários (`//`); por isso as pendências ficam no `todoValidar`.
 

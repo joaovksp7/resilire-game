@@ -28,26 +28,6 @@
       "aprendizado": "Dá para se cadastrar e receber os alertas oficiais da Defesa Civil por SMS."
     },
     {
-      "id": "m02-noticia-ou-boato",
-      "eixo": "alerta",
-      "titulo": "Notícia ou boato?",
-      "descricao": "Uma mensagem estranha está circulando nos grupos. Vá até a rádio comunitária e descubra como saber se ela é verdadeira.",
-      "instituicao": "radio",
-      "dialogo": "d02-noticia-ou-boato",
-      "pergunta": "q02-noticia-ou-boato",
-      "aprendizado": "Antes de acreditar ou repassar uma mensagem, confira se ela veio de uma fonte oficial."
-    },
-    {
-      "id": "m03-combinado",
-      "eixo": "alerta",
-      "titulo": "Combinado é combinado",
-      "descricao": "Vá até a escola e monte com a professora o plano de emergência da sua família.",
-      "instituicao": "escola",
-      "dialogo": "d03-combinado",
-      "pergunta": "q03-combinado",
-      "aprendizado": "O plano de emergência da família tem um ponto de encontro e os contatos de todos."
-    },
-    {
       "id": "m04-mochila",
       "eixo": "preparacao",
       "titulo": "Monte sua mochila",
@@ -58,16 +38,6 @@
       "aprendizado": "Na mochila de emergência vão documentos num saco plástico, lanterna, pilhas, água, comida que não estraga e remédios."
     },
     {
-      "id": "m05-remedio",
-      "eixo": "preparacao",
-      "titulo": "Remédio não pode faltar",
-      "descricao": "Vá até a UBS e descubra como deixar os remédios da família prontos para uma emergência.",
-      "instituicao": "ubs",
-      "dialogo": "d05-remedio",
-      "pergunta": "q05-remedio",
-      "aprendizado": "Remédios de uso contínuo e cópias das receitas ficam separados para levar."
-    },
-    {
       "id": "m06-morro",
       "eixo": "preparacao",
       "titulo": "O morro está avisando",
@@ -76,16 +46,6 @@
       "dialogo": "d06-morro",
       "pergunta": "q06-morro",
       "aprendizado": "Rachaduras em paredes, árvores ou postes inclinados e água barrenta minando do chão são sinais de deslizamento."
-    },
-    {
-      "id": "m07-desliga",
-      "eixo": "durante",
-      "titulo": "Desliga antes de sair",
-      "descricao": "A chuva apertou. Volte para casa e prepare a casa antes de sair.",
-      "instituicao": "casa",
-      "dialogo": "d07-desliga",
-      "pergunta": "q07-desliga",
-      "aprendizado": "Antes de sair de casa, desligar a energia e o gás."
     },
     {
       "id": "m08-agua-corrente",
@@ -106,16 +66,6 @@
       "dialogo": "d09-lugar-seguro",
       "pergunta": "q09-lugar-seguro",
       "aprendizado": "Para chegar ao abrigo, use a rota pela parte alta e leve a mochila de emergência."
-    },
-    {
-      "id": "m10-ninguem-fica",
-      "eixo": "durante",
-      "titulo": "Ninguém fica para trás",
-      "descricao": "Vá até o CRAS e descubra como ajudar os vizinhos e as famílias que precisam de apoio.",
-      "instituicao": "cras",
-      "dialogo": "d10-ninguem-fica",
-      "pergunta": "q10-ninguem-fica",
-      "aprendizado": "Ajudar os vizinhos e procurar o CRAS: ninguém fica para trás."
     }
   ]
 }

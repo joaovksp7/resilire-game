@@ -58,7 +58,8 @@ Roda em **computador fraco de laboratório, Chromebook e celular do aluno** — 
 
 ### Fonte da verdade
 
-- **`prompt-jogo-desastres-climaticos.md`** (raiz) — game design completo, missões, instituições, fases de implementação e critérios de aceite. Ler antes de começar qualquer fase nova.
+- **`prompt-jogo-desastres-climaticos.md`** (raiz) — game design original, missões, instituições, fases 1 a 8 (concluídas) e critérios de aceite. Ler antes de começar qualquer fase nova.
+- **`plano-parte-2.md`** (raiz) — continuação: até 4 jogadores em equipe, 5 missões, fases 9 a 13 e critérios de aceite. Ler antes de começar qualquer fase nova. Onde os dois planos discordam, vale este.
 - **`content/*.json`** — todo o texto educativo do jogo. Revisado pela equipe antes de ir pro ar.
 
 Os três eixos são chaves fixas, sempre nesta ordem: `alerta` → `preparacao` → `durante`.
@@ -101,6 +102,7 @@ content/
 public/
   fontes/
 prompt-jogo-desastres-climaticos.md
+plano-parte-2.md
 README.md
 CLAUDE.md
 AGENTS.md

@@ -1,5 +1,7 @@
 # Prompt para o Claude Code — Jogo educativo sobre desastres climáticos
 
+> **Continuação:** as fases 1 a 8 deste plano estão concluídas. O plano continua em [`plano-parte-2.md`](plano-parte-2.md) (até 4 jogadores, em equipe, fases 9 a 13). Lá o jogo passa a ter **5 missões** em vez de 10: o que este arquivo diz sobre as 10 missões (seção 4.6 e critérios de aceite) fica como histórico. Onde os dois planos discordam, vale o `plano-parte-2.md`.
+
 ## 1. Contexto
 
 Quero que você crie um jogo educativo para navegador sobre desastres climáticos (enchentes e deslizamentos), voltado a estudantes de escolas do Rio Grande do Sul, principalmente dos Vales do Rio Pardo e Taquari.
