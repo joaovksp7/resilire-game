@@ -5,7 +5,7 @@ Jogo educativo para navegador sobre **enchentes e deslizamentos**, para estudant
 - Game design completo:
 - Regras para quem desenvolve: [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)
 
-> **Status:** Parte 2, Fase 11 (Peões e vez) — de 1 a 4 jogadores no mesmo aparelho, cada um com o seu peão e passando a vez a cada jogada do dado; as missões ainda são uma por vez para a equipe toda (a divisão chega na Fase 12); as 10 missões jogáveis do começo ao fim, com progresso salvo (por enquanto, ao recarregar, os peões dos outros jogadores voltam para casa e a vez volta para o Jogador 1; a equipe inteira passa a ser salva na Fase 13); o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); no mercado o jogador monta a mochila de emergência; o jogo tem tela inicial, Como jogar, pausa, tela final e créditos; e tem som gerado por código (chuva, pin, dado e acerto), com botão de som sempre à mão, e animação nos pins. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`).
+> **Status:** Parte 2, Fase 12 (Missões divididas) — de 1 a 4 jogadores no mesmo aparelho, cada um com o seu peão e a sua missão, ao mesmo tempo, passando a vez a cada jogada do dado; as 10 missões jogáveis do começo ao fim, com progresso salvo (por enquanto, ao recarregar, os pins continuam, mas as missões em andamento são distribuídas de novo, os peões dos outros jogadores voltam para casa e a vez volta para o Jogador 1; a equipe inteira passa a ser salva na Fase 13); o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); no mercado o jogador monta a mochila de emergência; o jogo tem tela inicial, Como jogar, pausa, tela final e créditos; e tem som gerado por código (chuva, pin, dado e acerto), com botão de som sempre à mão, e animação nos pins. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`).
 
 ---
 
@@ -36,7 +36,9 @@ O personagem anda **por dado**, como num jogo de tabuleiro:
 2. As casas que dá para alcançar com até aquele número de passos ficam destacadas em azul no chão.
 3. Escolha uma delas e o personagem anda casa por casa até lá. Não precisa usar todos os passos.
 
-Com 2 ou mais jogadores, cada um tem o seu peão e todos começam na porta de casa. Uma vez é uma jogada do dado: ao chegar, a vez passa para o próximo, na ordem da tela inicial. Só o peão da vez anda, e ele tem um anel no chão; a câmera vai até ele e o rodapé mostra de quem é a vez, com o número e a cor do jogador. Quem parar na porta da missão faz a visita. Peões não bloqueiam o caminho uns dos outros e, na mesma casa, ficam lado a lado.
+Com 2 ou mais jogadores, cada um tem o seu peão e todos começam na porta de casa. Uma vez é uma jogada do dado: ao chegar, a vez passa para o próximo, na ordem da tela inicial. Só o peão da vez anda, e ele tem um anel no chão; a câmera vai até ele e o rodapé mostra de quem é a vez, com o número e a cor do jogador. Peões não bloqueiam o caminho uns dos outros e, na mesma casa, ficam lado a lado.
+
+Cada jogador cuida de uma missão diferente, ao mesmo tempo, sempre do eixo atual. As missões são distribuídas na ordem da vez, a partir de quem joga em seguida, e quem sobra ajuda a equipe. **Quem parar na porta de qualquer missão em andamento faz a visita**, seja a sua ou a de um colega. Depois da visita, o dono da missão recebe a próxima livre do eixo ou passa a ajudar, e quem fez a visita continua com a sua. O eixo só muda quando todas as missões dele acabam. O cartão da missão aparece no começo da vez de quem a recebeu, e quem já está na porta de uma missão em andamento faz a visita sem jogar o dado. Para quem ajuda, a barra do topo mostra "Ajudando a equipe", e "Ir rumo ao objetivo" e a seta da borda levam à missão mais perto.
 
 | Ação | Computador | Celular |
 |---|---|---|
@@ -51,7 +53,7 @@ Com 2 ou mais jogadores, cada um tem o seu peão e todos começam na porta de ca
 | Mover a câmera | `W` `A` `S` `D` ou setas | — |
 | Zoom | Roda do mouse | Pinça com dois dedos |
 
-A cada jogada, a câmera volta a seguir o personagem. A instituição da missão tem uma seta flutuando em cima; quando ela está fora da tela, uma seta na borda aponta para onde ir. A porta da missão aparece em amarelo entre as casas destacadas.
+A cada jogada, a câmera volta a seguir o personagem. Toda instituição com missão em andamento tem uma seta flutuando em cima, e a porta dela aparece em amarelo entre as casas destacadas. Quando o destino do jogador da vez está fora da tela, uma seta na borda aponta para onde ir.
 
 Telas, menus, diálogos, perguntas, o minijogo da mochila, cartões e o painel de pins funcionam só com teclado (`Tab`, `Enter`, `Espaço`; `Esc` fecha o painel de pins, a pausa, Como jogar, os créditos e a tela final).
 
@@ -99,7 +101,7 @@ No iPhone, a chave de silencioso do aparelho também corta o som do jogo. Os vol
 
 ### Progresso salvo
 
-O jogo salva sozinho a missão atual, os pins, os acertos de primeira e onde o personagem está. Ao recarregar a página, continua de onde parou. Com 2 ou mais jogadores, por enquanto só o lugar do Jogador 1 fica salvo: os outros peões voltam para casa e a vez volta para o Jogador 1 (muda na Fase 13). Se o navegador bloquear o armazenamento (acontece dentro de iframe em alguns navegadores), o jogo funciona normalmente, mas o progresso some ao recarregar (a tela inicial avisa). Para recomeçar, use "Começar de novo" no menu de pausa ou "Novo jogo" na tela inicial.
+O jogo salva sozinho os pins, os acertos de primeira e onde o personagem está. Ao recarregar a página, continua de onde parou. Com 2 ou mais jogadores, por enquanto só os pins e o lugar do Jogador 1 ficam salvos: as missões em andamento são distribuídas de novo, os outros peões voltam para casa e a vez volta para o Jogador 1 (muda na Fase 13). Se o navegador bloquear o armazenamento (acontece dentro de iframe em alguns navegadores), o jogo funciona normalmente, mas o progresso some ao recarregar (a tela inicial avisa). Para recomeçar, use "Começar de novo" no menu de pausa ou "Novo jogo" na tela inicial.
 
 Os nomes da última equipe ficam guardados à parte, só neste navegador, e voltam preenchidos na partida seguinte. Nada sai do aparelho.
 
@@ -170,7 +172,7 @@ A cor, o ícone e o formato do prédio ficam no código ([`src/world/institution
 Tem duas listas:
 
 - **`eixos`**: os três eixos, **sempre nesta ordem e com estes `id`**: `alerta`, `preparacao`, `durante`. Cada um tem `nome` e `descricao` (o texto do cartão que aparece quando o jogo passa para aquele eixo).
-- **`missoes`**: as missões, **na ordem em que o jogador faz**. As missões de um eixo vêm todas antes das do próximo.
+- **`missoes`**: as missões, **na ordem em que são entregues aos jogadores**. As missões de um eixo vêm todas antes das do próximo. Com 1 jogador, é a ordem em que elas são feitas; com 2 ou mais, dentro de um eixo elas podem terminar em qualquer ordem.
 
 | Campo da missão | O que é |
 |---|---|
@@ -271,7 +273,7 @@ src/
     sound.ts          som gerado por código: chuva, pin, dado, acerto e o liga/desliga
   missions/
     content.ts        lê content/*.json (e os créditos) e confere as ligações por id
-    missionManager.ts missão atual, pins e acertos de primeira
+    missionManager.ts missões em andamento e de quem é cada uma, pins e acertos de primeira
     missionFlow.ts    o loop: missão → porta → diálogo → pergunta (ou minijogo) → pin → próxima
   minigames/
     kitMinigame.ts    minijogo da mochila de emergência (prateleira, mochila, resultado)
@@ -309,7 +311,7 @@ src/
     buildings.ts      prédios das instituições e placas com ícone
     institutions.ts   cor, ícone e formato de cada instituição
     icons.ts          desenhos dos ícones (placas 3D e interface)
-    markers.ts        seta flutuante e anel na porta da missão atual
+    markers.ts        seta flutuante e anel na porta de cada missão em andamento
     decor.ts          casas, prédios, árvores e ponte
     scene.ts          céu e luzes
 ```

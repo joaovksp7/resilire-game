@@ -6,24 +6,31 @@ import { faceYawFor } from '../player/clickToMove';
 import type { DiceTurn } from '../player/diceTurn';
 import type { Pawns } from '../player/pawns';
 import type { Cell } from '../player/pathfinding';
+import type { TeamPlayer } from '../player/team';
 import { showCard } from '../ui/cards';
 import type { DialogueBox } from '../ui/dialogue';
 import type { DiceHud } from '../ui/diceHud';
 import type { EdgeArrow } from '../ui/edgeArrow';
+import type { MissionHud } from '../ui/missionHud';
 import type { CityMap } from '../world/cityMap';
 import type { Climate } from '../world/climate';
 import type { InstitutionId } from '../world/institutions';
 import { INSTITUTION_STYLES } from '../world/institutions';
-import type { MissionMarker } from '../world/markers';
+import type { MissionMarkers } from '../world/markers';
 import type { EixoId, GameContent, Mission } from './content';
 import type { MissionManager } from './missionManager';
 
 /** Até quantas casas em volta procurar uma rua seca, se a água cobrir a casa de um peão. */
 const DRY_SEARCH_RADIUS = 10;
 
+/** No registro do que cada jogador já sabe: está ajudando a equipe (nos outros casos, o id da missão). */
+const HELPING = 'ajudando';
+
 // Textos da interface (não são conteúdo educativo).
 const TEXT = {
   missionOf: (n: number, total: number, eixo: string) => `Missão ${n} de ${total} · ${eixo}`,
+  // "de" serve para qualquer nome ("Missão de Ana"); sem nome, "Missão do Jogador 2".
+  missionOfPlayer: (player: TeamPlayer, eixo: string) => `Missão ${player.typedName ? 'de' : 'do'} ${player.name} · ${eixo}`,
   destination: (name: string) => `Destino: ${name}`,
   go: 'Vamos lá',
   pinKicker: 'Pin conquistado',
@@ -31,7 +38,8 @@ const TEXT = {
   next: 'Continuar',
   eixoKicker: 'Novo eixo',
   wrongDoor: (here: string, goal: string) => `Você está ${here}. Sua missão agora é ${goal}.`,
-  wrongDoorOf: (name: string, here: string, goal: string) => `${name} está ${here}. A missão agora é ${goal}.`,
+  noMissionHere: (name: string, here: string) => `${name} está ${here}. Nenhuma missão em andamento aqui.`,
+  helping: (name: string) => `${name} agora ajuda a equipe e pode fazer a missão de um colega.`,
 } as const;
 
 export interface MissionFlowDeps {
@@ -41,13 +49,14 @@ export interface MissionFlowDeps {
   map: CityMap;
   pawns: Pawns;
   turn: DiceTurn;
-  marker: MissionMarker;
+  markers: MissionMarkers;
   markerAnchors: ReadonlyMap<InstitutionId, Vector3>;
   climate: Climate;
   dialogue: DialogueBox;
   /** Minijogo da mochila (missões com "minijogo": "kit"). */
   kit: KitMinigame;
   diceHud: DiceHud;
+  missionHud: MissionHud;
   edgeArrow: EdgeArrow;
   /** Som do pin conquistado. */
   sound: GameSound;
@@ -62,12 +71,15 @@ const sameCell = (a: Cell | null, b: Cell): boolean => !!a && a.col === b.col &&
 /**
  * O loop das missões: cartão da missão → jogar o dado até a porta → diálogo → pergunta →
  * pin → (troca de eixo) → próxima missão. Salva o progresso a cada passo.
+ * Cada jogador tem a sua missão, e quem para na porta de qualquer missão em andamento faz a visita.
  * Com 2 ou mais jogadores, a vez passa quando o peão chega e depois de cada visita.
  */
 export class MissionFlow {
   private readonly d: MissionFlowDeps;
   private visiting = false;
   private begun = false;
+  /** O que cada jogador já sabe: a missão do último cartão que viu, ou que está ajudando. */
+  private told: string[] = [];
 
   constructor(deps: MissionFlowDeps) {
     this.d = deps;
@@ -81,7 +93,7 @@ export class MissionFlow {
   }
 
   /**
-   * Começa (ou continua) o jogo: põe o clima do eixo, mostra a missão atual e confere se já está na porta.
+   * Começa (ou continua) o jogo: põe o clima do eixo e começa a vez de quem joga agora.
    * Só vale na primeira vez: voltar da tela inicial depois disso não repete nada.
    */
   async start(): Promise<void> {
@@ -89,21 +101,16 @@ export class MissionFlow {
     this.begun = true;
     this.d.climate.set(this.climateEixo(), false);
     if (this.moveOutOfWater()) this.persist();
-    this.refreshTarget();
-    if (!this.d.manager.current) return;
-    await this.showMissionCard();
-    const { pawns, diceHud } = this.d;
-    const cell = pawns.active.cell;
-    if (this.visitAtDoor(cell)) return;
+    const { pawns } = this.d;
     // Em equipe, todos começam em casa: o rodapé já abre dizendo de quem é a vez.
-    const notice = pawns.team.length > 1 ? null : this.wrongDoorNotice(cell);
-    if (notice) diceHud.say(notice);
+    await this.beginTurn(pawns.team.length > 1 ? null : this.wrongDoorNotice(pawns.active.cell));
   }
 
   /** Apaga o progresso e volta para a primeira missão, em casa. O jogo só começa no próximo start(). */
   reset(): void {
     const { manager, save, pawns, turn, climate } = this.d;
     this.begun = false;
+    this.told = [];
     manager.reset();
     save.clear();
     climate.set(this.climateEixo(), false);
@@ -117,13 +124,7 @@ export class MissionFlow {
     this.reset();
     this.begun = true;
     this.persist();
-    await this.showMissionCard();
-  }
-
-  /** Porta da instituição da missão atual. */
-  missionDoor(): Cell | null {
-    const mission = this.d.manager.current;
-    return mission ? (this.d.map.sites.get(mission.instituicao)?.door ?? null) : null;
+    await this.beginTurn();
   }
 
   private onArrive(cell: Cell): void {
@@ -133,31 +134,63 @@ export class MissionFlow {
     // O aviso fala de quem acabou de chegar, então é montado antes de a vez passar.
     const notice = this.wrongDoorNotice(cell);
     this.d.pawns.nextTurn();
-    if (notice) this.d.diceHud.say(notice);
+    void this.beginTurn(notice);
   }
 
-  /** Se o peão da vez está na porta da missão, começa a visita. */
+  /**
+   * Começo da vez: mostra o cartão de quem recebeu uma missão nova, avisa quem passou a ajudar
+   * e, se o peão já estiver na porta de uma missão em andamento, começa a visita sem jogar o dado.
+   */
+  private async beginTurn(notice: string | null = null): Promise<void> {
+    const { manager, pawns, diceHud } = this.d;
+    this.refreshTarget();
+    const player = pawns.activeIndex;
+    const mission = manager.missionOf(player);
+    const situation = mission?.id ?? HELPING;
+    const isNews = !manager.isFinished && this.told[player] !== situation;
+    if (isNews) this.told[player] = situation;
+    if (isNews && mission) await this.showMissionCard(mission);
+    if (this.visitAtDoor(pawns.active.cell)) return;
+    const helping = isNews && !mission ? TEXT.helping(pawns.activeMember.name) : null;
+    const text = [notice, helping].filter((line) => line !== null).join(' ');
+    if (text) diceHud.say(text);
+  }
+
+  /** Porta da instituição de uma missão. */
+  private doorOf(mission: Mission): Cell | null {
+    return this.d.map.sites.get(mission.instituicao)?.door ?? null;
+  }
+
+  /** Missão em andamento nesta porta: a do jogador da vez, se for uma delas; senão, a primeira de missions.json. */
+  private missionAtDoor(cell: Cell | null): Mission | null {
+    const { manager, pawns } = this.d;
+    const here = manager.active.filter(({ mission }) => {
+      const door = this.doorOf(mission);
+      return !!door && sameCell(cell, door);
+    });
+    return (here.find(({ owner }) => owner === pawns.activeIndex) ?? here[0])?.mission ?? null;
+  }
+
+  /** Se o peão da vez está na porta de uma missão em andamento, começa a visita. */
   private visitAtDoor(cell: Cell | null): boolean {
-    const mission = this.d.manager.current;
-    const door = this.missionDoor();
-    if (!mission || !door || !sameCell(cell, door)) return false;
+    const mission = this.missionAtDoor(cell);
+    if (!mission) return false;
     void this.visit(mission);
     return true;
   }
 
-  /** Aviso para quem parou na porta de uma instituição que não é a da missão (null nas outras casas). */
+  /** Aviso para quem parou na porta de uma instituição sem missão em andamento (null nas outras casas). */
   private wrongDoorNotice(cell: Cell | null): string | null {
     const { manager, map, content, pawns } = this.d;
-    const mission = manager.current;
-    if (!mission) return null;
+    if (manager.isFinished || this.missionAtDoor(cell)) return null;
     for (const site of map.sites.values()) {
       if (!sameCell(cell, site.door)) continue;
       const here = content.institutions.get(site.id);
-      const goal = content.institutions.get(mission.instituicao);
-      if (!here || !goal) return null;
-      return pawns.team.length > 1
-        ? TEXT.wrongDoorOf(pawns.activeMember.name, here.nomeComPreposicao, goal.nomeComPreposicao)
-        : TEXT.wrongDoor(here.nomeComPreposicao, goal.nomeComPreposicao);
+      if (!here) return null;
+      if (pawns.team.length > 1) return TEXT.noMissionHere(pawns.activeMember.name, here.nomeComPreposicao);
+      const mission = manager.missionOf(pawns.activeIndex);
+      const goal = mission && content.institutions.get(mission.instituicao);
+      return goal ? TEXT.wrongDoor(here.nomeComPreposicao, goal.nomeComPreposicao) : null;
     }
     return null;
   }
@@ -186,7 +219,7 @@ export class MissionFlow {
       const firstTry =
         mission.minijogo === 'kit' ? (await kit.run({ color: style.color, icon: style.icon })).firstTry : talk.firstTry;
 
-      const result = manager.complete(firstTry);
+      const result = manager.complete(mission, firstTry, pawns.nextIndex);
       this.persist();
       this.d.sound.pin();
       await showCard(uiRoot, {
@@ -214,24 +247,25 @@ export class MissionFlow {
           await showCard(uiRoot, { kicker: TEXT.eixoKicker, title: eixo.nome, text: eixo.descricao, button: TEXT.next });
         }
       }
-      this.refreshTarget();
       // A câmera já vai para o próximo atrás do cartão da missão.
       pawns.nextTurn();
-      await this.showMissionCard();
+      await this.beginTurn();
     } finally {
       this.visiting = false;
     }
   }
 
-  private async showMissionCard(): Promise<void> {
-    const { manager, content, uiRoot } = this.d;
-    const mission = manager.current;
-    const eixo = manager.currentEixo;
-    if (!mission || !eixo) return;
+  /** Cartão da missão do jogador da vez. Em equipe, com o nome em cima. */
+  private async showMissionCard(mission: Mission): Promise<void> {
+    const { manager, content, pawns, uiRoot } = this.d;
+    const eixo = manager.eixoOf(mission);
     const inst = content.institutions.get(mission.instituicao);
     const style = INSTITUTION_STYLES[mission.instituicao];
     await showCard(uiRoot, {
-      kicker: TEXT.missionOf(manager.index + 1, manager.total, eixo.nome),
+      kicker:
+        pawns.team.length > 1
+          ? TEXT.missionOfPlayer(pawns.activeMember, eixo.nome)
+          : TEXT.missionOf(manager.positionOf(mission) + 1, manager.total, eixo.nome),
       title: mission.titulo,
       text: mission.descricao,
       lines: [TEXT.destination(inst?.nome ?? '')],
@@ -241,33 +275,57 @@ export class MissionFlow {
     });
   }
 
-  /** Atualiza marcador, seta da borda e o "Ir rumo ao objetivo" para a missão atual. */
+  /** Para onde vai o jogador da vez: a própria missão ou, para quem ajuda, a missão em andamento mais perto. */
+  private targetMission(): Mission | null {
+    const { manager, turn, pawns } = this.d;
+    const own = manager.missionOf(pawns.activeIndex);
+    if (own) return own;
+    let nearest: Mission | null = null;
+    let nearestSteps = Infinity;
+    for (const { mission } of manager.active) {
+      const door = this.doorOf(mission);
+      const steps = door ? turn.stepsTo(door) : Infinity;
+      if (steps < nearestSteps) {
+        nearest = mission;
+        nearestSteps = steps;
+      }
+    }
+    return nearest;
+  }
+
+  /** Atualiza as setas das missões, a barra do topo, a seta da borda e o "Ir rumo ao objetivo". */
   private refreshTarget(): void {
-    const { manager, map, marker, markerAnchors, edgeArrow, diceHud } = this.d;
-    const mission = manager.current;
-    const site = mission ? map.sites.get(mission.instituicao) : undefined;
+    const { manager, map, markers, markerAnchors, edgeArrow, diceHud, missionHud, pawns } = this.d;
+    markers.setTargets(
+      manager.active.flatMap(({ mission }) => {
+        const door = this.doorOf(mission);
+        const anchor = markerAnchors.get(mission.instituicao);
+        if (!door || !anchor) return [];
+        return [{ anchor, door: map.tileCenter(door.col, door.row), color: INSTITUTION_STYLES[mission.instituicao].color }];
+      }),
+    );
+
+    const mission = this.targetMission();
+    missionHud.setTurn(pawns.activeIndex, mission);
     const anchor = mission ? markerAnchors.get(mission.instituicao) : undefined;
-    if (!mission || !site || !anchor) {
-      marker.setTarget(null);
+    if (!mission || !anchor) {
       edgeArrow.setTarget(null);
       diceHud.setGoTowards(null);
       return;
     }
     const style = INSTITUTION_STYLES[mission.instituicao];
-    const door = map.tileCenter(site.door.col, site.door.row);
-    marker.setTarget({ anchor, door, color: style.color });
     edgeArrow.setTarget({ position: anchor, color: style.color, icon: style.icon });
     diceHud.setGoTowards(() => this.goTowardsMission());
   }
 
   private goTowardsMission(): void {
-    const { manager, map, turn } = this.d;
-    const mission = manager.current;
+    const { map, turn } = this.d;
+    const mission = this.targetMission();
     const site = mission ? map.sites.get(mission.instituicao) : undefined;
     if (site) turn.goTowards(site.door, faceYawFor(map, site));
   }
 
-  /** Clima a mostrar: o do eixo da missão atual; depois da última missão, fica o do último eixo. */
+  /** Clima a mostrar: o do eixo atual; depois da última missão, fica o do último eixo. */
   private climateEixo(): EixoId {
     const { manager, content } = this.d;
     return manager.currentEixo?.id ?? content.eixos[content.eixos.length - 1].id;

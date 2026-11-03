@@ -27,7 +27,7 @@ import { PauseMenu } from './ui/pauseMenu';
 import { TitleScreen, type TitleMode } from './ui/titleScreen';
 import { createCity } from './world/city';
 import { Climate, floodedDoorProblem } from './world/climate';
-import { MissionMarker } from './world/markers';
+import { MissionMarkers } from './world/markers';
 import { Rain } from './world/rain';
 import { createScene } from './world/scene';
 
@@ -68,7 +68,9 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   // Progresso salvo (ou só em memória, se o navegador bloquear o armazenamento).
   const save = new SaveStore();
   const saved = save.load();
-  const manager = new MissionManager(content, saved);
+  // A equipe: a última guardada, ou um jogador só.
+  const lastTeam = createTeam(loadLastTeam() ?? []);
+  const manager = new MissionManager(content, saved, lastTeam.length);
   // Há partida para continuar? (Deixa de haver depois de "Novo jogo".)
   let hasSavedGame = saved !== null;
 
@@ -91,9 +93,8 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   const iso = new IsoCamera(city.map.halfSize);
   const input = new Input(gameRenderer.canvas);
 
-  // Peões da equipe (a última guardada, ou um jogador só), na porta de casa e virados para a câmera.
-  // O Jogador 1 volta para a casa salva.
-  const pawns = new Pawns(city.map, createTeam(loadLastTeam() ?? []));
+  // Peões da equipe, na porta de casa e virados para a câmera. O Jogador 1 volta para a casa salva.
+  const pawns = new Pawns(city.map, lastTeam);
   scene.add(pawns.object);
   const savedCell = saved?.player;
   if (savedCell && city.map.tile(savedCell.col, savedCell.row)?.walkable) pawns.first.placeAt(savedCell.col, savedCell.row, Math.PI / 4);
@@ -108,8 +109,8 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   // Movimento por dado: jogar → escolher casa destacada → andar.
   const dice = new Dice3D();
   const highlight = new ReachHighlight(city.map);
-  const marker = new MissionMarker();
-  scene.add(dice.mesh, highlight.mesh, marker.object);
+  const markers = new MissionMarkers();
+  scene.add(dice.mesh, highlight.mesh, markers.object);
   const turn = new DiceTurn({
     map: city.map,
     pawns,
@@ -118,12 +119,12 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     picker: new TapPicker({ map: city.map, camera: iso.camera, canvas: gameRenderer.canvas, pickRoot: city.root }),
     // Ruas alagadas não entram nas casas destacadas: o caminho tem que ser pela parte alta.
     isBlocked: (col, row) => climate.isFlooded(col, row),
-    // A porta da missão aparece em amarelo entre as casas destacadas.
-    isSpecial: (cell) => {
-      const mission = manager.current;
-      const door = mission ? city.map.sites.get(mission.instituicao)?.door : undefined;
-      return !!door && door.col === cell.col && door.row === cell.row;
-    },
+    // As portas das missões em andamento aparecem em amarelo entre as casas destacadas.
+    isSpecial: (cell) =>
+      manager.active.some(({ mission }) => {
+        const door = city.map.sites.get(mission.instituicao)?.door;
+        return !!door && door.col === cell.col && door.row === cell.row;
+      }),
   });
   // A cada jogada a câmera volta a seguir o peão da vez (WASD solta a câmera).
   turn.onChange((e) => {
@@ -166,12 +167,13 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     map: city.map,
     pawns,
     turn,
-    marker,
+    markers,
     markerAnchors: city.markerAnchors,
     climate,
     dialogue,
     kit: new KitMinigame(hudRoot, content.kit, () => sound.right()),
     diceHud,
+    missionHud,
     edgeArrow,
     sound,
     uiRoot: hudRoot,
@@ -186,6 +188,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     sound,
     startTeam: (team) => {
       pawns.setTeam(team);
+      manager.setTeamSize(team.length);
       saveLastTeam(team.map((player) => player.typedName));
       void flow.start();
     },
@@ -203,13 +206,13 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     onToggle: (open) => missionHud.setVisible(!open),
   });
   const openTitle = (): void => {
-    const mode: TitleMode = !manager.current ? 'fim' : flow.started || hasSavedGame ? 'continuar' : 'novo';
+    const mode: TitleMode = manager.isFinished ? 'fim' : flow.started || hasSavedGame ? 'continuar' : 'novo';
     title.open({ mode, pins: manager.completedCount, total: manager.total, team: pawns.team });
   };
   const pause = new PauseMenu(hudRoot, missionHud.element, {
     eixoNames,
     sound,
-    isFinished: () => !manager.current,
+    isFinished: () => manager.isFinished,
     showResult: () => void showEnd(),
     restart: () => void flow.restart(),
     goToTitle: openTitle,
@@ -227,7 +230,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
       dice.update(dt);
     }
     highlight.update(dt);
-    marker.update(dt);
+    markers.update(dt);
     climate.update(dt);
     iso.update(dt);
     sound.setRain(rain.intensity);

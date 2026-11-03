@@ -42,7 +42,7 @@ export class Pawns {
   private readonly turnListeners: TurnChangeListener[] = [];
   private currentTeam: Team = [];
   private members: readonly Player[] = [];
-  private activeIndex = 0;
+  private turn = 0;
 
   constructor(map: CityMap, team: Team) {
     this.map = map;
@@ -82,14 +82,24 @@ export class Pawns {
     return this.members[0];
   }
 
+  /** Posição de quem está na vez, na ordem da equipe (0 = Jogador 1). */
+  get activeIndex(): number {
+    return this.turn;
+  }
+
+  /** Posição de quem joga em seguida. Com 1 jogador, não muda. */
+  get nextIndex(): number {
+    return (this.turn + 1) % this.members.length;
+  }
+
   /** Peão de quem está na vez. */
   get active(): Player {
-    return this.members[this.activeIndex];
+    return this.members[this.turn];
   }
 
   /** Jogador que está na vez. */
   get activeMember(): TeamPlayer {
-    return this.currentTeam[this.activeIndex];
+    return this.currentTeam[this.turn];
   }
 
   /** Chamado quando qualquer peão chega ao fim de um caminho. */
@@ -118,14 +128,14 @@ export class Pawns {
   goHome(): void {
     const home = this.map.sites.get('casa');
     if (home) for (const pawn of this.members) pawn.placeAt(home.door.col, home.door.row, HOME_YAW);
-    this.activeIndex = 0;
+    this.turn = 0;
     this.emitTurn();
   }
 
   /** Passa a vez para o próximo da ordem. Com 1 jogador, não muda nada. */
   nextTurn(): void {
     if (this.members.length < 2) return;
-    this.activeIndex = (this.activeIndex + 1) % this.members.length;
+    this.turn = this.nextIndex;
     this.emitTurn();
   }
 

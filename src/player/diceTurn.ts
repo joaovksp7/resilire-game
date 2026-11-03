@@ -153,6 +153,14 @@ export class DiceTurn {
     this.setState('choosing', tapped && this.isFlooded(tapped.col, tapped.row) ? 'flooded' : 'pick-highlighted');
   }
 
+  /** Passos do peão da vez até `goal` pelas casas livres (Infinity se não houver caminho). */
+  stepsTo(goal: Cell): number {
+    const start = this.opts.pawns.active.cell;
+    if (!start) return Infinity;
+    const steps = distancesTo(this.grid, goal)[start.row * this.grid.cols + start.col];
+    return steps >= 0 ? steps : Infinity;
+  }
+
   /** Rua, praça ou ponte que existe mas está bloqueada (ex.: alagada). */
   private isFlooded(col: number, row: number): boolean {
     return !!this.opts.map.tile(col, row)?.walkable && !!this.opts.isBlocked?.(col, row);

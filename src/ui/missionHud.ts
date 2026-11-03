@@ -1,4 +1,4 @@
-import type { GameContent } from '../missions/content';
+import type { GameContent, Mission } from '../missions/content';
 import type { MissionManager } from '../missions/missionManager';
 import { INSTITUTION_STYLES } from '../world/institutions';
 import { badge, modals, openModal, type SoundSwitch, soundButton, textEl, uid } from './cards';
@@ -7,6 +7,8 @@ import { badge, modals, openModal, type SoundSwitch, soundButton, textEl, uid } 
 const TEXT = {
   missionOf: (n: number, total: number, eixo: string) => `Missão ${n} de ${total} · ${eixo}`,
   destination: (name: string) => `Destino: ${name}`,
+  helping: 'Ajudando a equipe',
+  nearest: (name: string) => `Mais perto: ${name}`,
   allDone: 'Todas as missões concluídas!',
   pinsButton: (n: number, total: number) => `Pins: ${n} de ${total}. Abrir painel de pins`,
   panelTitle: 'Seus pins',
@@ -22,6 +24,7 @@ const PIN_ICON =
 
 /**
  * Barra da missão no topo (missão, eixo, destino), o botão/painel de pins e o botão de som.
+ * A barra mostra a missão do jogador da vez ou, para quem está ajudando, "Ajudando a equipe".
  * O "Começar de novo" fica no menu de pausa e na tela inicial.
  */
 export class MissionHud {
@@ -32,6 +35,10 @@ export class MissionHud {
   private readonly bar: HTMLElement;
   private readonly pinsButton: HTMLButtonElement;
   private readonly pinsCount: HTMLSpanElement;
+  /** Jogador da vez (posição na ordem da equipe). */
+  private player = 0;
+  /** Para quem está ajudando: a missão em andamento mais perto. */
+  private nearest: Mission | null = null;
   /** Pins já mostrados no botão (para saber quando chegou um novo). */
   private shownCount = 0;
   private pulsePending = false;
@@ -77,22 +84,40 @@ export class MissionHud {
     this.top.hidden = !visible;
   }
 
+  /** Diz de quem é a vez e, para quem está ajudando, qual é a missão em andamento mais perto. */
+  setTurn(player: number, nearest: Mission | null): void {
+    this.player = player;
+    this.nearest = nearest;
+    this.render();
+  }
+
+  /** Linha do destino: selo da instituição e o texto. */
+  private destinationLine(mission: Mission, label: (name: string) => string): HTMLElement {
+    const inst = this.content.institutions.get(mission.instituicao);
+    const style = INSTITUTION_STYLES[mission.instituicao];
+    const dest = document.createElement('p');
+    dest.className = 'hud-missao__destino';
+    dest.append(badge(style.icon, style.color, 'selo selo--pequeno'), document.createTextNode(label(inst?.nome ?? '')));
+    return dest;
+  }
+
   render(): void {
-    const { manager, content } = this;
-    const mission = manager.current;
+    const { manager, nearest } = this;
+    const mission = manager.missionOf(this.player);
     const eixo = manager.currentEixo;
-    if (!mission || !eixo) {
+    if (!eixo) {
       this.bar.replaceChildren(textEl('p', 'hud-missao__titulo', TEXT.allDone));
-    } else {
-      const inst = content.institutions.get(mission.instituicao);
-      const style = INSTITUTION_STYLES[mission.instituicao];
-      const dest = document.createElement('p');
-      dest.className = 'hud-missao__destino';
-      dest.append(badge(style.icon, style.color, 'selo selo--pequeno'), document.createTextNode(TEXT.destination(inst?.nome ?? '')));
+    } else if (mission) {
       this.bar.replaceChildren(
-        textEl('p', 'hud-missao__kicker', TEXT.missionOf(manager.index + 1, manager.total, eixo.nome)),
+        textEl('p', 'hud-missao__kicker', TEXT.missionOf(manager.positionOf(mission) + 1, manager.total, manager.eixoOf(mission).nome)),
         textEl('p', 'hud-missao__titulo', mission.titulo),
-        dest,
+        this.destinationLine(mission, TEXT.destination),
+      );
+    } else {
+      this.bar.replaceChildren(
+        textEl('p', 'hud-missao__kicker', eixo.nome),
+        textEl('p', 'hud-missao__titulo', TEXT.helping),
+        ...(nearest && !manager.isCompleted(nearest.id) ? [this.destinationLine(nearest, TEXT.nearest)] : []),
       );
     }
     const count = manager.completedCount;
