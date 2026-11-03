@@ -5,7 +5,7 @@ Jogo educativo para navegador sobre **enchentes e deslizamentos**, para estudant
 - Game design completo:
 - Regras para quem desenvolve: [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)
 
-> **Status:** Parte 2, Fase 10 (Tela inicial com escolha de jogadores) — a tela inicial já escolhe de 1 a 4 jogadores e os nomes, mas o jogo ainda anda com um peão só (os outros chegam na Fase 11); as 10 missões jogáveis do começo ao fim, com progresso salvo; o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); no mercado o jogador monta a mochila de emergência; o jogo tem tela inicial, Como jogar, pausa, tela final e créditos; e tem som gerado por código (chuva, pin, dado e acerto), com botão de som sempre à mão, e animação nos pins. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`).
+> **Status:** Parte 2, Fase 11 (Peões e vez) — de 1 a 4 jogadores no mesmo aparelho, cada um com o seu peão e passando a vez a cada jogada do dado; as missões ainda são uma por vez para a equipe toda (a divisão chega na Fase 12); as 10 missões jogáveis do começo ao fim, com progresso salvo (por enquanto, ao recarregar, os peões dos outros jogadores voltam para casa e a vez volta para o Jogador 1; a equipe inteira passa a ser salva na Fase 13); o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); no mercado o jogador monta a mochila de emergência; o jogo tem tela inicial, Como jogar, pausa, tela final e créditos; e tem som gerado por código (chuva, pin, dado e acerto), com botão de som sempre à mão, e animação nos pins. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`).
 
 ---
 
@@ -35,6 +35,8 @@ O personagem anda **por dado**, como num jogo de tabuleiro:
 1. Jogue o dado (de 1 a 6). Ele cai rolando ao lado do personagem.
 2. As casas que dá para alcançar com até aquele número de passos ficam destacadas em azul no chão.
 3. Escolha uma delas e o personagem anda casa por casa até lá. Não precisa usar todos os passos.
+
+Com 2 ou mais jogadores, cada um tem o seu peão e todos começam na porta de casa. Uma vez é uma jogada do dado: ao chegar, a vez passa para o próximo, na ordem da tela inicial. Só o peão da vez anda, e ele tem um anel no chão; a câmera vai até ele e o rodapé mostra de quem é a vez, com o número e a cor do jogador. Quem parar na porta da missão faz a visita. Peões não bloqueiam o caminho uns dos outros e, na mesma casa, ficam lado a lado.
 
 | Ação | Computador | Celular |
 |---|---|---|
@@ -97,7 +99,7 @@ No iPhone, a chave de silencioso do aparelho também corta o som do jogo. Os vol
 
 ### Progresso salvo
 
-O jogo salva sozinho a missão atual, os pins, os acertos de primeira e onde o personagem está. Ao recarregar a página, continua de onde parou. Se o navegador bloquear o armazenamento (acontece dentro de iframe em alguns navegadores), o jogo funciona normalmente, mas o progresso some ao recarregar (a tela inicial avisa). Para recomeçar, use "Começar de novo" no menu de pausa ou "Novo jogo" na tela inicial.
+O jogo salva sozinho a missão atual, os pins, os acertos de primeira e onde o personagem está. Ao recarregar a página, continua de onde parou. Com 2 ou mais jogadores, por enquanto só o lugar do Jogador 1 fica salvo: os outros peões voltam para casa e a vez volta para o Jogador 1 (muda na Fase 13). Se o navegador bloquear o armazenamento (acontece dentro de iframe em alguns navegadores), o jogo funciona normalmente, mas o progresso some ao recarregar (a tela inicial avisa). Para recomeçar, use "Começar de novo" no menu de pausa ou "Novo jogo" na tela inicial.
 
 Os nomes da última equipe ficam guardados à parte, só neste navegador, e voltam preenchidos na partida seguinte. Nada sai do aparelho.
 
@@ -278,13 +280,14 @@ src/
     character.ts      personagem low-poly e animação de andar
     player.ts         movimento casa por casa (com pulinho), altura do chão e da ponte
     team.ts           a equipe: nomes, números e cores dos jogadores
+    pawns.ts          os peões da equipe: de quem é a vez, o anel e quem fica lado a lado na mesma casa
     pathfinding.ts    casas alcançáveis com o dado e caminho na grade de ruas (4 direções)
     dice.ts           dado 3D (pintas desenhadas em código) e a animação de rolar
-    diceTurn.ts       a vez: jogar o dado → escolher casa → andar
+    diceTurn.ts       a jogada do peão da vez: jogar o dado → escolher casa → andar
     reachHighlight.ts destaques azuis das casas alcançáveis
     clickToMove.ts    descobre o que foi tocado na tela (chão ou prédio)
   ui/
-    diceHud.ts        botão "Jogar dado", "Ir rumo ao objetivo" e avisos
+    diceHud.ts        botão "Jogar dado", "Ir rumo ao objetivo", avisos e de quem é a vez
     missionHud.ts     barra da missão no topo, painel de pins e botão de som
     dialogue.ts       caixa de diálogo e pergunta
     cards.ts          cartões (missão, pin, eixo), confirmação, botão de som e janelas com foco preso

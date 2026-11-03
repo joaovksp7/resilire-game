@@ -10,11 +10,11 @@ import { ContentError, type GameContent, loadContent } from './missions/content'
 import { MissionFlow } from './missions/missionFlow';
 import { KitMinigame } from './minigames/kitMinigame';
 import { MissionManager } from './missions/missionManager';
-import { Character } from './player/character';
+import { prefersReducedMotion } from './player/character';
 import { TapPicker } from './player/clickToMove';
 import { Dice3D } from './player/dice';
 import { DiceTurn } from './player/diceTurn';
-import { Player } from './player/player';
+import { Pawns } from './player/pawns';
 import { ReachHighlight } from './player/reachHighlight';
 import { createTeam } from './player/team';
 import { modals } from './ui/cards';
@@ -71,8 +71,6 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   const manager = new MissionManager(content, saved);
   // Há partida para continuar? (Deixa de haver depois de "Novo jogo".)
   let hasSavedGame = saved !== null;
-  // A equipe: a última guardada, ou um jogador só. Por enquanto só o peão do jogador 1 anda.
-  let team = createTeam(loadLastTeam() ?? []);
 
   // Clima por eixo: céu, luzes, rio, chuva e ruas alagadas. Já começa no eixo salvo
   // (MissionFlow.start() confirma).
@@ -93,15 +91,19 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   const iso = new IsoCamera(city.map.halfSize);
   const input = new Input(gameRenderer.canvas);
 
-  // Personagem: volta para a casa salva; senão começa na porta de casa, virado para a câmera.
-  const player = new Player(city.map, new Character());
-  scene.add(player.object);
-  const home = city.map.sites.get('casa');
+  // Peões da equipe (a última guardada, ou um jogador só), na porta de casa e virados para a câmera.
+  // O Jogador 1 volta para a casa salva.
+  const pawns = new Pawns(city.map, createTeam(loadLastTeam() ?? []));
+  scene.add(pawns.object);
   const savedCell = saved?.player;
-  if (savedCell && city.map.tile(savedCell.col, savedCell.row)?.walkable) player.placeAt(savedCell.col, savedCell.row, Math.PI / 4);
-  else if (home) player.placeAt(home.door.col, home.door.row, Math.PI / 4);
-  iso.centerOn(player.position.x, player.position.z, player.position.y);
-  iso.follow(player);
+  if (savedCell && city.map.tile(savedCell.col, savedCell.row)?.walkable) pawns.first.placeAt(savedCell.col, savedCell.row, Math.PI / 4);
+  iso.centerOn(pawns.active.position.x, pawns.active.position.z, pawns.active.position.y);
+  iso.follow(pawns.active);
+  // A câmera vai até o peão da vez. Com prefers-reduced-motion, chega direto, sem deslizar.
+  pawns.onTurnChange((pawn) => {
+    if (prefersReducedMotion()) iso.centerOn(pawn.position.x, pawn.position.z, pawn.position.y);
+    iso.follow(pawn);
+  });
 
   // Movimento por dado: jogar → escolher casa destacada → andar.
   const dice = new Dice3D();
@@ -110,7 +112,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   scene.add(dice.mesh, highlight.mesh, marker.object);
   const turn = new DiceTurn({
     map: city.map,
-    player,
+    pawns,
     dice,
     highlight,
     picker: new TapPicker({ map: city.map, camera: iso.camera, canvas: gameRenderer.canvas, pickRoot: city.root }),
@@ -123,9 +125,9 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
       return !!door && door.col === cell.col && door.row === cell.row;
     },
   });
-  // A cada jogada a câmera volta a seguir o personagem (WASD solta a câmera).
+  // A cada jogada a câmera volta a seguir o peão da vez (WASD solta a câmera).
   turn.onChange((e) => {
-    if (e.state === 'rolling' || e.state === 'walking') iso.follow(player);
+    if (e.state === 'rolling' || e.state === 'walking') iso.follow(pawns.active);
   });
   // Som do dado: batidinhas ao jogar e uma batida quando ele para no chão.
   let lastTurnState = turn.state;
@@ -137,7 +139,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   input.onTap((x, y) => turn.handleTap(x, y));
 
   // Interface.
-  const diceHud = new DiceHud(hudRoot, turn);
+  const diceHud = new DiceHud(hudRoot, turn, pawns);
   const missionHud = new MissionHud(hudRoot, content, manager, sound);
   const edgeArrow = new EdgeArrow(hudRoot, iso.camera, { top: missionHud.element, bottom: diceHud.element });
   const dialogue = new DialogueBox(hudRoot, () => sound.right());
@@ -162,7 +164,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     manager,
     save,
     map: city.map,
-    player,
+    pawns,
     turn,
     marker,
     markerAnchors: city.markerAnchors,
@@ -182,8 +184,8 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     eixoNames,
     persistent: save.persistent,
     sound,
-    startTeam: (chosen) => {
-      team = chosen;
+    startTeam: (team) => {
+      pawns.setTeam(team);
       saveLastTeam(team.map((player) => player.typedName));
       void flow.start();
     },
@@ -202,7 +204,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   });
   const openTitle = (): void => {
     const mode: TitleMode = !manager.current ? 'fim' : flow.started || hasSavedGame ? 'continuar' : 'novo';
-    title.open({ mode, pins: manager.completedCount, total: manager.total, team });
+    title.open({ mode, pins: manager.completedCount, total: manager.total, team: pawns.team });
   };
   const pause = new PauseMenu(hudRoot, missionHud.element, {
     eixoNames,
@@ -221,7 +223,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     iso.zoomBy(input.consumeZoom());
     // Na tela inicial e na pausa, o jogo para; na pausa, a chuva e o rio continuam.
     if (!title.isOpen && !pause.isOpen) {
-      player.update(dt);
+      pawns.update(dt);
       dice.update(dt);
     }
     highlight.update(dt);

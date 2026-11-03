@@ -11,7 +11,6 @@ import {
 import { PLAYER } from '../config';
 
 const COLORS = {
-  jacket: 0xffc23d,
   pants: 0x34508a,
   skin: 0xb07a4f,
   hair: 0x2e2019,
@@ -38,7 +37,7 @@ function limb(w: number, h: number, d: number, material: MeshLambertMaterial, x:
 
 /**
  * Personagem low-poly feito só com caixas e esferas, de frente para +z.
- * `root` fica no chão (y = 0 nos pés); quem move é o Player.
+ * `root` fica no chão (y = 0 nos pés); quem move é o Player. A cor da jaqueta muda de jogador para jogador.
  */
 export class Character {
   readonly root = new Group();
@@ -48,10 +47,10 @@ export class Character {
   private phase = 0;
   private swing = 0;
 
-  constructor() {
+  constructor(jacketColor: number) {
     this.root.name = 'personagem';
     const mat = (color: number): MeshLambertMaterial => new MeshLambertMaterial({ color });
-    const jacket = mat(COLORS.jacket);
+    const jacket = mat(jacketColor);
     const pants = mat(COLORS.pants);
     const skin = mat(COLORS.skin);
     const hair = mat(COLORS.hair);

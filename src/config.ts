@@ -128,6 +128,13 @@ export const TEAM = {
    * o número do jogador aparece sempre junto, porque a cor nunca é a única pista.
    */
   colors: [0xffc23d, 0x56b4e9, 0xd55e00, 0x009e73],
+  /** Distância entre peões que dividem a mesma casa, lado a lado na tela (unidades do mundo; 1 tile = 2). */
+  pawnSpacing: 0.72,
+  /** Rapidez para os peões abrirem espaço ao dividir uma casa (maior = mais rápido). */
+  spreadSharpness: 10,
+  /** Anel no chão do peão da vez: raio de dentro e de fora (unidades do mundo). */
+  ringInner: 0.44,
+  ringOuter: 0.62,
 } as const;
 
 export const PLAYER = {

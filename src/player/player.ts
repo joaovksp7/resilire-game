@@ -1,5 +1,5 @@
 import { type Group, Vector3 } from 'three';
-import { PLAYER } from '../config';
+import { PLAYER, TEAM } from '../config';
 import type { FollowTarget } from '../core/camera';
 import type { CityMap } from '../world/cityMap';
 import { type Character, prefersReducedMotion } from './character';
@@ -17,8 +17,13 @@ function angleDelta(from: number, to: number): number {
  * Anda de centro em centro de tile seguindo o caminho, na altura do chão (ou da ponte).
  */
 export class Player implements FollowTarget {
+  /** Centro da casa onde está (ou ponto do caminho). É o que vale para andar e para a câmera. */
+  readonly position = new Vector3();
   private readonly map: CityMap;
   private readonly character: Character;
+  /** Deslocamento só visual, para dividir a casa com outros peões: o atual e para onde está indo. */
+  private readonly spread = new Vector3();
+  private readonly spreadTarget = new Vector3();
   private readonly waypoints: Vector3[] = [];
   private readonly arriveListeners: ArriveListener[] = [];
   private yaw = 0;
@@ -34,12 +39,9 @@ export class Player implements FollowTarget {
     this.character = character;
   }
 
+  /** O boneco na cena. A posição dele é `position` mais o deslocamento visual. */
   get object(): Group {
     return this.character.root;
-  }
-
-  get position(): Vector3 {
-    return this.character.root.position;
   }
 
   get isMoving(): boolean {
@@ -65,6 +67,12 @@ export class Player implements FollowTarget {
     this.destination = null;
     this.yaw = this.targetYaw = yaw;
     this.character.root.rotation.y = yaw;
+    this.syncObject();
+  }
+
+  /** Para onde o boneco desliza em relação ao centro da casa (x e z do mundo). */
+  setSpread(x: number, z: number): void {
+    this.spreadTarget.set(x, 0, z);
   }
 
   /**
@@ -119,6 +127,8 @@ export class Player implements FollowTarget {
     }
 
     this.position.y = this.map.walkHeightAt(this.position.x, this.position.z);
+    this.spread.lerp(this.spreadTarget, prefersReducedMotion() ? 1 : 1 - Math.exp(-TEAM.spreadSharpness * dt));
+    this.syncObject();
 
     const turn = 1 - Math.exp(-PLAYER.turnSharpness * dt);
     this.yaw += angleDelta(this.yaw, this.targetYaw) * turn;
@@ -131,6 +141,13 @@ export class Player implements FollowTarget {
     if (!this.isMoving || this.segmentLength <= 1e-4 || prefersReducedMotion()) return 0;
     const progress = 1 - this.distanceTo(this.waypoints[0]) / this.segmentLength;
     return Math.sin(Math.PI * Math.min(1, Math.max(0, progress))) * PLAYER.hopHeight;
+  }
+
+  /** Põe o boneco no lugar, na altura do chão onde ele pisa de verdade (a casa pode ser uma ladeira). */
+  private syncObject(): void {
+    const x = this.position.x + this.spread.x;
+    const z = this.position.z + this.spread.z;
+    this.character.root.position.set(x, this.map.walkHeightAt(x, z), z);
   }
 
   private distanceTo(point: Vector3): number {

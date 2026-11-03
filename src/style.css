@@ -104,6 +104,29 @@ body {
   pointer-events: auto;
 }
 
+/* Com 2 ou mais jogadores: número e cor do peão da vez. --cor-peao vem do diceHud.ts. */
+.hud-dado__aviso--vez {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-left: 0.5rem;
+  border: 3px solid var(--cor-peao);
+  text-align: left;
+}
+
+.hud-dado__peao {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 2px solid var(--cor-borda);
+  border-radius: 50%;
+  background: var(--cor-peao);
+  color: var(--cor-texto);
+  font-weight: 900;
+}
+
 .botao-dado {
   display: inline-flex;
   align-items: center;

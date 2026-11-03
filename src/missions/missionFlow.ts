@@ -4,8 +4,8 @@ import type { SaveStore } from '../core/save';
 import type { KitMinigame } from '../minigames/kitMinigame';
 import { faceYawFor } from '../player/clickToMove';
 import type { DiceTurn } from '../player/diceTurn';
+import type { Pawns } from '../player/pawns';
 import type { Cell } from '../player/pathfinding';
-import type { Player } from '../player/player';
 import { showCard } from '../ui/cards';
 import type { DialogueBox } from '../ui/dialogue';
 import type { DiceHud } from '../ui/diceHud';
@@ -18,7 +18,7 @@ import type { MissionMarker } from '../world/markers';
 import type { EixoId, GameContent, Mission } from './content';
 import type { MissionManager } from './missionManager';
 
-/** Até quantas casas em volta procurar uma rua seca, se a água cobrir a casa do personagem. */
+/** Até quantas casas em volta procurar uma rua seca, se a água cobrir a casa de um peão. */
 const DRY_SEARCH_RADIUS = 10;
 
 // Textos da interface (não são conteúdo educativo).
@@ -31,6 +31,7 @@ const TEXT = {
   next: 'Continuar',
   eixoKicker: 'Novo eixo',
   wrongDoor: (here: string, goal: string) => `Você está ${here}. Sua missão agora é ${goal}.`,
+  wrongDoorOf: (name: string, here: string, goal: string) => `${name} está ${here}. A missão agora é ${goal}.`,
 } as const;
 
 export interface MissionFlowDeps {
@@ -38,7 +39,7 @@ export interface MissionFlowDeps {
   manager: MissionManager;
   save: SaveStore;
   map: CityMap;
-  player: Player;
+  pawns: Pawns;
   turn: DiceTurn;
   marker: MissionMarker;
   markerAnchors: ReadonlyMap<InstitutionId, Vector3>;
@@ -61,6 +62,7 @@ const sameCell = (a: Cell | null, b: Cell): boolean => !!a && a.col === b.col &&
 /**
  * O loop das missões: cartão da missão → jogar o dado até a porta → diálogo → pergunta →
  * pin → (troca de eixo) → próxima missão. Salva o progresso a cada passo.
+ * Com 2 ou mais jogadores, a vez passa quando o peão chega e depois de cada visita.
  */
 export class MissionFlow {
   private readonly d: MissionFlowDeps;
@@ -69,7 +71,7 @@ export class MissionFlow {
 
   constructor(deps: MissionFlowDeps) {
     this.d = deps;
-    deps.player.onArrive((cell) => this.onArrive(cell));
+    deps.pawns.onArrive((cell) => this.onArrive(cell));
     deps.diceHud.setGoTowards(() => this.goTowardsMission());
   }
 
@@ -90,18 +92,22 @@ export class MissionFlow {
     this.refreshTarget();
     if (!this.d.manager.current) return;
     await this.showMissionCard();
-    this.checkDoor(this.d.player.cell);
+    const { pawns, diceHud } = this.d;
+    const cell = pawns.active.cell;
+    if (this.visitAtDoor(cell)) return;
+    // Em equipe, todos começam em casa: o rodapé já abre dizendo de quem é a vez.
+    const notice = pawns.team.length > 1 ? null : this.wrongDoorNotice(cell);
+    if (notice) diceHud.say(notice);
   }
 
   /** Apaga o progresso e volta para a primeira missão, em casa. O jogo só começa no próximo start(). */
   reset(): void {
-    const { manager, save, map, player, turn, climate } = this.d;
+    const { manager, save, pawns, turn, climate } = this.d;
     this.begun = false;
     manager.reset();
     save.clear();
     climate.set(this.climateEixo(), false);
-    const home = map.sites.get('casa');
-    if (home) player.placeAt(home.door.col, home.door.row, Math.PI / 4);
+    pawns.goHome();
     turn.reset();
     this.refreshTarget();
   }
@@ -121,31 +127,43 @@ export class MissionFlow {
   }
 
   private onArrive(cell: Cell): void {
+    if (this.visiting) return;
     this.persist();
-    this.checkDoor(cell);
+    if (this.visitAtDoor(cell)) return;
+    // O aviso fala de quem acabou de chegar, então é montado antes de a vez passar.
+    const notice = this.wrongDoorNotice(cell);
+    this.d.pawns.nextTurn();
+    if (notice) this.d.diceHud.say(notice);
   }
 
-  /** Se o personagem parou na porta da missão, começa a visita; se parou em outra porta, avisa. */
-  private checkDoor(cell: Cell | null): void {
-    const { manager, map, content, diceHud } = this.d;
-    const mission = manager.current;
-    if (!mission || !cell || this.visiting) return;
+  /** Se o peão da vez está na porta da missão, começa a visita. */
+  private visitAtDoor(cell: Cell | null): boolean {
+    const mission = this.d.manager.current;
     const door = this.missionDoor();
-    if (door && sameCell(cell, door)) {
-      void this.visit(mission);
-      return;
-    }
+    if (!mission || !door || !sameCell(cell, door)) return false;
+    void this.visit(mission);
+    return true;
+  }
+
+  /** Aviso para quem parou na porta de uma instituição que não é a da missão (null nas outras casas). */
+  private wrongDoorNotice(cell: Cell | null): string | null {
+    const { manager, map, content, pawns } = this.d;
+    const mission = manager.current;
+    if (!mission) return null;
     for (const site of map.sites.values()) {
       if (!sameCell(cell, site.door)) continue;
       const here = content.institutions.get(site.id);
       const goal = content.institutions.get(mission.instituicao);
-      if (here && goal) diceHud.say(TEXT.wrongDoor(here.nomeComPreposicao, goal.nomeComPreposicao));
-      return;
+      if (!here || !goal) return null;
+      return pawns.team.length > 1
+        ? TEXT.wrongDoorOf(pawns.activeMember.name, here.nomeComPreposicao, goal.nomeComPreposicao)
+        : TEXT.wrongDoor(here.nomeComPreposicao, goal.nomeComPreposicao);
     }
+    return null;
   }
 
   private async visit(mission: Mission): Promise<void> {
-    const { content, manager, dialogue, kit, map, player, uiRoot } = this.d;
+    const { content, manager, dialogue, kit, map, pawns, uiRoot } = this.d;
     this.visiting = true;
     try {
       const inst = content.institutions.get(mission.instituicao);
@@ -157,7 +175,7 @@ export class MissionFlow {
 
       // De frente para o prédio durante a conversa.
       const site = map.sites.get(mission.instituicao);
-      if (site) player.placeAt(site.door.col, site.door.row, faceYawFor(map, site));
+      if (site) pawns.active.placeAt(site.door.col, site.door.row, faceYawFor(map, site));
 
       // Conversa (com a pergunta, se houver) e, depois, o minijogo, se a missão tiver.
       const talk = await dialogue.run(
@@ -197,6 +215,8 @@ export class MissionFlow {
         }
       }
       this.refreshTarget();
+      // A câmera já vai para o próximo atrás do cartão da missão.
+      pawns.nextTurn();
       await this.showMissionCard();
     } finally {
       this.visiting = false;
@@ -254,25 +274,30 @@ export class MissionFlow {
   }
 
   /**
-   * Se a água cobriu a casa onde o personagem está, leva ele para a rua seca mais perto
+   * Todo peão numa casa que a água cobriu vai para a rua seca mais perto
    * (ou para a porta de casa). Evita ficar preso sem casa nenhuma ao alcance do dado.
    */
   private moveOutOfWater(): boolean {
-    const { player, map, climate } = this.d;
-    const cell = player.cell;
-    if (!cell || !climate.isFlooded(cell.col, cell.row)) return false;
-    const { x, z } = player.position;
-    const dry =
-      map.nearestWalkable(x, z, DRY_SEARCH_RADIUS, (col, row) => climate.isFlooded(col, row)) ??
-      map.sites.get('casa')?.door ??
-      null;
-    if (!dry) return false;
-    player.placeAt(dry.col, dry.row);
-    return true;
+    const { pawns, map, climate } = this.d;
+    let moved = false;
+    for (const pawn of pawns.all) {
+      const cell = pawn.cell;
+      if (!cell || !climate.isFlooded(cell.col, cell.row)) continue;
+      const { x, z } = pawn.position;
+      const dry =
+        map.nearestWalkable(x, z, DRY_SEARCH_RADIUS, (col, row) => climate.isFlooded(col, row)) ??
+        map.sites.get('casa')?.door ??
+        null;
+      if (!dry) continue;
+      pawn.placeAt(dry.col, dry.row);
+      moved = true;
+    }
+    return moved;
   }
 
+  /** O save ainda guarda uma casa só, a do Jogador 1 (o da equipe chega na Fase 13). */
   private persist(): void {
-    const { save, manager, player } = this.d;
-    save.save(manager.toSave(player.cell));
+    const { save, manager, pawns } = this.d;
+    save.save(manager.toSave(pawns.first.cell));
   }
 }

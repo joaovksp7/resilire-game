@@ -2,8 +2,8 @@ import { PLAYER } from '../config';
 import type { CityMap } from '../world/cityMap';
 import type { TapPicker } from './clickToMove';
 import { Dice3D } from './dice';
+import type { Pawns } from './pawns';
 import { type Cell, distancesTo, findPath, type Reach, reachableTiles, type WalkGrid } from './pathfinding';
-import type { Player } from './player';
 import type { ReachHighlight } from './reachHighlight';
 
 /** Etapas de uma jogada. */
@@ -23,7 +23,8 @@ export type TurnListener = (event: TurnEvent) => void;
 
 export interface DiceTurnOptions {
   map: CityMap;
-  player: Player;
+  /** Quem joga e anda é sempre o peão da vez. */
+  pawns: Pawns;
   dice: Dice3D;
   highlight: ReachHighlight;
   picker: TapPicker;
@@ -56,7 +57,7 @@ export class DiceTurn {
       rows: map.rows,
       isWalkable: (col, row) => !!map.tile(col, row)?.walkable && !isBlocked?.(col, row),
     };
-    opts.player.onArrive(() => {
+    opts.pawns.onArrive(() => {
       if (this.current === 'walking') this.setState('waiting');
     });
   }
@@ -90,15 +91,17 @@ export class DiceTurn {
   /** Joga o dado (só quando é a vez de jogar). */
   roll(): void {
     if (this.current !== 'waiting' || this.paused) return;
-    const { dice, player, highlight } = this.opts;
+    const { dice, pawns, highlight } = this.opts;
+    const pawn = pawns.active;
     const value = Dice3D.draw();
     const token = ++this.rollToken;
     this.value = value;
     this.setState('rolling');
 
-    void dice.roll(value, player.position).then(() => {
+    // Cai ao lado do boneco, que pode estar fora do centro da casa se ela estiver dividida.
+    void dice.roll(value, pawn.object.position).then(() => {
       if (token !== this.rollToken) return;
-      const start = player.cell;
+      const start = pawn.cell;
       this.reach = start ? reachableTiles(this.grid, start, value) : null;
       if (!this.reach || this.reach.cells.length === 0) {
         dice.dismiss();
@@ -166,7 +169,7 @@ export class DiceTurn {
       return true;
     }
     const dist = distancesTo(this.grid, goal);
-    const start = this.opts.player.cell;
+    const start = this.opts.pawns.active.cell;
     let best: Cell | null = null;
     let bestDist = start ? dist[start.row * this.grid.cols + start.col] : -1;
     if (bestDist < 0) bestDist = Infinity;
@@ -183,9 +186,10 @@ export class DiceTurn {
   }
 
   private walkTo(cell: Cell, faceYaw: number | null): void {
-    const { player, highlight, dice } = this.opts;
+    const { pawns, highlight, dice } = this.opts;
+    const pawn = pawns.active;
     const reach = this.reach;
-    const start = player.cell;
+    const start = pawn.cell;
     if (!reach || !start || this.value === null) return;
 
     // A* (prefere menos curvas); se por algum motivo passar do número do dado, usa o caminho da busca.
@@ -197,7 +201,7 @@ export class DiceTurn {
     dice.dismiss();
     this.reach = null;
     this.setState('walking');
-    player.walk(path, faceYaw);
+    pawn.walk(path, faceYaw);
   }
 
   private setState(state: TurnState, hint: TurnHint | null = null): void {
