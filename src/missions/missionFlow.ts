@@ -93,18 +93,24 @@ export class MissionFlow {
     this.checkDoor(this.d.player.cell);
   }
 
-  /** Apaga o progresso e volta para a primeira missão, em casa. */
-  async restart(): Promise<void> {
+  /** Apaga o progresso e volta para a primeira missão, em casa. O jogo só começa no próximo start(). */
+  reset(): void {
     const { manager, save, map, player, turn, climate } = this.d;
-    this.begun = true;
+    this.begun = false;
     manager.reset();
     save.clear();
     climate.set(this.climateEixo(), false);
     const home = map.sites.get('casa');
     if (home) player.placeAt(home.door.col, home.door.row, Math.PI / 4);
     turn.reset();
-    this.persist();
     this.refreshTarget();
+  }
+
+  /** Apaga o progresso e já começa de novo, na primeira missão. */
+  async restart(): Promise<void> {
+    this.reset();
+    this.begun = true;
+    this.persist();
     await this.showMissionCard();
   }
 

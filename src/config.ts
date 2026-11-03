@@ -118,6 +118,18 @@ export const AUDIO = {
   effects: 0.6,
 } as const;
 
+/** Equipe: até 4 pessoas no mesmo aparelho, cada uma na sua vez. */
+export const TEAM = {
+  maxPlayers: 4,
+  /** Tamanho máximo do nome de um jogador. */
+  nameMaxLength: 12,
+  /**
+   * Cor da jaqueta de cada jogador, na ordem da vez. Paleta pensada para daltonismo;
+   * o número do jogador aparece sempre junto, porque a cor nunca é a única pista.
+   */
+  colors: [0xffc23d, 0x56b4e9, 0xd55e00, 0x009e73],
+} as const;
+
 export const PLAYER = {
   /** Velocidade de caminhada (unidades do mundo por segundo; 1 tile = 2 unidades). */
   speed: 4,

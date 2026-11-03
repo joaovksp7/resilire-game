@@ -5,7 +5,7 @@ import { IsoCamera } from './core/camera';
 import { Input } from './core/input';
 import { GameLoop } from './core/loop';
 import { GameRenderer, isWebGLAvailable } from './core/renderer';
-import { SaveStore } from './core/save';
+import { loadLastTeam, saveLastTeam, SaveStore } from './core/save';
 import { ContentError, type GameContent, loadContent } from './missions/content';
 import { MissionFlow } from './missions/missionFlow';
 import { KitMinigame } from './minigames/kitMinigame';
@@ -16,6 +16,7 @@ import { Dice3D } from './player/dice';
 import { DiceTurn } from './player/diceTurn';
 import { Player } from './player/player';
 import { ReachHighlight } from './player/reachHighlight';
+import { createTeam } from './player/team';
 import { modals } from './ui/cards';
 import { DiceHud } from './ui/diceHud';
 import { DialogueBox } from './ui/dialogue';
@@ -68,9 +69,13 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   const save = new SaveStore();
   const saved = save.load();
   const manager = new MissionManager(content, saved);
+  // Há partida para continuar? (Deixa de haver depois de "Novo jogo".)
+  let hasSavedGame = saved !== null;
+  // A equipe: a última guardada, ou um jogador só. Por enquanto só o peão do jogador 1 anda.
+  let team = createTeam(loadLastTeam() ?? []);
 
-  // Clima por eixo: céu, luzes, rio, chuva e ruas alagadas. Já começa no eixo salvo,
-  // para a tela inicial mostrar a cidade como o jogador deixou (MissionFlow.start() confirma).
+  // Clima por eixo: céu, luzes, rio, chuva e ruas alagadas. Já começa no eixo salvo
+  // (MissionFlow.start() confirma).
   const rain = new Rain();
   scene.add(rain.mesh);
   const initialEixo = manager.currentEixo?.id ?? content.eixos[content.eixos.length - 1].id;
@@ -78,9 +83,10 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
 
   // Som: chuva e efeitos. Só começa no primeiro clique, toque ou tecla (regra dos navegadores).
   const sound = new GameSound();
-  // Tecla M liga e desliga o som em qualquer tela.
+  // Tecla M liga e desliga o som em qualquer tela (menos enquanto se digita um nome).
   window.addEventListener('keydown', (event) => {
     if (event.code !== 'KeyM' || event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (event.target instanceof HTMLInputElement) return;
     sound.toggle();
   });
 
@@ -176,8 +182,18 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     eixoNames,
     persistent: save.persistent,
     sound,
-    play: () => void flow.start(),
-    restart: () => void flow.restart(),
+    startTeam: (chosen) => {
+      team = chosen;
+      saveLastTeam(team.map((player) => player.typedName));
+      void flow.start();
+    },
+    resume: () => void flow.start(),
+    // "Novo jogo": apaga o progresso e volta à tela inicial, já com o seletor.
+    restart: () => {
+      flow.reset();
+      hasSavedGame = false;
+      openTitle();
+    },
     showResult: () => {
       void flow.start();
       void showEnd();
@@ -185,8 +201,8 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     onToggle: (open) => missionHud.setVisible(!open),
   });
   const openTitle = (): void => {
-    const mode: TitleMode = !manager.current ? 'fim' : flow.started || saved !== null ? 'continuar' : 'novo';
-    title.open({ mode, pins: manager.completedCount, total: manager.total });
+    const mode: TitleMode = !manager.current ? 'fim' : flow.started || hasSavedGame ? 'continuar' : 'novo';
+    title.open({ mode, pins: manager.completedCount, total: manager.total, team });
   };
   const pause = new PauseMenu(hudRoot, missionHud.element, {
     eixoNames,
@@ -203,7 +219,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     const pan = input.panAxis();
     iso.pan(pan.x, pan.y, dt);
     iso.zoomBy(input.consumeZoom());
-    // Na tela inicial e na pausa, o jogo para; a chuva e o rio continuam.
+    // Na tela inicial e na pausa, o jogo para; na pausa, a chuva e o rio continuam.
     if (!title.isOpen && !pause.isOpen) {
       player.update(dt);
       dice.update(dt);
@@ -212,9 +228,11 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     marker.update(dt);
     climate.update(dt);
     iso.update(dt);
-    rain.update(dt, iso.focus, iso.camera);
     sound.setRain(rain.intensity);
     edgeArrow.update();
+    // A tela inicial cobre a cidade inteira: não precisa desenhar, o que alivia a máquina fraca.
+    if (title.isOpen) return;
+    rain.update(dt, iso.focus, iso.camera);
     gameRenderer.renderer.render(scene, iso.camera);
   });
   loop.start();

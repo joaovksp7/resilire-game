@@ -4,6 +4,8 @@
 const KEY = 'resilire-game:progresso:v1';
 /** Som ligado ou desligado. Fica à parte do progresso: "Começar de novo" não apaga. */
 const SOUND_KEY = 'resilire-game:som:v1';
+/** Nomes da última equipe. Também fica à parte: "Novo jogo" apaga o progresso, mas os nomes voltam preenchidos. */
+const TEAM_KEY = 'resilire-game:equipe:v1';
 
 /** Preferência de som salva: true = ligado, false = desligado, null = nunca escolhido (ou sem armazenamento). */
 export function loadSoundOn(): boolean | null {
@@ -21,6 +23,25 @@ export function saveSoundOn(on: boolean): void {
     window.localStorage.setItem(SOUND_KEY, on ? '1' : '0');
   } catch {
     // Armazenamento bloqueado: o som continua funcionando, só não lembra a escolha.
+  }
+}
+
+/** Nomes digitados na última equipe ("" = sem nome), ou null se não houver (ou sem armazenamento). */
+export function loadLastTeam(): string[] | null {
+  try {
+    const value: unknown = JSON.parse(window.localStorage.getItem(TEAM_KEY) ?? 'null');
+    return isStringArray(value) && value.length > 0 ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Guarda a última equipe. Sem armazenamento, ela vale só até fechar a página. */
+export function saveLastTeam(typedNames: readonly string[]): void {
+  try {
+    window.localStorage.setItem(TEAM_KEY, JSON.stringify(typedNames));
+  } catch {
+    // Armazenamento bloqueado: o jogo continua, só não lembra a equipe.
   }
 }
 

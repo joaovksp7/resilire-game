@@ -20,6 +20,12 @@
   /* Fundo da tela inicial e da tela final: a cidade aparece atrás, mais apagada. */
   --cor-veu-tela: rgba(27, 42, 53, 0.6);
 
+  /* Cena da tela inicial. */
+  --cena-ceu-topo: #8fd0f2;
+  --cena-ceu-baixo: #dff2fb;
+  --cena-rio: #4aa3df;
+  --cena-margem: #d8c690;
+
   --fonte-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --tamanho-texto: 1.125rem;
   --raio: 12px;
@@ -785,14 +791,40 @@ body {
   gap: 0.5rem;
 }
 
-/* Tela inicial. */
+/* Tela inicial. O conteúdo rola por cima da cena, e o espaço embaixo deixa os peões à vista. */
+.modal--abertura {
+  padding: 0;
+}
+
+.abertura {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(var(--cena-ceu-topo), var(--cena-ceu-baixo));
+}
+
+.abertura__conteudo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: var(--espaco) var(--espaco) 7rem;
+  overflow-y: auto;
+}
+
 .inicio {
+  flex: none;
   max-width: 24rem;
-  padding: 1.5rem 1.25rem;
+  max-height: none;
+  margin-bottom: auto;
+  padding: 1rem 1.25rem 1.25rem;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 1rem;
+  gap: 0.85rem;
+  overflow: visible;
   text-align: center;
 }
 
@@ -802,32 +834,392 @@ body {
 
 .inicio__titulo {
   display: flex;
+  flex: none;
   flex-direction: column;
   gap: 0.15rem;
-  margin: 0;
+  margin: auto 0 0;
+  color: var(--cor-texto);
   line-height: 1.1;
+  text-align: center;
+  /* Contorno branco: o título continua legível quando uma nuvem ou o sol passa atrás. */
+  text-shadow: 0 2px 0 var(--cor-superficie), 0 -1px 0 var(--cor-superficie), 2px 0 0 var(--cor-superficie), -2px 0 0 var(--cor-superficie);
 }
 
 .inicio__nome {
-  font-size: 2.5rem;
+  font-size: clamp(3rem, 14vmin, 5rem);
   font-weight: 900;
   overflow-wrap: anywhere;
 }
 
+.inicio__letra {
+  display: inline-block;
+  animation: letra-entra 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  animation-delay: calc(var(--ordem, 0) * 0.07s);
+}
+
+@keyframes letra-entra {
+  from {
+    transform: translateY(-1.2em) rotate(-10deg);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
 .inicio__subtitulo {
-  color: var(--cor-texto-suave);
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.3rem;
+  font-weight: 800;
 }
 
 .inicio__progresso {
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
-.inicio__menu {
+/* Seletor "Quantos vão jogar?". O escolhido tem cor e contorno mais grosso. */
+.seletor {
   display: flex;
   flex-direction: column;
+  gap: 0.4rem;
+}
+
+.seletor__rotulo {
+  font-weight: 700;
+}
+
+.seletor__botoes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
+}
+
+.seletor__botao {
+  min-height: 3.25rem;
+  padding: 0;
+  border-radius: var(--raio);
+  font-size: 1.4rem;
+}
+
+.seletor__botao[aria-pressed='true'] {
+  background: var(--cor-destaque);
+  color: var(--cor-destaque-texto);
+  box-shadow: inset 0 0 0 3px var(--cor-borda);
+  font-weight: 900;
+}
+
+/* Só para leitores de tela. */
+.so-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Janela "Quem vai jogar?". --cor-peao vem do teamSetup.ts. */
+.equipe__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.equipe__linha {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.equipe__peao {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid var(--cor-borda);
+  border-radius: 50%;
+  background: var(--cor-peao);
+  color: var(--cor-texto);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.equipe__campo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.equipe__rotulo {
+  font-weight: 700;
+}
+
+/*
+ * Fonte de 16px ou mais: abaixo disso, o iPhone dá zoom ao tocar no campo.
+ * A margem de rolagem mantém o campo com foco fora do rodapé fixo e com o rótulo à vista.
+ */
+.equipe__nome {
+  width: 100%;
+  min-height: 3rem;
+  scroll-margin: 2rem 0 10rem;
+  padding: 0.4rem 0.75rem;
+  border: 3px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+}
+
+/* "Como jogar" e "Créditos" dividem a linha, para o menu caber no celular com os peões à vista. */
+.inicio__menu {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.inicio__menu > .botao {
+  grid-column: 1 / -1;
+}
+
+.inicio__menu > .inicio__metade {
+  grid-column: auto;
+  padding-inline: 0.5rem;
+}
+
+/* Cena da tela inicial (titleScene.ts): só enfeite, por trás do conteúdo. Anima só transform e opacity. */
+.cena {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cena svg {
+  display: block;
+}
+
+.cena__sol {
+  position: absolute;
+  top: 0.5rem;
+  right: 2%;
+  width: clamp(3.5rem, 16vmin, 8rem);
+}
+
+.cena__raios {
+  transform-origin: 60px 60px;
+  animation: cena-gira 40s linear infinite;
+}
+
+@keyframes cena-gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cena__nuvem {
+  position: absolute;
+  left: var(--x);
+  width: var(--largura);
+  animation: cena-nuvem var(--tempo) linear infinite;
+  animation-delay: var(--atraso);
+}
+
+.cena__nuvem--1 {
+  --x: 4vw;
+  --largura: 9rem;
+  --tempo: 70s;
+  --atraso: -20s;
+  top: 8%;
+}
+
+.cena__nuvem--2 {
+  --x: 58vw;
+  --largura: 6.5rem;
+  --tempo: 110s;
+  --atraso: -75s;
+  top: 26%;
+}
+
+.cena__nuvem--3 {
+  --x: 30vw;
+  --largura: 11rem;
+  --tempo: 90s;
+  --atraso: -50s;
+  top: 44%;
+}
+
+/* Sai pela esquerda e entra pela direita, a partir de qualquer posição --x. */
+@keyframes cena-nuvem {
+  from {
+    transform: translateX(calc(-1 * var(--x) - 100%));
+  }
+  to {
+    transform: translateX(calc(100vw - var(--x)));
+  }
+}
+
+/* Garoa leve: um desenho que se repete e desce exatamente uma altura do desenho, sem emenda. */
+.cena__garoa {
+  position: absolute;
+  inset: -12rem 0 0;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cg stroke='%2379a9c6' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M30 14l-3 12M112 40l-3 12M172 18l-3 12M66 84l-3 12M146 104l-3 12M18 124l-3 12M98 150l-3 12M178 164l-3 12'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 12rem 12rem;
+  animation: cena-garoa 2.6s linear infinite;
+}
+
+@keyframes cena-garoa {
+  to {
+    transform: translateY(12rem);
+  }
+}
+
+.cena__morros {
+  position: absolute;
+  right: 0;
+  bottom: 3rem;
+  left: 0;
+  width: 100%;
+  height: clamp(10rem, 42%, 24rem);
+}
+
+.cena__rio {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3.5rem;
+  overflow: hidden;
+  border-top: 0.6rem solid var(--cena-margem);
+  background: var(--cena-rio);
+}
+
+.cena__onda {
+  width: 200%;
+  height: 1.25rem;
+  animation: cena-onda 14s linear infinite;
+}
+
+@keyframes cena-onda {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.cena__peoes {
+  position: absolute;
+  right: 0;
+  bottom: 3.1rem;
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.cena__peao {
+  width: 2.25rem;
+  transform-origin: bottom;
+  animation: cena-pulo 1.6s ease-in-out infinite;
+  animation-delay: calc(var(--ordem, 0) * 0.2s);
+}
+
+.cena__peao[hidden] {
+  display: none;
+}
+
+@keyframes cena-pulo {
+  0%,
+  45%,
+  100% {
+    transform: none;
+  }
+  8% {
+    transform: scale(1.06, 0.92);
+  }
+  25% {
+    transform: translateY(-0.9rem);
+  }
+}
+
+.cena__dado {
+  width: 1.75rem;
+  margin-left: 0.5rem;
+  animation: cena-dado 4.5s ease-in-out infinite;
+}
+
+@keyframes cena-dado {
+  0%,
+  70%,
+  100% {
+    transform: none;
+  }
+  78% {
+    transform: translateY(-1.6rem) rotate(180deg);
+  }
+  88% {
+    transform: translateY(0) rotate(360deg);
+  }
+  93% {
+    transform: translateY(-0.4rem) rotate(360deg);
+  }
+}
+
+/* Tela baixa: tudo um pouco mais compacto, sem passar do alvo de toque mínimo (44px). */
+@media (max-height: 37.5rem) {
+  .inicio__nome {
+    font-size: 2.5rem;
+  }
+
+  .inicio__subtitulo {
+    font-size: 1.1rem;
+  }
+
+  .inicio {
+    gap: 0.5rem;
+    padding-block: 0.6rem 0.75rem;
+  }
+
+  .seletor__botao,
+  .inicio__menu > .botao {
+    min-height: 2.875rem;
+  }
+
+  .abertura__conteudo {
+    gap: 0.4rem;
+    padding-top: 0.5rem;
+  }
+}
+
+/* Tela deitada ou iframe baixo: o título de um lado, o menu do outro e os peões à esquerda. */
+@media (max-height: 30rem) and (min-width: 36rem) {
+  .abertura__conteudo {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .inicio__titulo {
+    margin: auto 0;
+    padding-bottom: 5rem;
+  }
+
+  .inicio {
+    flex: 0 1 22rem;
+    min-width: 0;
+    margin: auto 0;
+  }
+
+  .cena__peoes {
+    justify-content: flex-start;
+    padding-left: 4%;
+  }
 }
 
 .inicio__aviso {
@@ -1285,7 +1677,14 @@ body {
   .botao-pins--novo,
   .cartao--pin .selo--grande,
   .cartao--pin .selo--grande::after,
-  .fim .pin {
+  .fim .pin,
+  .inicio__letra,
+  .cena__raios,
+  .cena__nuvem,
+  .cena__garoa,
+  .cena__onda,
+  .cena__peao,
+  .cena__dado {
     animation: none;
   }
 

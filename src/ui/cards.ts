@@ -44,9 +44,10 @@ export interface ModalOptions {
   labelledBy: string;
   /**
    * 'card' e 'panel' ficam no centro com fundo escurecido; 'dialogue' fica no rodapé;
-   * 'tela' cobre a tela toda com um fundo mais forte (tela inicial e tela final).
+   * 'tela' cobre a tela toda com um fundo mais forte (tela final);
+   * 'abertura' cobre a tela toda, sem deixar o jogo aparecer (tela inicial, que traz a própria cena).
    */
-  variant: 'card' | 'panel' | 'dialogue' | 'tela';
+  variant: 'card' | 'panel' | 'dialogue' | 'tela' | 'abertura';
   /** Chamado com Esc. Sem isso, Esc não fecha. */
   onEscape?: () => void;
 }

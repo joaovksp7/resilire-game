@@ -28,7 +28,7 @@ O jogo continua com as **10 missões**. Para a partida com vários jogadores con
 
 ### 3.1 Tela inicial
 
-A tela inicial que já existe (nome do jogo com a cidade ao fundo) ganha a escolha de quantos vão jogar:
+A tela inicial (nome do jogo sobre uma cena animada desenhada em código, sem a cidade 3D ao fundo) ganha a escolha de quantos vão jogar:
 
 ```
           RESILIRE
