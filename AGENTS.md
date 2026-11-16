@@ -59,7 +59,7 @@ Roda em **computador fraco de laboratório, Chromebook e celular do aluno** — 
 ### Fonte da verdade
 
 - **`prompt-jogo-desastres-climaticos.md`** (raiz) — game design original, missões, instituições, fases 1 a 8 (concluídas) e critérios de aceite. Ler antes de começar qualquer fase nova.
-- **`plano-parte-2.md`** (raiz) — continuação: até 4 jogadores em equipe, 5 missões, fases 9 a 13 e critérios de aceite. Ler antes de começar qualquer fase nova. Onde os dois planos discordam, vale este.
+- **`plano-parte-2.md`** (raiz) — continuação: até 4 jogadores em equipe, as 10 missões divididas entre os jogadores, fases 9 a 14 (concluídas) e critérios de aceite. Ler antes de começar qualquer fase nova. Onde os dois planos discordam, vale este.
 - **`content/*.json`** — todo o texto educativo do jogo. Revisado pela equipe antes de ir pro ar.
 
 Os três eixos são chaves fixas, sempre nesta ordem: `alerta` → `preparacao` → `durante`.
@@ -89,7 +89,7 @@ src/
   world/               # cidade, rio, clima, prédios
   player/              # personagem, pathfinding A*
   missions/            # gerenciador de missões e eixos
-  minigames/           # kit de emergência
+  minigames/           # atividades das paradas (hoje, a mochila de emergência)
   ui/                  # HUD, diálogos, menus, tela final
   audio/               # Web Audio API, sons gerados por código
 content/
@@ -97,6 +97,7 @@ content/
   institutions.json
   dialogues.json
   questions.json
+  atividades.json      # atividade de cada missão que não tem pergunta
   kit-items.json
   creditos.json        # texto da tela de créditos (não é educativo)
 public/
@@ -116,7 +117,7 @@ O único lugar onde mora texto educativo. **Nunca** tocar no código de renderiz
 
 - O formato de cada JSON fica documentado no `README.md`. Mudar formato = avisar antes, porque a equipe edita esses arquivos sem programar
 - `creditos.json` não é conteúdo educativo: fica aqui só para a equipe editar sem programar (seções com `titulo` e `linhas`)
-- Todo item tem `id` estável. Missão aponta para instituição, diálogo e pergunta (ou `minijogo`) pelo `id`, nunca pelo texto
+- Todo item tem `id` estável. Missão aponta para instituição, diálogo e pergunta (ou `atividade`) pelo `id`, nunca pelo texto
 - Toda missão tem `eixo` com uma das três chaves fixas
 - Pergunta: `correta` é o **índice** dentro de `alternativas`, não o texto. Alternativas embaralhadas na exibição
 - Os JSONs ficam formatados e legíveis, porque o conteúdo é revisado lendo esses arquivos
@@ -128,9 +129,12 @@ O único lugar onde mora texto educativo. **Nunca** tocar no código de renderiz
 ## Mecânica — o que não pode quebrar
 
 - **Loop:** missão → andar até a instituição (jogando o dado) → diálogo → pergunta → pin → próxima missão
+- **Equipe e vez:** de 1 a 4 jogadores no mesmo aparelho, cada um com o seu peão. Uma vez é uma jogada do dado, na ordem da tela inicial; só o peão da vez anda. Com 1 jogador, o jogo funciona como uma missão por vez, na ordem de `missions.json`
+- **Missões divididas:** cada jogador cuida de uma missão, ao mesmo tempo, na ordem de `missions.json`. Quem parar na porta de qualquer missão em andamento faz a visita, e o dono recebe a próxima livre, mesmo que seja do eixo seguinte; só quando não sobra missão livre ele passa a ajudar a equipe. O eixo (clima, rio e ruas alagadas) só muda quando todas as missões dele acabam. Os pins são da equipe e guardam quem buscou. Sem ranking nem vencedor
 - **Eixos em ordem fixa.** Clima, nível do rio e ruas bloqueadas mudam por eixo. Na fase `durante`, ruas baixas alagadas obrigam rota pela parte alta
 - **Errar não reprova.** Explica e deixa tentar de novo. Sem cronômetro, sem penalidade
 - **Movimento por dado**, como jogo de tabuleiro: o jogador joga um dado (1 a 6) e escolhe uma das casas destacadas a até N passos (o número é o máximo; pode parar antes, inclusive na porta da instituição). Uma casa por passo, em grade de tiles com 4 direções. Ruas bloqueadas (ex.: alagadas) não entram nas casas destacadas. WASD e setas movem a câmera
+- **Save versão 2** (`resilire-game:progresso:v2`): equipe, vez, casa de cada peão, missão de cada um, pins com quem buscou e acertos de primeira. Mudar o formato = nova versão e chave nova, e o save antigo é ignorado sem quebrar o jogo
 - **`localStorage` pode não existir.** Dentro de iframe cross-origin o Safari bloqueia e o Chrome particiona. Todo acesso em `try/catch`, degradando para estado em memória. Nunca deixar isso derrubar o jogo
 
 ---

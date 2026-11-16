@@ -1,7 +1,10 @@
 // Progresso salvo no localStorage. Dentro de iframe o navegador pode bloquear o armazenamento
 // (Safari bloqueia, Chrome particiona): nesse caso o jogo segue funcionando só com a memória.
 
-const KEY = 'resilire-game:progresso:v1';
+import { TEAM } from '../config';
+
+/** Versão 2: a equipe inteira. O save da versão 1 (`progresso:v1`, de um jogador só) é ignorado. */
+const KEY = 'resilire-game:progresso:v2';
 /** Som ligado ou desligado. Fica à parte do progresso: "Começar de novo" não apaga. */
 const SOUND_KEY = 'resilire-game:som:v1';
 /** Nomes da última equipe. Também fica à parte: "Novo jogo" apaga o progresso, mas os nomes voltam preenchidos. */
@@ -45,34 +48,85 @@ export function saveLastTeam(typedNames: readonly string[]): void {
   }
 }
 
+/** Uma casa do mapa. */
+export interface SavedCell {
+  readonly col: number;
+  readonly row: number;
+}
+
+/** Um jogador da equipe salva, na ordem da vez. A cor do peão vem da posição (TEAM.colors). */
+export interface SavedPlayer {
+  /** O que foi digitado ("" = sem nome, vira "Jogador N"). */
+  readonly name: string;
+  /** Casa onde estava o peão. */
+  readonly cell: SavedCell | null;
+  /** Id da missão de que cuida (null = está ajudando a equipe). */
+  readonly mission: string | null;
+}
+
+/** Um pin conquistado e quem buscou (posição na ordem da vez; 0 = Jogador 1). */
+export interface SavedPin {
+  readonly mission: string;
+  readonly by: number;
+}
+
 export interface SaveData {
-  readonly version: 1;
-  /** Missão em andamento (null = todas concluídas). */
-  readonly currentMission: string | null;
-  /** Missões concluídas, na ordem em que foram feitas. */
-  readonly completed: readonly string[];
-  /** Missões em que a pergunta foi acertada de primeira. */
+  readonly version: 2;
+  /** A equipe, na ordem da vez (de 1 a TEAM.maxPlayers jogadores). */
+  readonly players: readonly SavedPlayer[];
+  /** De quem é a vez (posição em `players`). */
+  readonly turn: number;
+  /** Pins conquistados, na ordem em que foram buscados. */
+  readonly pins: readonly SavedPin[];
+  /** Missões em que a pergunta (ou a mochila) foi acertada de primeira. */
   readonly firstTry: readonly string[];
-  /** Casa onde o personagem estava. */
-  readonly player: { readonly col: number; readonly row: number } | null;
 }
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((v) => typeof v === 'string');
 }
 
-/** Confere o formato do que veio do armazenamento (pode estar velho ou corrompido). */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+const isIndex = (value: unknown, length: number): value is number =>
+  Number.isInteger(value) && (value as number) >= 0 && (value as number) < length;
+
+function parseCell(value: unknown): SavedCell | null {
+  if (!isRecord(value) || !Number.isInteger(value.col) || !Number.isInteger(value.row)) return null;
+  return { col: value.col as number, row: value.row as number };
+}
+
+function parsePlayer(value: unknown): SavedPlayer | null {
+  if (!isRecord(value) || typeof value.name !== 'string') return null;
+  if (value.mission !== null && typeof value.mission !== 'string') return null;
+  return { name: value.name, cell: parseCell(value.cell), mission: value.mission };
+}
+
+/**
+ * Confere o formato do que veio do armazenamento (pode estar velho ou corrompido).
+ * O save da versão 1 (de um jogador só) fica na chave antiga e nem chega aqui.
+ */
 function parse(text: string | null): SaveData | null {
   if (!text) return null;
   try {
-    const data = JSON.parse(text) as Partial<SaveData> | null;
-    if (!data || data.version !== 1) return null;
-    if (data.currentMission !== null && typeof data.currentMission !== 'string') return null;
-    if (!isStringArray(data.completed) || !isStringArray(data.firstTry)) return null;
-    const p = data.player;
-    const player =
-      p && Number.isInteger(p.col) && Number.isInteger(p.row) ? { col: p.col, row: p.row } : null;
-    return { version: 1, currentMission: data.currentMission ?? null, completed: data.completed, firstTry: data.firstTry, player };
+    const data: unknown = JSON.parse(text);
+    if (!isRecord(data) || data.version !== 2) return null;
+    const rawPlayers = data.players;
+    if (!Array.isArray(rawPlayers) || rawPlayers.length < 1 || rawPlayers.length > TEAM.maxPlayers) return null;
+    const players = rawPlayers.map(parsePlayer);
+    if (players.some((p) => p === null)) return null;
+    if (!isIndex(data.turn, players.length)) return null;
+    const rawPins = data.pins;
+    if (!Array.isArray(rawPins)) return null;
+    const pins: SavedPin[] = [];
+    for (const pin of rawPins) {
+      if (!isRecord(pin) || typeof pin.mission !== 'string' || !isIndex(pin.by, players.length)) return null;
+      pins.push({ mission: pin.mission, by: pin.by });
+    }
+    if (!isStringArray(data.firstTry)) return null;
+    return { version: 2, players: players as SavedPlayer[], turn: data.turn, pins, firstTry: data.firstTry };
   } catch {
     return null;
   }

@@ -8,7 +8,7 @@ import { GameRenderer, isWebGLAvailable } from './core/renderer';
 import { loadLastTeam, saveLastTeam, SaveStore } from './core/save';
 import { ContentError, type GameContent, loadContent } from './missions/content';
 import { MissionFlow } from './missions/missionFlow';
-import { KitMinigame } from './minigames/kitMinigame';
+import { Activities } from './minigames/activities';
 import { MissionManager } from './missions/missionManager';
 import { prefersReducedMotion } from './player/character';
 import { TapPicker } from './player/clickToMove';
@@ -68,8 +68,8 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   // Progresso salvo (ou só em memória, se o navegador bloquear o armazenamento).
   const save = new SaveStore();
   const saved = save.load();
-  // A equipe: a última guardada, ou um jogador só.
-  const lastTeam = createTeam(loadLastTeam() ?? []);
+  // A equipe: a da partida salva; sem partida, a última guardada, ou um jogador só.
+  const lastTeam = createTeam(saved ? saved.players.map((player) => player.name) : (loadLastTeam() ?? []));
   const manager = new MissionManager(content, saved, lastTeam.length);
   // Há partida para continuar? (Deixa de haver depois de "Novo jogo".)
   let hasSavedGame = saved !== null;
@@ -93,11 +93,17 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   const iso = new IsoCamera(city.map.halfSize);
   const input = new Input(gameRenderer.canvas);
 
-  // Peões da equipe, na porta de casa e virados para a câmera. O Jogador 1 volta para a casa salva.
+  // Peões da equipe, na porta de casa e virados para a câmera. Com partida salva, cada um volta
+  // para a casa onde estava, e a vez volta para quem estava jogando.
   const pawns = new Pawns(city.map, lastTeam);
   scene.add(pawns.object);
-  const savedCell = saved?.player;
-  if (savedCell && city.map.tile(savedCell.col, savedCell.row)?.walkable) pawns.first.placeAt(savedCell.col, savedCell.row, Math.PI / 4);
+  if (saved) {
+    pawns.all.forEach((pawn, index) => {
+      const cell = saved.players[index]?.cell;
+      if (cell && city.map.tile(cell.col, cell.row)?.walkable) pawn.placeAt(cell.col, cell.row, Math.PI / 4);
+    });
+    pawns.setTurn(saved.turn);
+  }
   iso.centerOn(pawns.active.position.x, pawns.active.position.z, pawns.active.position.y);
   iso.follow(pawns.active);
   // A câmera vai até o peão da vez. Com prefers-reduced-motion, chega direto, sem deslizar.
@@ -141,10 +147,10 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
 
   // Interface.
   const diceHud = new DiceHud(hudRoot, turn, pawns);
-  const missionHud = new MissionHud(hudRoot, content, manager, sound);
+  const missionHud = new MissionHud(hudRoot, content, manager, () => pawns.team, sound);
   const edgeArrow = new EdgeArrow(hudRoot, iso.camera, { top: missionHud.element, bottom: diceHud.element });
   const dialogue = new DialogueBox(hudRoot, () => sound.right());
-  const endScreen = new EndScreen(hudRoot, content, manager);
+  const endScreen = new EndScreen(hudRoot, content, manager, () => pawns.team);
   const eixoNames = content.eixos.map((e) => e.nome);
 
   // Com diálogo, cartão ou painel aberto, o jogo fica parado.
@@ -155,9 +161,9 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     edgeArrow.setEnabled(!open);
   });
 
-  /** Tela final. "Jogar de novo" apaga o progresso e volta para a primeira missão. */
+  /** Tela final. "Jogar de novo" apaga o progresso e volta à tela inicial, já com o seletor. */
   const showEnd = async (): Promise<void> => {
-    if ((await endScreen.open()) === 'jogar-de-novo') await flow.restart();
+    if ((await endScreen.open()) === 'jogar-de-novo') newGame();
   };
 
   const flow = new MissionFlow({
@@ -171,7 +177,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     markerAnchors: city.markerAnchors,
     climate,
     dialogue,
-    kit: new KitMinigame(hudRoot, content.kit, () => sound.right()),
+    activities: new Activities(hudRoot, content, () => sound.right()),
     diceHud,
     missionHud,
     edgeArrow,
@@ -194,17 +200,19 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     },
     resume: () => void flow.start(),
     // "Novo jogo": apaga o progresso e volta à tela inicial, já com o seletor.
-    restart: () => {
-      flow.reset();
-      hasSavedGame = false;
-      openTitle();
-    },
+    restart: () => newGame(),
     showResult: () => {
       void flow.start();
       void showEnd();
     },
     onToggle: (open) => missionHud.setVisible(!open),
   });
+  /** Apaga o progresso e abre a tela inicial, já com o seletor (Novo jogo, Jogar de novo, Começar de novo). */
+  const newGame = (): void => {
+    flow.reset();
+    hasSavedGame = false;
+    openTitle();
+  };
   const openTitle = (): void => {
     const mode: TitleMode = manager.isFinished ? 'fim' : flow.started || hasSavedGame ? 'continuar' : 'novo';
     title.open({ mode, pins: manager.completedCount, total: manager.total, team: pawns.team });
@@ -214,7 +222,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     sound,
     isFinished: () => manager.isFinished,
     showResult: () => void showEnd(),
-    restart: () => void flow.restart(),
+    restart: () => newGame(),
     goToTitle: openTitle,
   });
 

@@ -1,7 +1,7 @@
 import type { Vector3 } from 'three';
 import type { GameSound } from '../audio/sound';
 import type { SaveStore } from '../core/save';
-import type { KitMinigame } from '../minigames/kitMinigame';
+import type { Activities } from '../minigames/activities';
 import { faceYawFor } from '../player/clickToMove';
 import type { DiceTurn } from '../player/diceTurn';
 import type { Pawns } from '../player/pawns';
@@ -35,6 +35,8 @@ const TEXT = {
   go: 'Vamos lá',
   pinKicker: 'Pin conquistado',
   firstTry: 'Você acertou de primeira!',
+  teamFirstTry: 'Acerto de primeira da equipe!',
+  foundBy: (name: string) => `Buscado por ${name}`,
   next: 'Continuar',
   eixoKicker: 'Novo eixo',
   wrongDoor: (here: string, goal: string) => `Você está ${here}. Sua missão agora é ${goal}.`,
@@ -53,8 +55,8 @@ export interface MissionFlowDeps {
   markerAnchors: ReadonlyMap<InstitutionId, Vector3>;
   climate: Climate;
   dialogue: DialogueBox;
-  /** Minijogo da mochila (missões com "minijogo": "kit"). */
-  kit: KitMinigame;
+  /** Abre a atividade das missões que têm "atividade" no lugar da pergunta. */
+  activities: Activities;
   diceHud: DiceHud;
   missionHud: MissionHud;
   edgeArrow: EdgeArrow;
@@ -87,7 +89,7 @@ export class MissionFlow {
     deps.diceHud.setGoTowards(() => this.goTowardsMission());
   }
 
-  /** true depois do primeiro start() ou restart() (o jogo já saiu da tela inicial alguma vez). */
+  /** true depois do primeiro start() (o jogo já saiu da tela inicial alguma vez desde o último reset()). */
   get started(): boolean {
     return this.begun;
   }
@@ -119,14 +121,6 @@ export class MissionFlow {
     this.refreshTarget();
   }
 
-  /** Apaga o progresso e já começa de novo, na primeira missão. */
-  async restart(): Promise<void> {
-    this.reset();
-    this.begun = true;
-    this.persist();
-    await this.beginTurn();
-  }
-
   private onArrive(cell: Cell): void {
     if (this.visiting) return;
     this.persist();
@@ -143,6 +137,8 @@ export class MissionFlow {
    */
   private async beginTurn(notice: string | null = null): Promise<void> {
     const { manager, pawns, diceHud } = this.d;
+    // Salva de quem é a vez: recarregar a página agora continua na vez dessa pessoa.
+    this.persist();
     this.refreshTarget();
     const player = pawns.activeIndex;
     const mission = manager.missionOf(player);
@@ -196,37 +192,47 @@ export class MissionFlow {
   }
 
   private async visit(mission: Mission): Promise<void> {
-    const { content, manager, dialogue, kit, map, pawns, uiRoot } = this.d;
+    const { content, manager, dialogue, activities, map, pawns, uiRoot } = this.d;
     this.visiting = true;
     try {
       const inst = content.institutions.get(mission.instituicao);
       const dialog = content.dialogues.get(mission.dialogo);
-      // Missão com minijogo não tem pergunta (null); undefined = id que não existe.
+      // Cada missão tem pergunta ou atividade: a que falta fica null; undefined = id que não existe.
       const question = mission.pergunta !== undefined ? content.questions.get(mission.pergunta) : null;
-      if (!inst || !dialog || question === undefined) return;
+      const activity = mission.atividade !== undefined ? content.activities.get(mission.atividade) : null;
+      if (!inst || !dialog || question === undefined || activity === undefined) return;
       const style = INSTITUTION_STYLES[mission.instituicao];
 
       // De frente para o prédio durante a conversa.
       const site = map.sites.get(mission.instituicao);
       if (site) pawns.active.placeAt(site.door.col, site.door.row, faceYawFor(map, site));
 
-      // Conversa (com a pergunta, se houver) e, depois, o minijogo, se a missão tiver.
+      // Conversa (com a pergunta, se houver) e, depois, a atividade, se a missão tiver.
       const talk = await dialogue.run(
         { nome: inst.personagem.nome, funcao: inst.personagem.funcao, color: style.color, icon: style.icon },
         dialog.falas,
         question,
       );
-      const firstTry =
-        mission.minijogo === 'kit' ? (await kit.run({ color: style.color, icon: style.icon })).firstTry : talk.firstTry;
+      const firstTry = activity
+        ? (await activities.run(activity, { color: style.color, icon: style.icon })).firstTry
+        : talk.firstTry;
 
-      const result = manager.complete(mission, firstTry, pawns.nextIndex);
+      // O pin é da equipe e guarda quem fez a visita (que pode não ser o dono da missão).
+      const visitor = pawns.activeMember;
+      const result = manager.complete(mission, firstTry, pawns.activeIndex);
       this.persist();
       this.d.sound.pin();
+      const inTeam = pawns.team.length > 1;
+      const lines = inTeam
+        ? [TEXT.foundBy(visitor.name), ...(firstTry ? [TEXT.teamFirstTry] : [])]
+        : firstTry
+          ? [TEXT.firstTry]
+          : [];
       await showCard(uiRoot, {
         kicker: TEXT.pinKicker,
         title: inst.nome,
         text: mission.titulo,
-        lines: firstTry ? [TEXT.firstTry] : [],
+        lines,
         icon: style.icon,
         color: style.color,
         button: TEXT.next,
@@ -353,9 +359,15 @@ export class MissionFlow {
     return moved;
   }
 
-  /** O save ainda guarda uma casa só, a do Jogador 1 (o da equipe chega na Fase 13). */
+  /** Salva a equipe: nomes, casa de cada peão, de quem é a vez, a missão de cada um e os pins. */
   private persist(): void {
     const { save, manager, pawns } = this.d;
-    save.save(manager.toSave(pawns.first.cell));
+    save.save(
+      manager.toSave(
+        pawns.team.map((player) => player.typedName),
+        pawns.all.map((pawn) => pawn.cell),
+        pawns.activeIndex,
+      ),
+    );
   }
 }

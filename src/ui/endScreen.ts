@@ -1,11 +1,17 @@
 import type { GameContent } from '../missions/content';
 import type { MissionManager } from '../missions/missionManager';
+import { type Team, teamLabel } from '../player/team';
 import { INSTITUTION_STYLES } from '../world/institutions';
 import { badge, confirmRestart, openModal, screenTitle, textEl, uiButton } from './cards';
 
 // Textos da interface (não são conteúdo educativo: o resumo vem do "aprendizado" de cada missão).
 const TEXT = {
   title: 'Você completou todas as missões!',
+  teamTitle: 'A equipe completou todas as missões!',
+  teamFirstTry: (n: number, total: number) => `Acertos de primeira da equipe: ${n} de ${total}`,
+  teamPinsTitle: 'Pins da equipe',
+  teamLearnedTitle: 'O que a equipe aprendeu',
+  foundBy: (name: string) => `Buscado por ${name}`,
   pins: (n: number, total: number) => `Pins: ${n} de ${total}`,
   firstTry: (n: number, total: number) => `Acertos de primeira: ${n} de ${total}`,
   pinsTitle: 'Seus pins',
@@ -19,32 +25,39 @@ export type EndChoice = 'fechar' | 'jogar-de-novo';
 
 /**
  * Tela final: os pins, os acertos de primeira e um resumo em tópicos do que foi aprendido
- * em cada eixo. "Jogar de novo" pede confirmação antes de apagar o progresso.
+ * em cada eixo. Em equipe, mostra os nomes e quem buscou cada pin, sem ranking nem vencedor.
+ * "Jogar de novo" pede confirmação antes de apagar o progresso.
  */
 export class EndScreen {
   private readonly root: HTMLElement;
   private readonly content: GameContent;
   private readonly manager: MissionManager;
+  /** A equipe de agora. */
+  private readonly team: () => Team;
 
-  constructor(root: HTMLElement, content: GameContent, manager: MissionManager) {
+  constructor(root: HTMLElement, content: GameContent, manager: MissionManager, team: () => Team) {
     this.root = root;
     this.content = content;
     this.manager = manager;
+    this.team = team;
   }
 
   /** Abre a tela. Resolve com a escolha: fechar (voltar à cidade) ou jogar de novo (já confirmado). */
   open(): Promise<EndChoice> {
     return new Promise((resolve) => {
       const { manager, content } = this;
+      const team = this.team();
+      const inTeam = team.length > 1;
       const panel = document.createElement('div');
       panel.className = 'painel painel--largo fim';
-      const title = screenTitle('h2', 'painel__titulo', TEXT.title);
+      const title = screenTitle('h2', 'painel__titulo', inTeam ? TEXT.teamTitle : TEXT.title);
+      const names = inTeam ? [textEl('p', 'fim__equipe', teamLabel(team))] : [];
 
       const stats = document.createElement('p');
       stats.className = 'fim__numeros';
       stats.append(
         textEl('span', '', TEXT.pins(manager.completedCount, manager.total)),
-        textEl('span', '', TEXT.firstTry(manager.firstTryCount, manager.total)),
+        textEl('span', '', (inTeam ? TEXT.teamFirstTry : TEXT.firstTry)(manager.firstTryCount, manager.total)),
       );
 
       // Pins conquistados (a tela só abre com todas as missões concluídas).
@@ -57,7 +70,13 @@ export class EndScreen {
         item.className = 'pin pin--ganho';
         // Os pins aparecem um depois do outro (o CSS usa a ordem para o atraso).
         item.style.setProperty('--ordem', String(pins.childElementCount));
-        item.append(badge(style.icon, style.color), textEl('span', 'pin__nome', mission.titulo));
+        const label = document.createElement('span');
+        label.className = 'pin__texto';
+        label.append(textEl('span', 'pin__nome', mission.titulo));
+        const by = manager.foundBy(mission.id);
+        const finder = inTeam && by !== null ? team[by] : undefined;
+        if (finder) label.append(textEl('span', 'pin__quem', TEXT.foundBy(finder.name)));
+        item.append(badge(style.icon, style.color), label);
         pins.append(item);
       }
 
@@ -84,10 +103,11 @@ export class EndScreen {
 
       panel.append(
         title,
+        ...names,
         stats,
-        textEl('h3', 'painel__subtitulo', TEXT.pinsTitle),
+        textEl('h3', 'painel__subtitulo', inTeam ? TEXT.teamPinsTitle : TEXT.pinsTitle),
         pins,
-        textEl('h3', 'painel__subtitulo', TEXT.learnedTitle),
+        textEl('h3', 'painel__subtitulo', inTeam ? TEXT.teamLearnedTitle : TEXT.learnedTitle),
         learned,
         footer,
       );

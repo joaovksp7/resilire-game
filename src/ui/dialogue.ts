@@ -55,7 +55,7 @@ export class DialogueBox {
 
   /**
    * Mostra as falas e a pergunta. Resolve com `firstTry` = acertou na primeira tentativa.
-   * Sem pergunta (missão com minijogo), fecha depois da última fala, com `firstTry` = true.
+   * Sem pergunta (missão com atividade), fecha depois da última fala, com `firstTry` = true.
    */
   run(speaker: Speaker, falas: readonly string[], question: Question | null): Promise<{ firstTry: boolean }> {
     return new Promise((resolve) => {

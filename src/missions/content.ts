@@ -2,6 +2,7 @@
 // Os JSON entram no build: um campo com tipo errado já dá erro no `npm run build`;
 // ids que não existem são conferidos aqui, ao abrir o jogo.
 
+import activitiesJson from '../../content/atividades.json';
 import creditsJson from '../../content/creditos.json';
 import dialoguesJson from '../../content/dialogues.json';
 import institutionsJson from '../../content/institutions.json';
@@ -17,9 +18,12 @@ export type EixoId = (typeof EIXO_IDS)[number];
 export const QUESTION_TYPES = ['multipla-escolha', 'acao'] as const;
 export type QuestionType = (typeof QUESTION_TYPES)[number];
 
-/** Minijogos que uma missão pode ter no lugar da pergunta. */
-export const MINIGAME_IDS = ['kit'] as const;
-export type MinigameId = (typeof MINIGAME_IDS)[number];
+/**
+ * Tipos de atividade que uma missão pode ter no lugar da pergunta (content/atividades.json).
+ * Cada tipo novo entra aqui junto com a tela dele (src/minigames/activities.ts).
+ */
+export const ACTIVITY_TYPES = ['mochila'] as const;
+export type ActivityType = (typeof ACTIVITY_TYPES)[number];
 
 // Formato bruto dos arquivos (o que a equipe edita). `todoValidar` é opcional em qualquer item.
 interface RawInstitution {
@@ -42,10 +46,15 @@ interface RawMission {
   descricao: string;
   instituicao: string;
   dialogo: string;
-  /** Pergunta OU minijogo: cada missão tem um dos dois. */
+  /** Pergunta OU atividade: cada missão tem uma das duas. */
   pergunta?: string;
-  minijogo?: string;
+  atividade?: string;
   aprendizado: string;
+  todoValidar?: string;
+}
+interface RawActivity {
+  id: string;
+  tipo: string;
   todoValidar?: string;
 }
 interface RawDialogue {
@@ -84,6 +93,7 @@ const rawInstitutions: RawInstitution[] = institutionsJson;
 const rawMissions: { eixos: RawEixo[]; missoes: RawMission[] } = missionsJson;
 const rawDialogues: RawDialogue[] = dialoguesJson;
 const rawQuestions: RawQuestion[] = questionsJson;
+const rawActivities: RawActivity[] = activitiesJson;
 const rawKit: RawKit = kitJson;
 const rawCredits: RawCreditSection[] = creditsJson;
 
@@ -96,12 +106,17 @@ export interface Eixo extends RawEixo {
 export interface Mission extends RawMission {
   eixo: EixoId;
   instituicao: InstitutionId;
-  minijogo?: MinigameId;
 }
 export type Dialogue = RawDialogue;
 export interface Question extends RawQuestion {
   tipo: QuestionType;
 }
+/** Mochila de emergência: o texto e os itens ficam em content/kit-items.json. */
+export interface MochilaActivity extends RawActivity {
+  tipo: 'mochila';
+}
+/** Uma atividade de content/atividades.json. Cada tipo tem os seus campos. */
+export type Activity = MochilaActivity;
 export type KitItem = RawKitItem;
 /** Uma seção da tela de créditos (título e linhas). */
 export type CreditSection = RawCreditSection;
@@ -119,6 +134,7 @@ export interface GameContent {
   readonly missions: readonly Mission[];
   readonly dialogues: ReadonlyMap<string, Dialogue>;
   readonly questions: ReadonlyMap<string, Question>;
+  readonly activities: ReadonlyMap<string, Activity>;
   readonly kit: KitContent;
   readonly credits: readonly CreditSection[];
 }
@@ -154,6 +170,7 @@ export function loadContent(
   questions: readonly RawQuestion[] = rawQuestions,
   kitFile: RawKit = rawKit,
   credits: readonly RawCreditSection[] = rawCredits,
+  activities: readonly RawActivity[] = rawActivities,
 ): GameContent {
   // Instituições: todas as do mapa precisam ter nome e personagem.
   const institutionMap = indexById('institutions.json', institutions, 'a instituição');
@@ -209,6 +226,14 @@ export function loadContent(
     }
   }
 
+  // Atividades: cada uma com um tipo que o jogo sabe abrir.
+  const activityMap = indexById('atividades.json', activities, 'a atividade');
+  for (const a of activities) {
+    if (!(ACTIVITY_TYPES as readonly string[]).includes(a.tipo)) {
+      fail('atividades.json', `atividade "${a.id}": o tipo "${a.tipo}" não existe. Use ${ACTIVITY_TYPES.join(', ')}.`);
+    }
+  }
+
   // Kit de emergência: itens com espaço e "levar" (true = útil, false = não é prioridade).
   requireText('kit-items.json', 'mochila', 'titulo', kitFile.mochila?.titulo);
   requireText('kit-items.json', 'mochila', 'instrucao', kitFile.mochila?.instrucao);
@@ -254,14 +279,18 @@ export function loadContent(
       fail('missions.json', `${where}: a instituição "${m.instituicao}" não existe em institutions.json.`);
     }
     if (!dialogueMap.has(m.dialogo)) fail('missions.json', `${where}: o diálogo "${m.dialogo}" não existe em dialogues.json.`);
-    if ((m.pergunta === undefined) === (m.minijogo === undefined)) {
-      fail('missions.json', `${where}: use "pergunta" ou "minijogo" (um dos dois, não os dois).`);
+    // O campo "minijogo" virou "atividade" (com o id de uma atividade de atividades.json).
+    if ('minijogo' in m) {
+      fail('missions.json', `${where}: o campo "minijogo" agora se chama "atividade", com o id de uma atividade de atividades.json.`);
+    }
+    if ((m.pergunta === undefined) === (m.atividade === undefined)) {
+      fail('missions.json', `${where}: use "pergunta" ou "atividade" (uma das duas, não as duas).`);
     }
     if (m.pergunta !== undefined && !questionMap.has(m.pergunta)) {
       fail('missions.json', `${where}: a pergunta "${m.pergunta}" não existe em questions.json.`);
     }
-    if (m.minijogo !== undefined && !(MINIGAME_IDS as readonly string[]).includes(m.minijogo)) {
-      fail('missions.json', `${where}: o minijogo "${m.minijogo}" não existe. Use ${MINIGAME_IDS.join(', ')}.`);
+    if (m.atividade !== undefined && !activityMap.has(m.atividade)) {
+      fail('missions.json', `${where}: a atividade "${m.atividade}" não existe em atividades.json.`);
     }
   }
 
@@ -271,6 +300,7 @@ export function loadContent(
     missions: missions as readonly Mission[],
     dialogues: dialogueMap,
     questions: questionMap as Map<string, Question>,
+    activities: activityMap as Map<string, Activity>,
     kit: { titulo: kitFile.mochila.titulo, instrucao: kitFile.mochila.instrucao, itens: kitItems, capacidade },
     credits,
   };

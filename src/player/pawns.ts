@@ -132,6 +132,13 @@ export class Pawns {
     this.emitTurn();
   }
 
+  /** Põe a vez num jogador (posição na ordem da equipe), sem mexer nos peões. Usado ao continuar uma partida salva. */
+  setTurn(index: number): void {
+    if (index < 0 || index >= this.members.length) return;
+    this.turn = index;
+    this.emitTurn();
+  }
+
   /** Passa a vez para o próximo da ordem. Com 1 jogador, não muda nada. */
   nextTurn(): void {
     if (this.members.length < 2) return;

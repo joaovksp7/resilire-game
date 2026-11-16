@@ -1,4 +1,4 @@
-import type { SaveData } from '../core/save';
+import type { SaveData, SavedCell, SavedPlayer } from '../core/save';
 import type { Eixo, GameContent, Mission } from './content';
 
 export interface CompleteResult {
@@ -18,23 +18,25 @@ export type MissionListener = () => void;
 
 /**
  * Progresso das missões: quais estão em andamento e de quem é cada uma, quais foram concluídas
- * (pins) e em quais a pergunta foi acertada de primeira. Cada jogador cuida de uma missão do eixo
- * atual, ao mesmo tempo; com 1 jogador, isso dá uma missão por vez, na ordem de missions.json.
+ * (pins), quem buscou cada pin e em quais a pergunta foi acertada de primeira. Cada jogador cuida de uma missão, ao
+ * mesmo tempo, na ordem de missions.json: quem termina pega a próxima livre, mesmo que seja do eixo seguinte. Com 1
+ * jogador, isso dá uma missão por vez. O eixo atual (clima) é o da primeira missão não concluída.
  */
 export class MissionManager {
   private readonly content: GameContent;
   private readonly listeners: MissionListener[] = [];
-  private readonly completed = new Set<string>();
+  /** Pins conquistados, na ordem em que foram buscados: id da missão → quem buscou (posição na ordem da vez). */
+  private readonly completed = new Map<string, number>();
   private readonly firstTry = new Set<string>();
   private teamSize: number;
-  /** A missão de cada jogador, na ordem da vez (null = está ajudando a equipe). */
+  /** A missão de cada jogador, na ordem da vez (null = está ajudando a equipe: não sobrou missão livre). */
   private assigned: (Mission | null)[] = [];
 
   constructor(content: GameContent, saved: SaveData | null, teamSize: number) {
     this.content = content;
     this.teamSize = teamSize;
     if (saved) this.restore(saved);
-    this.deal(0);
+    else this.deal(0);
   }
 
   get missions(): readonly Mission[] {
@@ -84,6 +86,11 @@ export class MissionManager {
     return this.completed.has(missionId);
   }
 
+  /** Quem buscou o pin (posição na ordem da vez), ou null se a missão não foi concluída. */
+  foundBy(missionId: string): number | null {
+    return this.completed.get(missionId) ?? null;
+  }
+
   wasFirstTry(missionId: string): boolean {
     return this.firstTry.has(missionId);
   }
@@ -108,21 +115,19 @@ export class MissionManager {
   }
 
   /**
-   * Conclui uma missão em andamento (ganha o pin). O dono recebe a próxima missão livre do eixo ou
-   * passa a ajudar; quem fez a visita continua com a sua. Se o eixo acabou, as missões do próximo
-   * são distribuídas a partir de `nextPlayer`, quem joga em seguida.
+   * Conclui uma missão em andamento (ganha o pin), guardando quem fez a visita (`visitor`). O dono
+   * recebe a próxima missão livre (de qualquer eixo) ou, se não sobrar nenhuma, passa a ajudar; quem
+   * fez a visita continua com a sua. O eixo muda quando todas as missões dele foram concluídas.
    */
-  complete(mission: Mission, firstTry: boolean, nextPlayer: number): CompleteResult {
-    this.completed.add(mission.id);
+  complete(mission: Mission, firstTry: boolean, visitor: number): CompleteResult {
+    const before = this.currentEixo;
+    this.completed.set(mission.id, visitor);
     if (firstTry) this.firstTry.add(mission.id);
     const eixo = this.currentEixo;
-    const eixoChanged = !!eixo && eixo.id !== mission.eixo;
-    if (eixoChanged) {
-      this.deal(nextPlayer);
-    } else {
-      const owner = this.assigned.indexOf(mission);
-      if (owner >= 0) this.assigned[owner] = this.nextFree();
-    }
+    // Compara com o eixo de antes: concluir uma missão adiantada (de um eixo seguinte) não muda o eixo.
+    const eixoChanged = !!eixo && eixo.id !== before?.id;
+    const owner = this.assigned.indexOf(mission);
+    if (owner >= 0) this.assigned[owner] = this.nextFree();
     this.emit();
     return { eixoChanged, finished: !eixo };
   }
@@ -134,21 +139,50 @@ export class MissionManager {
     this.emit();
   }
 
-  toSave(player: { col: number; row: number } | null): SaveData {
+  /**
+   * O progresso para salvar. `names` são os nomes digitados e `cells` as casas dos peões, na ordem
+   * da vez; `turn` é de quem é a vez.
+   */
+  toSave(names: readonly string[], cells: readonly (SavedCell | null)[], turn: number): SaveData {
+    const players: SavedPlayer[] = names.map((name, index) => ({
+      name,
+      cell: cells[index] ? { col: cells[index].col, row: cells[index].row } : null,
+      mission: this.assigned[index]?.id ?? null,
+    }));
     return {
-      version: 1,
-      currentMission: this.firstOpen?.id ?? null,
-      completed: [...this.completed],
+      version: 2,
+      players,
+      turn,
+      pins: [...this.completed].map(([mission, by]) => ({ mission, by })),
       firstTry: [...this.firstTry],
-      player,
     };
   }
 
-  /** Restaura os pins, ignorando ids que não existem mais no conteúdo. */
+  /**
+   * Restaura os pins e a missão de cada jogador. Ids que não existem mais no conteúdo são ignorados,
+   * e missão que não vale mais (já concluída ou repetida) é trocada pela próxima livre, para
+   * ninguém ficar sem missão enquanto sobra alguma.
+   */
   private restore(saved: SaveData): void {
-    const ids = new Set(this.content.missions.map((m) => m.id));
-    for (const id of saved.completed) if (ids.has(id)) this.completed.add(id);
+    const byId = new Map(this.content.missions.map((m) => [m.id, m]));
+    for (const pin of saved.pins) {
+      if (byId.has(pin.mission) && pin.by < this.teamSize) this.completed.set(pin.mission, pin.by);
+    }
     for (const id of saved.firstTry) if (this.completed.has(id)) this.firstTry.add(id);
+
+    if (saved.players.length !== this.teamSize) {
+      this.deal(0);
+      return;
+    }
+    this.assigned = Array.from({ length: this.teamSize }, () => null);
+    saved.players.forEach((player, index) => {
+      const mission = player.mission ? byId.get(player.mission) : undefined;
+      const valid = !!mission && !this.completed.has(mission.id) && !this.assigned.includes(mission);
+      if (valid) this.assigned[index] = mission;
+    });
+    for (let i = 0; i < this.teamSize; i++) {
+      if (!this.assigned[i]) this.assigned[i] = this.nextFree();
+    }
   }
 
   /** A primeira missão ainda não concluída. */
@@ -156,7 +190,7 @@ export class MissionManager {
     return this.content.missions.find((m) => !this.completed.has(m.id));
   }
 
-  /** Entrega as missões do eixo atual, uma para cada jogador, na ordem da vez a partir de `from`. Quem sobra ajuda. */
+  /** Entrega as primeiras missões livres, uma para cada jogador, na ordem da vez a partir de `from`. Quem sobra ajuda. */
   private deal(from: number): void {
     this.assigned = Array.from({ length: this.teamSize }, () => null);
     for (let i = 0; i < this.teamSize; i++) {
@@ -164,12 +198,9 @@ export class MissionManager {
     }
   }
 
-  /** A próxima missão do eixo atual que ainda não foi feita nem está com ninguém. */
+  /** A próxima missão de missions.json (de qualquer eixo) que ainda não foi feita nem está com ninguém. */
   private nextFree(): Mission | null {
-    const eixo = this.currentEixo;
-    return (
-      this.content.missions.find((m) => m.eixo === eixo?.id && !this.completed.has(m.id) && !this.assigned.includes(m)) ?? null
-    );
+    return this.content.missions.find((m) => !this.completed.has(m.id) && !this.assigned.includes(m)) ?? null;
   }
 
   private emit(): void {

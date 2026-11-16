@@ -1,5 +1,6 @@
 import type { GameContent, Mission } from '../missions/content';
 import type { MissionManager } from '../missions/missionManager';
+import type { Team } from '../player/team';
 import { INSTITUTION_STYLES } from '../world/institutions';
 import { badge, modals, openModal, type SoundSwitch, soundButton, textEl, uid } from './cards';
 
@@ -12,10 +13,15 @@ const TEXT = {
   allDone: 'Todas as missões concluídas!',
   pinsButton: (n: number, total: number) => `Pins: ${n} de ${total}. Abrir painel de pins`,
   panelTitle: 'Seus pins',
+  teamPanelTitle: 'Pins da equipe',
   firstTry: (n: number, done: number) => `Acertos de primeira: ${n} de ${done}`,
   locked: (n: number) => `Missão ${n}`,
   lockedLabel: (n: number) => `Missão ${n}: ainda não conquistado`,
   close: 'Fechar',
+  foundBy: (name: string) => `Buscado por ${name}`,
+  activeTitle: 'Em andamento',
+  activeItem: (player: string, mission: string, place: string) => `${player}: ${mission} (${place})`,
+  helpingItem: (player: string) => `${player}: ajudando a equipe`,
 } as const;
 
 /** Desenho de pin (alfinete) para o botão do painel. */
@@ -31,6 +37,8 @@ export class MissionHud {
   private readonly root: HTMLElement;
   private readonly content: GameContent;
   private readonly manager: MissionManager;
+  /** A equipe de agora (muda ao começar um jogo novo). */
+  private readonly team: () => Team;
   private readonly top: HTMLElement;
   private readonly bar: HTMLElement;
   private readonly pinsButton: HTMLButtonElement;
@@ -43,10 +51,11 @@ export class MissionHud {
   private shownCount = 0;
   private pulsePending = false;
 
-  constructor(root: HTMLElement, content: GameContent, manager: MissionManager, sound: SoundSwitch) {
+  constructor(root: HTMLElement, content: GameContent, manager: MissionManager, team: () => Team, sound: SoundSwitch) {
     this.root = root;
     this.content = content;
     this.manager = manager;
+    this.team = team;
 
     this.bar = document.createElement('section');
     this.bar.className = 'hud-missao';
@@ -148,12 +157,38 @@ export class MissionHud {
     }, 0);
   }
 
+  /** "Buscado por Ana", com 2 ou mais jogadores (null com 1 jogador ou sem pin). */
+  private foundByText(missionId: string): string | null {
+    const team = this.team();
+    const by = this.manager.foundBy(missionId);
+    const player = by === null ? undefined : team[by];
+    return team.length > 1 && player ? TEXT.foundBy(player.name) : null;
+  }
+
+  /** Com 2 ou mais jogadores: cada jogador e a missão de que cuida (ou que está ajudando). */
+  private activeSection(): HTMLElement | null {
+    const { manager, content } = this;
+    const team = this.team();
+    if (team.length < 2 || manager.isFinished) return null;
+    const list = document.createElement('ul');
+    list.className = 'painel__lista';
+    for (const [index, player] of team.entries()) {
+      const mission = manager.missionOf(index);
+      const place = mission ? (content.institutions.get(mission.instituicao)?.nome ?? '') : '';
+      list.append(textEl('li', '', mission ? TEXT.activeItem(player.name, mission.titulo, place) : TEXT.helpingItem(player.name)));
+    }
+    const section = document.createElement('section');
+    section.className = 'painel__secao';
+    section.append(textEl('h3', 'painel__subtitulo', TEXT.activeTitle), list);
+    return section;
+  }
+
   private openPanel(): void {
     const { manager } = this;
     const panel = document.createElement('div');
     panel.className = 'painel';
     const titleId = uid('painel-titulo');
-    const title = textEl('h2', 'painel__titulo', TEXT.panelTitle);
+    const title = textEl('h2', 'painel__titulo', this.team().length > 1 ? TEXT.teamPanelTitle : TEXT.panelTitle);
     title.id = titleId;
 
     const list = document.createElement('ul');
@@ -164,10 +199,12 @@ export class MissionHud {
       item.className = `pin ${done ? 'pin--ganho' : 'pin--falta'}`;
       if (done) {
         const style = INSTITUTION_STYLES[mission.instituicao];
-        item.append(
-          badge(style.icon, style.color),
-          textEl('span', 'pin__nome', mission.titulo),
-        );
+        const label = document.createElement('span');
+        label.className = 'pin__texto';
+        label.append(textEl('span', 'pin__nome', mission.titulo));
+        const foundBy = this.foundByText(mission.id);
+        if (foundBy) label.append(textEl('span', 'pin__quem', foundBy));
+        item.append(badge(style.icon, style.color), label);
       } else {
         const empty = document.createElement('span');
         empty.className = 'selo selo--vazio';
@@ -187,7 +224,8 @@ export class MissionHud {
     close.type = 'button';
     close.dataset.autofocus = '';
     actions.append(close);
-    panel.append(title, list, stats, actions);
+    const active = this.activeSection();
+    panel.append(title, ...(active ? [active] : []), list, stats, actions);
 
     const modal = openModal(this.root, panel, { labelledBy: titleId, variant: 'panel', onEscape: () => modal.close() });
     close.addEventListener('click', () => modal.close());

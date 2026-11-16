@@ -24,7 +24,7 @@ export interface PauseMenuOptions {
   /** true quando todas as missões foram concluídas (mostra "Ver resultado"). */
   isFinished(): boolean;
   showResult(): void;
-  /** Apaga o progresso e recomeça (a confirmação já foi feita aqui). */
+  /** Apaga o progresso e volta à tela inicial, já com o seletor (a confirmação já foi feita aqui). */
   restart(): void;
   goToTitle(): void;
 }

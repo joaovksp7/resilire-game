@@ -5,7 +5,7 @@ Jogo educativo para navegador sobre **enchentes e deslizamentos**, para estudant
 - Game design completo:
 - Regras para quem desenvolve: [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)
 
-> **Status:** Parte 2, Fase 12 (Missões divididas) — de 1 a 4 jogadores no mesmo aparelho, cada um com o seu peão e a sua missão, ao mesmo tempo, passando a vez a cada jogada do dado; as 10 missões jogáveis do começo ao fim, com progresso salvo (por enquanto, ao recarregar, os pins continuam, mas as missões em andamento são distribuídas de novo, os peões dos outros jogadores voltam para casa e a vez volta para o Jogador 1; a equipe inteira passa a ser salva na Fase 13); o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); no mercado o jogador monta a mochila de emergência; o jogo tem tela inicial, Como jogar, pausa, tela final e créditos; e tem som gerado por código (chuva, pin, dado e acerto), com botão de som sempre à mão, e animação nos pins. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`).
+> **Status:** Parte 2 concluída (Fases 9 a 14) — de 1 a 4 jogadores no mesmo aparelho, cada um com o seu peão e a sua missão, ao mesmo tempo, passando a vez a cada jogada do dado; as 10 missões jogáveis do começo ao fim; os pins são da equipe e mostram quem buscou cada um; o progresso da equipe inteira fica salvo (quem joga, de quem é a vez, onde está cada peão e a missão de cada um); o clima muda a cada eixo (chuva, céu, rio subindo e ruas da parte baixa alagadas em "Durante o evento"); no mercado o jogador monta a mochila de emergência; o jogo tem tela inicial, Como jogar, pausa, tela final e créditos; e tem som gerado por código (chuva, pin, dado e acerto), com botão de som sempre à mão, e animação nos pins. **Todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil** (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`).
 
 ---
 
@@ -23,8 +23,10 @@ Depois, abra o endereço que aparecer no terminal (normalmente `http://localhost
 ### Telas
 
 - **Tela inicial:** o nome do jogo sobre uma cena animada desenhada em código (nuvens, sol, garoa leve, rio e os peões pulando, um para cada jogador escolhido). Com `prefers-reduced-motion`, a cena fica parada. Na primeira vez, mostra **Quantos vão jogar?** (de 1 a 4, começando no número da última partida) e **Jogar**. Com 1, vai direto para a cidade. Com 2 ou mais, abre **Quem vai jogar?**, com um campo de nome por jogador (opcional, até 12 letras; vazio vira "Jogador 1", "Jogador 2"…) e a cor do peão. Se já houver progresso, mostra quem está jogando, os pins, **Continuar** e **Novo jogo**; depois de completar tudo, **Ver resultado** e **Jogar de novo**. Novo jogo e Jogar de novo apagam o progresso depois de confirmar e voltam ao seletor. Sempre tem **Como jogar**, **Créditos** e **Som** (liga e desliga). Se o navegador não deixar salvar o progresso, uma linha avisa.
-- **Pausa:** botão ⏸ no alto da tela (ou `Esc`). Tem **Continuar**, **Como jogar**, **Ver resultado** (só depois de completar tudo), **Começar de novo**, **Som** e **Tela inicial**. Na pausa e na tela inicial, o personagem e o dado ficam parados.
-- **Tela final:** aparece depois da última missão, com os pins, os acertos de primeira e um resumo do que foi aprendido em cada eixo (o campo `aprendizado` de cada missão). Dá para **Jogar de novo** ou **Fechar** e continuar andando pela cidade.
+- **Pausa:** botão ⏸ no alto da tela (ou `Esc`). Tem **Continuar**, **Como jogar**, **Ver resultado** (só depois de completar tudo), **Começar de novo**, **Som** e **Tela inicial**. **Começar de novo** apaga o progresso e volta à tela inicial, já com o seletor. Na pausa e na tela inicial, o personagem e o dado ficam parados.
+- **Painel de pins:** os pins conquistados e, com 2 ou mais jogadores, quem buscou cada um e as missões em andamento, com quem cuida de cada uma.
+- **Tela final:** aparece depois da última missão, com os pins, os acertos de primeira e um resumo do que foi aprendido em cada eixo (o campo `aprendizado` de cada missão). Com 2 ou mais jogadores, diz "A equipe completou todas as missões!", mostra os nomes da equipe e quem buscou cada pin, sem ranking nem vencedor. Dá para **Jogar de novo** (volta à tela inicial, já com o seletor) ou **Fechar** e continuar andando pela cidade.
+- **Como jogar:** o objetivo, o dado, os eixos, **Jogando em grupo** e os controles.
 
 "Novo jogo", "Começar de novo" e "Jogar de novo" sempre pedem confirmação antes de apagar o progresso.
 
@@ -38,7 +40,7 @@ O personagem anda **por dado**, como num jogo de tabuleiro:
 
 Com 2 ou mais jogadores, cada um tem o seu peão e todos começam na porta de casa. Uma vez é uma jogada do dado: ao chegar, a vez passa para o próximo, na ordem da tela inicial. Só o peão da vez anda, e ele tem um anel no chão; a câmera vai até ele e o rodapé mostra de quem é a vez, com o número e a cor do jogador. Peões não bloqueiam o caminho uns dos outros e, na mesma casa, ficam lado a lado.
 
-Cada jogador cuida de uma missão diferente, ao mesmo tempo, sempre do eixo atual. As missões são distribuídas na ordem da vez, a partir de quem joga em seguida, e quem sobra ajuda a equipe. **Quem parar na porta de qualquer missão em andamento faz a visita**, seja a sua ou a de um colega. Depois da visita, o dono da missão recebe a próxima livre do eixo ou passa a ajudar, e quem fez a visita continua com a sua. O eixo só muda quando todas as missões dele acabam. O cartão da missão aparece no começo da vez de quem a recebeu, e quem já está na porta de uma missão em andamento faz a visita sem jogar o dado. Para quem ajuda, a barra do topo mostra "Ajudando a equipe", e "Ir rumo ao objetivo" e a seta da borda levam à missão mais perto.
+Cada jogador cuida de uma missão diferente, ao mesmo tempo, na ordem de `missions.json`. No começo, as missões são distribuídas na ordem da vez, a partir do Jogador 1. **Quem parar na porta de qualquer missão em andamento faz a visita**, seja a sua ou a de um colega. Depois da visita, o dono da missão recebe a próxima livre, mesmo que seja do eixo seguinte, e quem fez a visita continua com a sua. Só quando não sobra missão livre (no fim do jogo) ele passa a ajudar a equipe. O eixo (clima, rio e ruas alagadas) só muda quando todas as missões dele acabam, então uma missão adiantada do eixo seguinte é feita ainda com o clima do eixo atual. O cartão da missão aparece no começo da vez de quem a recebeu, e quem já está na porta de uma missão em andamento faz a visita sem jogar o dado. Para quem ajuda, a barra do topo mostra "Ajudando a equipe", e "Ir rumo ao objetivo" e a seta da borda levam à missão mais perto.
 
 | Ação | Computador | Celular |
 |---|---|---|
@@ -101,7 +103,7 @@ No iPhone, a chave de silencioso do aparelho também corta o som do jogo. Os vol
 
 ### Progresso salvo
 
-O jogo salva sozinho os pins, os acertos de primeira e onde o personagem está. Ao recarregar a página, continua de onde parou. Com 2 ou mais jogadores, por enquanto só os pins e o lugar do Jogador 1 ficam salvos: as missões em andamento são distribuídas de novo, os outros peões voltam para casa e a vez volta para o Jogador 1 (muda na Fase 13). Se o navegador bloquear o armazenamento (acontece dentro de iframe em alguns navegadores), o jogo funciona normalmente, mas o progresso some ao recarregar (a tela inicial avisa). Para recomeçar, use "Começar de novo" no menu de pausa ou "Novo jogo" na tela inicial.
+O jogo salva sozinho, a cada vez: quem está jogando, de quem é a vez, onde está cada peão, a missão de cada jogador, os pins com quem buscou e os acertos de primeira. Ao recarregar a página, **Continuar** volta exatamente de onde parou (cada jogador vê de novo o cartão da sua missão, como lembrete). O formato é a versão 2 (chave `resilire-game:progresso:v2`); a partida salva por uma versão antiga do jogo (de um jogador só) é ignorada e começa do zero, e a escolha do som continua. Se o navegador bloquear o armazenamento (acontece dentro de iframe em alguns navegadores), o jogo funciona normalmente, mas o progresso some ao recarregar (a tela inicial avisa). Para recomeçar, use "Começar de novo" no menu de pausa ou "Novo jogo" na tela inicial.
 
 Os nomes da última equipe ficam guardados à parte, só neste navegador, e voltam preenchidos na partida seguinte. Nada sai do aparelho.
 
@@ -183,7 +185,7 @@ Tem duas listas:
 | `instituicao` | `id` da instituição de destino (de `institutions.json`) |
 | `dialogo` | `id` do diálogo (de `dialogues.json`) |
 | `pergunta` | `id` da pergunta (de `questions.json`) |
-| `minijogo` | No lugar da `pergunta`: `"kit"` abre o minijogo da mochila (de `kit-items.json`). Cada missão tem **ou** `pergunta` **ou** `minijogo`, nunca os dois |
+| `atividade` | No lugar da `pergunta`: `id` da atividade (de `atividades.json`), por exemplo `"a02-mochila"`. Cada missão tem **ou** `pergunta` **ou** `atividade`, nunca as duas. (Este campo se chamava `minijogo`, com o valor `"kit"`.) |
 | `aprendizado` | Um tópico curto com o que foi aprendido, para o resumo da tela final |
 
 **Atenção no eixo `durante`:** a parte baixa da cidade fica alagada, então as missões desse eixo precisam ir para instituições da parte alta. Hoje, o Mercado e a Rádio ficam na parte alagada. Se uma missão de `durante` apontar para uma delas, o jogo avisa qual missão corrigir.
@@ -204,13 +206,34 @@ Uma lista de diálogos, cada um com `id` e `falas`: uma lista de frases, mostrad
 
 A `explicacao` da alternativa certa aparece quando o jogador acerta; a das erradas explica por que aquela não era a melhor escolha, e o jogador tenta de novo. **As alternativas aparecem embaralhadas no jogo**, então a ordem no arquivo não importa para o jogador.
 
-### `kit-items.json` — minijogo da mochila de emergência
+### `atividades.json` — atividades das missões
+
+Uma lista de atividades. Uma missão com `atividade` no lugar da `pergunta` abre uma delas depois do diálogo.
+
+| Campo | O que é |
+|---|---|
+| `id` | Id da atividade (ex.: `"a02-mochila"`) |
+| `tipo` | Qual atividade é. Por enquanto só existe `mochila` |
+
+Exemplo:
+
+```json
+{
+  "id": "a02-mochila",
+  "tipo": "mochila"
+}
+```
+
+- **`mochila`**: só tem `id` e `tipo`. O título, a instrução e os itens ficam em `kit-items.json` (veja abaixo), para o mesmo texto não ficar em dois lugares.
+- Os próximos tipos (ordenar passos, separar em colunas, jogo da memória e outros) entram aos poucos, cada um com os seus campos, e vão ser explicados aqui.
+
+### `kit-items.json` — atividade da mochila de emergência (tipo `mochila`)
 
 O jogador toca nos itens da prateleira para colocar ou tirar da mochila. A mochila tem espaço exato para **todos os itens com `"levar": true`, e só eles**: cada item que não é prioridade ocupa o lugar de um útil. Ao fechar a mochila, o jogo mostra o que faltou, o que não precisava levar e o que ficou bom, com a `explicacao` de cada item. Se não estiver tudo certo, o jogador arruma de novo; conta como acerto de primeira quando a primeira mochila fechada já está certa.
 
 Tem duas partes:
 
-- **`mochila`**: o `titulo` e a `instrucao` que aparecem no alto da tela do minijogo.
+- **`mochila`**: o `titulo` e a `instrucao` que aparecem no alto da tela da atividade.
 - **`itens`**: a lista de itens (aparecem embaralhados na prateleira).
 
 | Campo do item | O que é |
@@ -268,15 +291,16 @@ src/
   main.ts             liga tudo: conteúdo, cidade, câmera, personagem, missões e interface
   config.ts           nome do jogo e constantes (câmera, render, mundo, personagem, cores, clima e chuva)
   style.css           cores e fontes (variáveis CSS) e estilos da interface
-  core/               loop, entrada (teclado/mouse/toque), câmera, renderer, save (progresso, escolha do som e última equipe)
+  core/               loop, entrada (teclado/mouse/toque), câmera, renderer, save (progresso da equipe, escolha do som e última equipe)
   audio/
     sound.ts          som gerado por código: chuva, pin, dado, acerto e o liga/desliga
   missions/
     content.ts        lê content/*.json (e os créditos) e confere as ligações por id
     missionManager.ts missões em andamento e de quem é cada uma, pins e acertos de primeira
-    missionFlow.ts    o loop: missão → porta → diálogo → pergunta (ou minijogo) → pin → próxima
+    missionFlow.ts    o loop: missão → porta → diálogo → pergunta (ou atividade) → pin → próxima
   minigames/
-    kitMinigame.ts    minijogo da mochila de emergência (prateleira, mochila, resultado)
+    activities.ts     abre a atividade da missão (de content/atividades.json) pelo tipo
+    kitMinigame.ts    atividade da mochila de emergência (prateleira, mochila, resultado)
     kitIcons.ts       desenhos dos itens da mochila
   player/
     character.ts      personagem low-poly e animação de andar
@@ -290,7 +314,7 @@ src/
     clickToMove.ts    descobre o que foi tocado na tela (chão ou prédio)
   ui/
     diceHud.ts        botão "Jogar dado", "Ir rumo ao objetivo", avisos e de quem é a vez
-    missionHud.ts     barra da missão no topo, painel de pins e botão de som
+    missionHud.ts     barra da missão no topo, painel de pins (com quem buscou) e botão de som
     dialogue.ts       caixa de diálogo e pergunta
     cards.ts          cartões (missão, pin, eixo), confirmação, botão de som e janelas com foco preso
     edgeArrow.ts      seta na borda da tela apontando o destino
@@ -298,7 +322,7 @@ src/
     titleScene.ts     cena animada ao fundo da tela inicial
     teamSetup.ts      janela "Quem vai jogar?"
     pauseMenu.ts      botão e menu de pausa
-    endScreen.ts      tela final (pins, acertos de primeira e resumo por eixo)
+    endScreen.ts      tela final (pins, quem buscou, acertos de primeira e resumo por eixo)
     howToPlay.ts      janela "Como jogar"
   world/
     layout.ts         mapa da cidade em texto (tipos e alturas)

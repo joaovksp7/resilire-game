@@ -736,6 +736,20 @@ body {
   border-width: 2px;
 }
 
+/* Nome do pin e, em equipe, quem buscou embaixo. */
+.pin__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.pin__quem {
+  color: var(--cor-texto-suave);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .painel__resumo {
   font-weight: 700;
 }
@@ -1265,6 +1279,11 @@ body {
     transform: none;
     opacity: 1;
   }
+}
+
+.fim__equipe {
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .fim__numeros {

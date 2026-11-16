@@ -54,7 +54,7 @@
       "descricao": "Vá até o mercado e descubra o que levar numa mochila de emergência.",
       "instituicao": "mercado",
       "dialogo": "d04-mochila",
-      "minijogo": "kit",
+      "atividade": "a02-mochila",
       "aprendizado": "Na mochila de emergência vão documentos num saco plástico, lanterna, pilhas, água, comida que não estraga e remédios."
     },
     {

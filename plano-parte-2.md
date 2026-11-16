@@ -4,6 +4,8 @@ Continuação de [`prompt-jogo-desastres-climaticos.md`](prompt-jogo-desastres-c
 
 Decisões aprovadas em 28/10/2026 e revisadas no mesmo dia: o jogo continua com as 10 missões, e cada jogador cuida de uma missão diferente.
 
+> **Status (16/11/2026): Fases 9 a 14 implementadas.** Conferido: `npx tsc --noEmit` e `npm run build` sem erro, e a lógica do save versão 2 (restaurar equipe, vez e missões; ignorar save antigo ou corrompido; funcionar sem `localStorage`) e da partida com 1 e 4 jogadores até o fim. **Falta testar à mão** para dar os critérios da seção 7 por cumpridos: celular a 360px, Chromebook, partida só com teclado, Chrome e Firefox dentro de iframe, 30 fps com 4 peões em máquina fraca e uma partida cronometrada com 4 jogadores (meta de 15 a 25 minutos).
+
 ## 1. Objetivo
 
 Deixar o jogo jogável por **até 4 pessoas no mesmo aparelho**, cada uma na sua vez, como num jogo de tabuleiro. Pensado para um grupo de alunos num computador do laboratório, num Chromebook ou num celular passado de mão em mão.
