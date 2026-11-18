@@ -3,119 +3,131 @@
     {
       "id": "alerta",
       "nome": "Alerta",
-      "descricao": "O céu está nublado e começou a chover fraco. É hora de saber receber e conferir os alertas oficiais."
+      "descricao": "O céu está nublado e começou a chover. Vêm aí temporais e risco de alagamento. É hora de combinar em casa o plano de emergência da família.",
+      "todoValidar": "Texto do eixo é rascunho."
     },
     {
       "id": "preparacao",
       "nome": "Preparação",
-      "descricao": "A chuva aumentou e o rio está subindo um pouco. É hora de montar o kit, combinar o plano da família e reconhecer as áreas de risco."
+      "descricao": "A chuva aumentou e o rio está subindo um pouco. É hora de montar a mochila de emergência, conhecer o abrigo e aprender o que é seguro e o que é perigoso numa inundação.",
+      "todoValidar": "Texto do eixo é rascunho."
     },
     {
       "id": "durante",
       "nome": "Durante o evento",
-      "descricao": "A chuva está forte e o rio transbordou. Algumas ruas da parte baixa estão alagadas: use as ruas da parte alta. É hora de agir com segurança, buscar abrigo e pedir ajuda."
+      "descricao": "A chuva está forte e o rio transbordou. As ruas da parte baixa estão alagadas, inclusive a da sua casa: use as ruas da parte alta. É hora de agir com segurança, pedir ajuda e conferir as informações.",
+      "todoValidar": "Texto do eixo é rascunho."
+    },
+    {
+      "id": "depois",
+      "nome": "Depois do evento",
+      "descricao": "A chuva parou e a água está baixando aos poucos. É hora de cuidar da saúde, dos animais e de quem se machucou, e de começar a reconstruir.",
+      "todoValidar": "Texto do eixo é rascunho."
     }
   ],
   "missoes": [
     {
-      "id": "m01-fique-por-dentro",
+      "id": "m01-plano-familia",
       "eixo": "alerta",
-      "titulo": "Fique por dentro",
-      "descricao": "Vá até a Defesa Civil e descubra como receber os alertas oficiais no celular.",
-      "instituicao": "defesa-civil",
-      "dialogo": "d01-fique-por-dentro",
-      "pergunta": "q01-fique-por-dentro",
-      "aprendizado": "Dá para se cadastrar e receber os alertas oficiais da Defesa Civil por SMS."
+      "titulo": "Estou preparado?",
+      "descricao": "Você está em casa e os temporais estão chegando. Combine com a família o plano de emergência.",
+      "instituicao": "casa",
+      "dialogo": "d01-plano-familia",
+      "atividade": "a01-plano-familia",
+      "aprendizado": "No plano de emergência da família entram o ponto de encontro, os contatos de todos, os documentos protegidos, os remédios, o animal de estimação e o caminho até um lugar seguro."
     },
     {
-      "id": "m02-noticia-ou-boato",
-      "eixo": "alerta",
-      "titulo": "Notícia ou boato?",
-      "descricao": "Uma mensagem estranha está circulando nos grupos. Vá até a rádio comunitária e descubra como saber se ela é verdadeira.",
-      "instituicao": "radio",
-      "dialogo": "d02-noticia-ou-boato",
-      "pergunta": "q02-noticia-ou-boato",
-      "aprendizado": "Antes de acreditar ou repassar uma mensagem, confira se ela veio de uma fonte oficial."
-    },
-    {
-      "id": "m03-combinado",
-      "eixo": "alerta",
-      "titulo": "Combinado é combinado",
-      "descricao": "Vá até a escola e monte com a professora o plano de emergência da sua família.",
-      "instituicao": "escola",
-      "dialogo": "d03-combinado",
-      "pergunta": "q03-combinado",
-      "aprendizado": "O plano de emergência da família tem um ponto de encontro e os contatos de todos."
-    },
-    {
-      "id": "m04-mochila",
+      "id": "m02-mochila",
       "eixo": "preparacao",
-      "titulo": "Monte sua mochila",
-      "descricao": "Vá até o mercado e descubra o que levar numa mochila de emergência.",
+      "titulo": "Compras conscientes",
+      "descricao": "Passe no mercado e escolha só o que é útil para a mochila de emergência.",
       "instituicao": "mercado",
-      "dialogo": "d04-mochila",
+      "dialogo": "d02-mochila",
       "atividade": "a02-mochila",
       "aprendizado": "Na mochila de emergência vão documentos num saco plástico, lanterna, pilhas, água, comida que não estraga e remédios."
     },
     {
-      "id": "m05-remedio",
+      "id": "m03-abrigo",
       "eixo": "preparacao",
-      "titulo": "Remédio não pode faltar",
-      "descricao": "Vá até a UBS e descubra como deixar os remédios da família prontos para uma emergência.",
-      "instituicao": "ubs",
-      "dialogo": "d05-remedio",
-      "pergunta": "q05-remedio",
-      "aprendizado": "Remédios de uso contínuo e cópias das receitas ficam separados para levar."
-    },
-    {
-      "id": "m06-morro",
-      "eixo": "preparacao",
-      "titulo": "O morro está avisando",
-      "descricao": "Vá até o quartel dos Bombeiros e aprenda a reconhecer os sinais de que um morro pode deslizar.",
-      "instituicao": "bombeiros",
-      "dialogo": "d06-morro",
-      "pergunta": "q06-morro",
-      "aprendizado": "Rachaduras em paredes, árvores ou postes inclinados e água barrenta minando do chão são sinais de deslizamento."
-    },
-    {
-      "id": "m07-desliga",
-      "eixo": "durante",
-      "titulo": "Desliga antes de sair",
-      "descricao": "A chuva apertou. Volte para casa e prepare a casa antes de sair.",
-      "instituicao": "casa",
-      "dialogo": "d07-desliga",
-      "pergunta": "q07-desliga",
-      "aprendizado": "Antes de sair de casa, desligar a energia e o gás."
-    },
-    {
-      "id": "m08-agua-corrente",
-      "eixo": "durante",
-      "titulo": "Água corrente não se atravessa",
-      "descricao": "Algumas ruas alagaram. Volte ao Corpo de Bombeiros e aprenda o que fazer diante de uma rua cheia de água.",
-      "instituicao": "bombeiros",
-      "dialogo": "d08-agua-corrente",
-      "pergunta": "q08-agua-corrente",
-      "aprendizado": "Rua alagada não se atravessa, nem a pé, nem de carro: procure outro caminho pela parte alta."
-    },
-    {
-      "id": "m09-lugar-seguro",
-      "eixo": "durante",
-      "titulo": "Para o lugar seguro",
-      "descricao": "Chegou a hora de ir para o abrigo. As ruas baixas estão alagadas: vá pela parte alta da cidade.",
+      "titulo": "Um lugar seguro",
+      "descricao": "Algumas famílias já precisaram sair de casa. Vá até o abrigo e conheça como ele funciona.",
       "instituicao": "abrigo",
-      "dialogo": "d09-lugar-seguro",
-      "pergunta": "q09-lugar-seguro",
-      "aprendizado": "Para chegar ao abrigo, use a rota pela parte alta e leve a mochila de emergência."
+      "dialogo": "d03-abrigo",
+      "atividade": "a03-chegada-abrigo",
+      "aprendizado": "O abrigo é um lugar seguro para a família ficar. Para chegar, use a rota pela parte alta e leve a mochila de emergência."
     },
     {
-      "id": "m10-ninguem-fica",
+      "id": "m04-escola",
+      "eixo": "preparacao",
+      "titulo": "Conhecimento que protege",
+      "descricao": "Vá até a escola e aprenda a separar o que é seguro do que é perigoso numa inundação.",
+      "instituicao": "escola",
+      "dialogo": "d04-escola",
+      "atividade": "a04-seguro-ou-perigoso",
+      "aprendizado": "Numa inundação, ir pela parte alta, desligar a energia e o gás, conferir os avisos e pedir ajuda no 193 protegem. Atravessar rua alagada, ficar na beira do rio e repassar boato colocam em perigo."
+    },
+    {
+      "id": "m05-mapa-risco",
       "eixo": "durante",
-      "titulo": "Ninguém fica para trás",
-      "descricao": "Vá até o CRAS e descubra como ajudar os vizinhos e as famílias que precisam de apoio.",
-      "instituicao": "cras",
-      "dialogo": "d10-ninguem-fica",
-      "pergunta": "q10-ninguem-fica",
-      "aprendizado": "Ajudar os vizinhos e procurar o CRAS: ninguém fica para trás."
+      "titulo": "Informação e prevenção",
+      "descricao": "O rio está subindo rápido. Vá até a Defesa Civil e descubra se a sua casa fica numa área de risco.",
+      "instituicao": "defesa-civil",
+      "dialogo": "d05-mapa-risco",
+      "atividade": "a05-mapa-risco",
+      "aprendizado": "A Defesa Civil mapeia as áreas de risco e manda alertas oficiais por SMS. Rachaduras em paredes, árvores ou postes inclinados e água barrenta minando do chão são sinais de deslizamento."
+    },
+    {
+      "id": "m06-ligacao-193",
+      "eixo": "durante",
+      "titulo": "Segurança em primeiro lugar",
+      "descricao": "Com o temporal, um poste caiu em cima de um carro e tem uma pessoa presa. Vá até o Corpo de Bombeiros e aprenda a pedir ajuda.",
+      "instituicao": "bombeiros",
+      "dialogo": "d06-ligacao-193",
+      "atividade": "a06-ligacao-193",
+      "aprendizado": "Em perigo, ninguém enfrenta sozinho: ligue para os Bombeiros no 193. Rua alagada não se atravessa, nem a pé, nem de carro."
+    },
+    {
+      "id": "m07-confiavel",
+      "eixo": "durante",
+      "titulo": "Informação salva vidas",
+      "descricao": "Muitas mensagens estão circulando nos grupos. Vá até a rádio comunitária e descubra como saber se uma informação é confiável.",
+      "instituicao": "radio",
+      "dialogo": "d07-confiavel",
+      "atividade": "a07-confiavel-ou-boato",
+      "aprendizado": "Antes de acreditar ou repassar uma mensagem, confira se ela veio de uma fonte oficial. Os telefones de emergência são 190 (Polícia), 192 (SAMU) e 193 (Bombeiros)."
+    },
+    {
+      "id": "m08-posto-saude",
+      "eixo": "depois",
+      "titulo": "Cuidar também é prevenir",
+      "descricao": "Uma pessoa do abrigo teve contato com a água da enchente e não está se sentindo bem. Ajude a levá-la até a UBS.",
+      "instituicao": "ubs",
+      "dialogo": "d08-posto-saude",
+      "atividade": "a08-memoria-saude",
+      "aprendizado": "Depois da enchente: evitar a água contaminada, cuidar da higiene e buscar atendimento se não estiver bem. Remédios de uso contínuo e cópias das receitas ficam separados para levar.",
+      "todoValidar": "Precisa de revisão da área da saúde."
+    },
+    {
+      "id": "m09-animal-perdido",
+      "eixo": "depois",
+      "titulo": "Animal perdido",
+      "descricao": "Passando pela rua, você encontrou um animal perdido, sem identificação. Vá até o abrigo de animais e descubra o que fazer.",
+      "instituicao": "abrigo-animais",
+      "dialogo": "d09-animal-perdido",
+      "pergunta": "q11-animal-perdido",
+      "aprendizado": "Animal perdido sem identificação vai para o abrigo de animais. Animal silvestre na cidade é caso para os órgãos ambientais, como o IBAMA e a SEMA.",
+      "todoValidar": "Título é rascunho (o roteiro não dá título a esta parada)."
+    },
+    {
+      "id": "m10-primeiros-socorros",
+      "eixo": "depois",
+      "titulo": "Primeiros socorros",
+      "descricao": "Muita gente se machucou durante o temporal. Vá até o hospital e aprenda como ajudar até o socorro chegar.",
+      "instituicao": "hospital",
+      "dialogo": "d10-primeiros-socorros",
+      "atividade": "a10-caca-palavras",
+      "aprendizado": "Quando alguém se machuca com gravidade, ligue para o SAMU no 192. Até o socorro chegar, os primeiros socorros fazem diferença, e eles se aprendem num curso, com quem sabe ensinar.",
+      "todoValidar": "Aprendizado a partir do diálogo d10. As orientações de primeiros socorros são da equipe (plano-parte-3, seção 4.3) e precisam de revisão da área da saúde."
     }
   ]
 }

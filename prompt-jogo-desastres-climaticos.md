@@ -1,6 +1,6 @@
 # Prompt para o Claude Code — Jogo educativo sobre desastres climáticos
 
-> **Continuação:** as fases 1 a 8 deste plano estão concluídas. O plano continua em [`plano-parte-2.md`](plano-parte-2.md) (até 4 jogadores, em equipe, fases 9 a 13). Lá o jogo passa a ter **5 missões** em vez de 10: o que este arquivo diz sobre as 10 missões (seção 4.6 e critérios de aceite) fica como histórico. Onde os dois planos discordam, vale o `plano-parte-2.md`.
+> **Continuação:** as fases 1 a 8 deste plano estão concluídas. O plano continua em [`plano-parte-2.md`](plano-parte-2.md) (até 4 jogadores, em equipe, fases 9 a 14) e em [`plano-parte-3.md`](plano-parte-3.md) (uma atividade diferente em cada parada, fases 15 a 21). O jogo tem 10 paradas, uma em cada lugar, com o roteiro do `plano-parte-3.md`: o que este arquivo diz sobre as missões (seção 4.6 e critérios de aceite) fica como histórico. Onde os planos discordam, vale o mais novo.
 
 ## 1. Contexto
 

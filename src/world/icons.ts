@@ -26,8 +26,10 @@ export const ICONS = {
   radio: `M3 9H21V21H3Z M6 9L17 3L17.9 4.8L9.6 9Z ${circle(9, 15, 3.2)} M15 12h3v2h-3Z M15 16h3v2h-3Z`,
   // Sacola de compras
   sacola: 'M4 8H20L19 21H5Z M8 8V6a4 4 0 0 1 8 0V8H14.5V6a2.5 2.5 0 0 0-5 0V8Z',
-  // Duas pessoas
-  pessoas: `${circle(7, 8, 3)} ${circle(17, 8, 3)} M2 21v-4a5 4.5 0 0 1 10 0v4Z M12 21v-4a5 4.5 0 0 1 10 0v4Z`,
+  // Prédio com uma cruz vazada (o Hospital; a UBS usa a cruz sozinha)
+  hospital: 'M8 2H16V6H8Z M3 6H21V22H3Z M10.5 8.5h3v3h3v3h-3v3h-3v-3h-3v-3h3Z',
+  // Pata de animal
+  pata: `${circle(5, 10, 2.2)} ${circle(9.2, 5.5, 2.3)} ${circle(14.8, 5.5, 2.3)} ${circle(19, 10, 2.2)} M12 12c-3.5 0-6.5 4-6.5 6.5c0 2 1.6 3 3.3 3c1.3 0 2.1-0.6 3.2-0.6s1.9 0.6 3.2 0.6c1.7 0 3.3-1 3.3-3c0-2.5-3-6.5-6.5-6.5Z`,
   // Casa com porta
   casa: 'M12 2L23 11H20V22H4V11H1Z M10 15H14V22H10Z',
 } as const;

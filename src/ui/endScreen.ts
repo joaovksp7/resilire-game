@@ -1,4 +1,4 @@
-import type { GameContent } from '../missions/content';
+import type { GameContent, Mission } from '../missions/content';
 import type { MissionManager } from '../missions/missionManager';
 import { type Team, teamLabel } from '../player/team';
 import { INSTITUTION_STYLES } from '../world/institutions';
@@ -12,6 +12,8 @@ const TEXT = {
   teamPinsTitle: 'Pins da equipe',
   teamLearnedTitle: 'O que a equipe aprendeu',
   foundBy: (name: string) => `Buscado por ${name}`,
+  placeActivity: (lugar: string, atividade: string) => `${lugar} · ${atividade}`,
+  question: 'Pergunta',
   pins: (n: number, total: number) => `Pins: ${n} de ${total}`,
   firstTry: (n: number, total: number) => `Acertos de primeira: ${n} de ${total}`,
   pinsTitle: 'Seus pins',
@@ -40,6 +42,15 @@ export class EndScreen {
     this.content = content;
     this.manager = manager;
     this.team = team;
+  }
+
+  /** "Defesa Civil · Mapa de risco": o lugar da missão e a atividade (ou "Pergunta"), com os nomes de content/. */
+  private placeActivity(mission: Mission): string {
+    const lugar = this.content.institutions.get(mission.instituicao)?.nome ?? '';
+    const activity = mission.atividade !== undefined ? this.content.activities.get(mission.atividade) : undefined;
+    const atividade =
+      activity === undefined ? TEXT.question : activity.tipo === 'mochila' ? this.content.kit.titulo : activity.titulo;
+    return TEXT.placeActivity(lugar, atividade);
   }
 
   /** Abre a tela. Resolve com a escolha: fechar (voltar à cidade) ou jogar de novo (já confirmado). */
@@ -72,7 +83,7 @@ export class EndScreen {
         item.style.setProperty('--ordem', String(pins.childElementCount));
         const label = document.createElement('span');
         label.className = 'pin__texto';
-        label.append(textEl('span', 'pin__nome', mission.titulo));
+        label.append(textEl('span', 'pin__nome', mission.titulo), textEl('span', 'pin__quem', this.placeActivity(mission)));
         const by = manager.foundBy(mission.id);
         const finder = inTeam && by !== null ? team[by] : undefined;
         if (finder) label.append(textEl('span', 'pin__quem', TEXT.foundBy(finder.name)));

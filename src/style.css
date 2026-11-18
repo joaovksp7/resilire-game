@@ -26,6 +26,11 @@
   --cena-rio: #4aa3df;
   --cena-margem: #d8c690;
 
+  /* Mapa de risco (atividade da Defesa Civil). O rio e a margem usam as cores da cena acima. */
+  --mapa-grama: #cfe5b0;
+  --mapa-morro: #8fa968;
+  --mapa-rua: #ffffff;
+
   --fonte-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --tamanho-texto: 1.125rem;
   --raio: 12px;
@@ -508,6 +513,7 @@ body {
 .painel,
 .dialogo,
 .kit,
+.atividade,
 .inicio {
   width: 100%;
   max-height: 100%;
@@ -1709,6 +1715,732 @@ body {
   }
 
   .kit__rodape {
+    margin: 0 -1rem;
+    padding: 0.6rem 1rem max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* ---------- Atividades (ordenar, classificar, historia, chamada, cena, mensagens, memoria, caca-palavras) ---------- */
+
+.atividade {
+  max-width: 40rem;
+  padding: 1.25rem 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.atividade p,
+.atividade h2,
+.atividade h3,
+.atividade ul,
+.atividade ol {
+  margin: 0;
+}
+
+.atividade__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.atividade__titulo {
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.atividade__corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.atividade__instrucao {
+  font-size: 1.05rem;
+}
+
+.atividade__secao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border-radius: var(--raio);
+  background: var(--cor-fundo-suave);
+}
+
+/* Onde os passos ou cartões são postos (a lista "Sua ordem" e as colunas). */
+.atividade__secao--destino {
+  border: 3px dashed var(--cor-inst, var(--cor-linha));
+}
+
+.atividade__secao-titulo {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.atividade__pilha,
+.atividade__ordem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.atividade__ordem:empty {
+  display: none;
+}
+
+.atividade__cartao {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.6rem 0.8rem;
+  border: 2px solid var(--cor-linha);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+  overflow-wrap: break-word;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.atividade__cartao--escolhido {
+  border-color: var(--cor-borda);
+}
+
+/* Cartão escolhido, esperando a coluna. */
+.atividade__cartao[aria-pressed='true'] {
+  border: 3px solid var(--cor-borda);
+  background: var(--cor-destaque);
+  color: var(--cor-destaque-texto);
+}
+
+.atividade__numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: var(--cor-borda);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.atividade__dica,
+.atividade__vazia {
+  color: var(--cor-texto-suave);
+  font-weight: 700;
+}
+
+.atividade__vazia {
+  font-size: 0.9rem;
+}
+
+.atividade__colunas {
+  display: grid;
+  grid-template-columns: repeat(var(--colunas, 2), minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.atividade__coluna {
+  padding: 0.5rem;
+}
+
+/* Botões das colunas, no rodapé fixo (aparecem quando há um cartão escolhido). */
+.atividade__destinos {
+  flex-basis: 100%;
+  display: grid;
+  grid-template-columns: repeat(var(--colunas, 2), minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.atividade__por {
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+}
+
+.atividade__rodape-dica {
+  flex-basis: 100%;
+  font-size: 0.95rem;
+}
+
+.atividade__pilha--coluna .atividade__cartao {
+  min-height: 2.75rem;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Rodapé fixo: o botão fica sempre à vista enquanto a lista rola. */
+.atividade__rodape {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem 1rem;
+  margin: 0 -1.25rem;
+  padding: 0.75rem 1.25rem max(1.25rem, env(safe-area-inset-bottom));
+  border-top: 2px solid var(--cor-fundo-suave);
+  background: var(--cor-superficie);
+}
+
+.atividade__aviso {
+  flex-basis: 100%;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.atividade__aviso:empty {
+  display: none;
+}
+
+/* O aviso comum é só para leitor de tela (a tela já mostra o que mudou). */
+.atividade__aviso:not(.atividade__aviso--visivel) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.atividade__aviso--visivel {
+  color: var(--cor-errado);
+}
+
+.atividade__resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.atividade__resultado li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-left: 6px solid var(--cor-linha);
+  border-radius: var(--raio);
+  background: var(--cor-fundo-suave);
+}
+
+.atividade__resultado li.atividade__resultado--certo {
+  border-left-color: var(--cor-certo);
+}
+
+.atividade__resultado li.atividade__resultado--errado {
+  border-left-color: var(--cor-errado);
+}
+
+.atividade__resultado-marca {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--cor-certo);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.atividade__resultado--errado .atividade__resultado-marca {
+  background: var(--cor-errado);
+}
+
+.atividade__resultado-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.atividade__resultado-nome {
+  font-weight: 800;
+}
+
+.atividade__resultado-nota {
+  font-weight: 700;
+}
+
+.atividade__resultado--errado .atividade__resultado-nota {
+  color: var(--cor-errado);
+}
+
+/* História e ligação: a situação de cada momento. */
+.atividade__situacao {
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+/* A explicação, ao rolar até ela, para acima do rodapé fixo. */
+.atividade .dialogo__retorno {
+  scroll-margin-bottom: 6.5rem;
+}
+
+/* Ligação: a tela do celular (só CSS, sem imagem). */
+.atividade__celular {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 26rem;
+  margin: 0 auto;
+  padding: 0.75rem;
+  border: 4px solid var(--cor-borda);
+  border-radius: 1.5rem;
+  background: var(--cor-fundo-suave);
+}
+
+.atividade__celular-topo {
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid var(--cor-inst, var(--cor-linha));
+  text-align: center;
+}
+
+.atividade__celular-nome {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.atividade__celular-estado {
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.atividade__celular-pergunta {
+  text-align: center;
+}
+
+.atividade__conversa {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.atividade__balao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  max-width: 85%;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--raio);
+  overflow-wrap: break-word;
+}
+
+.atividade__balao--atendente {
+  align-self: flex-start;
+  border: 2px solid var(--cor-linha);
+  border-bottom-left-radius: 4px;
+  background: var(--cor-superficie);
+}
+
+.atividade__balao--voce {
+  align-self: flex-end;
+  border: 2px solid var(--cor-borda);
+  border-bottom-right-radius: 4px;
+  background: var(--cor-destaque);
+  color: var(--cor-destaque-texto);
+}
+
+.atividade__balao-quem {
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+/* Escolha do número: teclas grandes, lado a lado. */
+.dialogo__alternativas.atividade__teclas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.atividade__tecla {
+  min-height: 3.5rem;
+  padding: 0.4rem;
+  border-radius: var(--raio);
+  font-size: 1.4rem;
+}
+
+.atividade__tecla:disabled {
+  cursor: default;
+}
+
+.atividade__tecla:disabled:not(.botao--certa):not(.botao--errada) {
+  opacity: 0.6;
+}
+
+/* Mensagens: a resposta certa, marcada embaixo da mensagem já respondida. */
+.atividade__balao-marca {
+  align-self: flex-start;
+  margin-top: 0.3rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.atividade__balao-marca--confiar {
+  background: var(--cor-certo-fundo);
+  color: var(--cor-certo);
+}
+
+.atividade__balao-marca--conferir {
+  background: var(--cor-errado-fundo);
+  color: var(--cor-errado);
+}
+
+/* Mapa de risco: o desenho, com os pontos (botões) por cima. */
+.mapa {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto;
+  aspect-ratio: 4 / 3;
+  border: 3px solid var(--cor-borda);
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+
+.mapa__desenho {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mapa__grama {
+  fill: var(--mapa-grama);
+}
+
+.mapa__morro {
+  fill: var(--mapa-morro);
+}
+
+.mapa__mata {
+  fill: var(--mapa-morro);
+  stroke: var(--cor-texto-suave);
+  stroke-width: 1.5;
+}
+
+.mapa__rua {
+  stroke: var(--mapa-rua);
+  stroke-width: 7;
+  stroke-linecap: square;
+}
+
+.mapa__margem {
+  fill: var(--cena-margem);
+}
+
+.mapa__rio {
+  fill: var(--cena-rio);
+}
+
+.mapa__ponte {
+  fill: var(--cena-margem);
+  stroke: var(--cor-texto-suave);
+  stroke-width: 1.5;
+}
+
+.mapa__casa {
+  fill: var(--cor-superficie);
+  stroke: var(--cor-linha);
+  stroke-width: 1.5;
+}
+
+.mapa__abrigo {
+  fill: var(--cor-superficie);
+  stroke: var(--cor-borda);
+  stroke-width: 2.5;
+}
+
+.mapa__lar {
+  fill: var(--cor-destaque);
+  stroke: var(--cor-borda);
+  stroke-width: 2.5;
+}
+
+.mapa__ponto {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 3px solid var(--cor-borda);
+  border-radius: 50%;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: 800;
+  box-shadow: var(--sombra);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.mapa__ponto--risco {
+  border-color: var(--cor-errado);
+  background: var(--cor-errado-fundo);
+  color: var(--cor-errado);
+}
+
+.mapa__ponto--seguro {
+  border-color: var(--cor-certo);
+  background: var(--cor-certo-fundo);
+  color: var(--cor-certo);
+}
+
+.mapa__legenda {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0;
+  list-style: none;
+}
+
+.mapa__legenda li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.mapa__legenda-numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 2px solid var(--cor-borda);
+  border-radius: 50%;
+  background: var(--cor-superficie);
+  font-weight: 800;
+}
+
+.mapa__legenda--risco .mapa__legenda-numero {
+  border-color: var(--cor-errado);
+  background: var(--cor-errado-fundo);
+  color: var(--cor-errado);
+}
+
+.mapa__legenda--seguro .mapa__legenda-numero {
+  border-color: var(--cor-certo);
+  background: var(--cor-certo-fundo);
+  color: var(--cor-certo);
+}
+
+.mapa__legenda-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.mapa__legenda-nome {
+  font-weight: 700;
+}
+
+.mapa__legenda-estado {
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+}
+
+.mapa__legenda--risco .mapa__legenda-estado {
+  color: var(--cor-errado);
+  font-weight: 700;
+}
+
+.mapa__legenda--seguro .mapa__legenda-estado {
+  color: var(--cor-certo);
+  font-weight: 700;
+}
+
+/* No rodapé fixo, a explicação do último ponto (ou par, ou palavra) ocupa a linha toda. */
+.mapa__retorno,
+.memoria__retorno,
+.caca__retorno {
+  flex-basis: 100%;
+}
+
+/* Carta ou letra que recebe o foco (teclado) rola até ficar acima do rodapé fixo, sem ficar escondida. */
+.memoria__carta,
+.caca__letra {
+  scroll-margin: 1rem 0 13rem;
+}
+
+/* Jogo da memória: cartas que são botões. Virar não tem efeito de giro. */
+.memoria {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.memoria__carta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 6.5rem;
+  padding: 0.5rem 0.6rem;
+  border: 3px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-borda);
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  text-align: left;
+  overflow-wrap: break-word;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.memoria__carta:not(.memoria__carta--virada) {
+  align-items: center;
+}
+
+.memoria__verso {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.memoria__carta--virada {
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+}
+
+.memoria__carta--par {
+  border-color: var(--cor-certo);
+  background: var(--cor-certo-fundo);
+}
+
+.memoria__tipo {
+  color: var(--cor-texto-suave);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.memoria__texto {
+  font-weight: 700;
+}
+
+@media (min-width: 40rem) {
+  .memoria {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Caça-palavras: a lista de palavras e a grade de letras (cada letra é um botão). */
+/* As palavras lado a lado, cada uma do tamanho dela (sem quebrar no meio). */
+.caca__lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.caca__palavra {
+  font-weight: 800;
+}
+
+/* "achada" / "ainda não achada" é só para o leitor de tela: na tela, a palavra achada fica riscada e com ✓. */
+.caca__estado {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.caca__item--achada .caca__palavra {
+  color: var(--cor-certo);
+  text-decoration: line-through;
+  text-decoration-thickness: 3px;
+}
+
+.caca__item--achada .caca__palavra::before {
+  content: '\2713\00a0';
+  display: inline-block;
+}
+
+.caca {
+  display: grid;
+  grid-template-columns: repeat(var(--colunas, 8), minmax(0, 1fr));
+  gap: 2px;
+  width: 100%;
+  max-width: 26rem;
+  margin: 0 auto;
+}
+
+.caca__letra {
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+  border: 2px solid var(--cor-linha);
+  border-radius: 6px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.caca__letra--achada {
+  border-color: var(--cor-certo);
+  background: var(--cor-certo-fundo);
+  color: var(--cor-certo);
+}
+
+/* A primeira letra escolhida, esperando a última. */
+.caca__letra[aria-pressed='true'] {
+  border: 3px solid var(--cor-borda);
+  background: var(--cor-destaque);
+  color: var(--cor-destaque-texto);
+}
+
+/* Celular: margens menores. */
+@media (max-width: 30rem) {
+  .atividade {
+    padding: 1rem 1rem 0;
+  }
+
+  .atividade__titulo {
+    font-size: 1.2rem;
+  }
+
+  .atividade__secao {
+    padding: 0.6rem;
+  }
+
+  .atividade__coluna {
+    padding: 0.4rem;
+  }
+
+  .atividade__rodape {
     margin: 0 -1rem;
     padding: 0.6rem 1rem max(1rem, env(safe-area-inset-bottom));
   }

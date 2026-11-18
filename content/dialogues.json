@@ -1,37 +1,19 @@
 [
   {
-    "id": "d01-fique-por-dentro",
+    "id": "d01-plano-familia",
     "falas": [
-      "Oi! Eu sou a Marta, da Defesa Civil. Que bom que você veio.",
-      "Quando vem chuva forte, a Defesa Civil manda alertas oficiais para avisar a população.",
-      "Você pode se cadastrar para receber esses alertas por SMS, no seu celular ou no de alguém da sua família.",
-      "Os alertas têm níveis. Quanto mais alto o nível, maior o risco e mais importante é seguir as orientações.",
-      "Quando chegar um alerta, leia com calma e siga as orientações da Defesa Civil."
+      "Que bom que você está aqui! Sou a Vó Cida. Estão vindo temporais, e a nossa rua pode alagar.",
+      "Vamos combinar o plano de emergência da família, com calma.",
+      "Primeiro, os documentos e os papéis de saúde vão em sacos plásticos fechados, para não molharem.",
+      "Depois, separamos os remédios que cada um toma todo dia, e os do nosso cachorro, como o veterinário orientou.",
+      "O cachorro vai com a coleira e a plaquinha com o nome dele e o nosso telefone, para não se perder.",
+      "Também combinamos um ponto de encontro seguro e anotamos os telefones de todos.",
+      "Na hora de sair, a gente desliga a energia e o gás e segue o caminho combinado até um lugar seguro."
     ],
-    "todoValidar": "Incluir como se cadastrar para receber os alertas por SMS (número e mensagem a enviar) e quais são os níveis de alerta usados no RS."
+    "todoValidar": "Rascunho a partir da cena 1 do roteiro e dos textos antigos da Escola e da Casa. Confirmar como orientar crianças sobre desligar energia e gás (quem deve fazer e como) e se a ordem dos passos do plano importa."
   },
   {
-    "id": "d02-noticia-ou-boato",
-    "falas": [
-      "Olá! Eu sou o Beto, locutor da rádio comunitária.",
-      "Em dia de chuva forte, muita mensagem circula nos grupos de WhatsApp. Algumas são boatos.",
-      "Antes de acreditar ou repassar, confira se a informação veio de uma fonte oficial, como a Defesa Civil.",
-      "Na dúvida, não compartilhe. Boato espalha confusão e atrapalha quem precisa de ajuda."
-    ],
-    "todoValidar": "Confirmar quais fontes oficiais citar como exemplo (além da Defesa Civil)."
-  },
-  {
-    "id": "d03-combinado",
-    "falas": [
-      "Oi! Eu sou a professora Ana.",
-      "Toda família pode ter um plano de emergência: um combinado do que fazer se a chuva ficar perigosa.",
-      "Nesse plano, vocês escolhem um ponto de encontro seguro, para se acharem se estiverem separados.",
-      "Também é importante anotar os telefones de contato da família.",
-      "Combinem tudo juntos, com calma, antes de qualquer emergência."
-    ]
-  },
-  {
-    "id": "d04-mochila",
+    "id": "d02-mochila",
     "falas": [
       "Bom dia! Eu sou o seu Valdir, do mercado.",
       "Uma mochila de emergência guarda o que a família pode precisar se tiver que sair de casa rápido.",
@@ -41,66 +23,99 @@
     ]
   },
   {
-    "id": "d05-remedio",
-    "falas": [
-      "Olá! Eu sou o Jorge, enfermeiro da UBS.",
-      "Tem alguém na sua família que toma remédio todo dia? Esses são os remédios de uso contínuo.",
-      "Numa emergência, eles não podem faltar. Separe esses remédios junto com a mochila da família.",
-      "Guarde também cópias das receitas. Com elas fica mais fácil conseguir o remédio se precisar.",
-      "E aqui na UBS a gente também cuida das vacinas da família."
-    ],
-    "todoValidar": "Confirmar se há orientação específica sobre vacinas em período de enchente para incluir na fala."
-  },
-  {
-    "id": "d06-morro",
-    "falas": [
-      "E aí! Eu sou o Paulo, bombeiro.",
-      "Em chuva forte, o morro pode dar sinais de que a terra está se movendo.",
-      "Fique de olho em rachaduras nas paredes, em árvores ou postes inclinados e em água barrenta minando do chão.",
-      "Se notar esses sinais, avise um adulto e chame ajuda: o telefone dos Bombeiros é 193."
-    ],
-    "todoValidar": "Confirmar a orientação completa ao notar sinais de deslizamento (por exemplo, sair do local e para onde ir)."
-  },
-  {
-    "id": "d07-desliga",
-    "falas": [
-      "Que bom que você chegou! Sou a Vó Cida.",
-      "Antes de sair de casa numa emergência, a gente desliga a energia e o gás.",
-      "Isso ajuda a evitar acidentes enquanto a casa estiver vazia.",
-      "Agora pegue a mochila de emergência e vamos seguir o plano da família."
-    ],
-    "todoValidar": "Confirmar como orientar crianças sobre desligar energia e gás (quem deve fazer e como) e a explicação do porquê."
-  },
-  {
-    "id": "d08-agua-corrente",
-    "falas": [
-      "Paulo de novo! Agora presta atenção, que é importante.",
-      "Nunca atravesse uma rua alagada, nem a pé, nem de carro.",
-      "A água pode estar mais funda e mais forte do que parece.",
-      "Procure outro caminho pelas ruas da parte alta.",
-      "Se precisar de ajuda, ligue para os Bombeiros no 193."
-    ],
-    "todoValidar": "Confirmar a explicação do porquê (água mais funda e mais forte do que parece)."
-  },
-  {
-    "id": "d09-lugar-seguro",
+    "id": "d03-abrigo",
     "falas": [
       "Bem-vindo ao abrigo! Eu sou a Lúcia e cuido daqui.",
-      "O abrigo é um lugar seguro para as famílias ficarem enquanto não dá para voltar para casa.",
-      "Traga a mochila de emergência, com os documentos e os remédios.",
+      "O abrigo é um lugar seguro para as famílias descansarem enquanto não dá para voltar para casa.",
+      "Aqui tem uma equipe para escutar e acalmar quem chega, criança ou adulto.",
+      "Quem vier precisa trazer a mochila de emergência, com os documentos e os remédios.",
       "Animais de estimação também precisam de cuidado. Pergunte para a equipe do abrigo como fazer com o seu.",
-      "Você chegou pela parte alta, longe da água. Muito bem!"
+      "E todo mundo pode ajudar: veja se os vizinhos estão bem e conte para um adulto se alguém precisar de apoio."
     ],
-    "todoValidar": "Confirmar como funciona o abrigo no município, o que levar e a regra para animais de estimação."
+    "todoValidar": "As atitudes de acolhimento e convivência no abrigo são da equipe (plano-parte-3, seção 4.3). Confirmar como funciona o abrigo no município, o que levar e a regra para animais de estimação."
   },
   {
-    "id": "d10-ninguem-fica",
+    "id": "d04-escola",
     "falas": [
-      "Olá! Eu sou a Rosa, assistente social do CRAS.",
-      "O CRAS apoia as famílias atingidas pela enchente.",
-      "As famílias podem fazer um cadastro aqui para receber esse apoio.",
-      "Você também pode ajudar: veja se os vizinhos estão bem e conte para um adulto se alguém precisar de apoio."
+      "Oi! Eu sou a professora Ana. Hoje a aula é especial.",
+      "Vamos falar de riscos ambientais: as inundações e os deslizamentos.",
+      "Numa inundação, tem atitude que protege e atitude que coloca a gente em perigo.",
+      "Ir para a parte alta, longe da beira do rio, protege. Atravessar rua alagada é perigoso.",
+      "Antes de sair de casa, desligar a energia e o gás. E, antes de acreditar numa mensagem, conferir a fonte."
     ],
-    "todoValidar": "Confirmar que tipo de apoio o CRAS oferece no município e quais documentos o cadastro pede."
+    "todoValidar": "O texto sobre mudanças climáticas é da equipe (plano-parte-3, seção 4.3)."
+  },
+  {
+    "id": "d05-mapa-risco",
+    "falas": [
+      "Oi! Eu sou a Marta, da Defesa Civil. Que bom que você veio.",
+      "Aqui a gente acompanha o mapa das áreas de risco da cidade. O rio está subindo rápido.",
+      "Quando o risco aumenta, a Defesa Civil manda alertas oficiais. Dá para se cadastrar e receber os alertas por SMS.",
+      "Os alertas têm níveis. Quanto mais alto o nível, maior o risco e mais importante é seguir as orientações.",
+      "As sirenes dão o aviso antes, e as rotas de evacuação levam as famílias até um lugar seguro.",
+      "No morro, fique de olho em rachaduras nas paredes, em árvores ou postes inclinados e em água barrenta minando do chão.",
+      "E a sua casa fica na beira do rio, numa área de risco. Vocês já conhecem o caminho do abrigo: é para lá que a família vai."
+    ],
+    "todoValidar": "Incluir como se cadastrar para receber os alertas por SMS (número e mensagem a enviar) e quais são os níveis de alerta usados no RS. Confirmar se a cidade tem sirenes de aviso. Confirmar a orientação completa ao notar sinais de deslizamento."
+  },
+  {
+    "id": "d06-ligacao-193",
+    "falas": [
+      "E aí! Eu sou o Paulo, bombeiro.",
+      "Com o temporal, um poste caiu em cima de um carro, e tem uma pessoa presa lá dentro.",
+      "Numa situação assim, nunca tente resolver sozinho. Peça ajuda: o telefone dos Bombeiros é 193.",
+      "Na ligação, fale com calma e responda ao que o atendente perguntar.",
+      "Guarde também os outros números de emergência: 190 é a Polícia e 192 é o SAMU.",
+      "E lembre: rua alagada não se atravessa, nem a pé, nem de carro. A água pode estar mais funda e mais forte do que parece."
+    ],
+    "todoValidar": "O que o atendente do 193 pergunta, o que responder e o que fazer (e não fazer) perto de poste e fio caídos são da equipe (plano-parte-3, seção 4.3). Confirmar a explicação do porquê da rua alagada."
+  },
+  {
+    "id": "d07-confiavel",
+    "falas": [
+      "Olá! Eu sou o Beto, locutor da rádio comunitária.",
+      "Aqui a gente transmite boletins de utilidade pública: os avisos oficiais, onde tem abrigo e onde tem mantimentos.",
+      "Também repetimos os telefones de emergência: 190 para a Polícia, 192 para o SAMU e 193 para os Bombeiros.",
+      "Se faltar luz, um rádio a pilha continua tocando os boletins.",
+      "Em dia de chuva forte, muita mensagem circula nos grupos. Algumas são boatos.",
+      "Antes de acreditar ou repassar, confira se a informação veio de uma fonte oficial, como a Defesa Civil. Na dúvida, não compartilhe."
+    ],
+    "todoValidar": "A estação para sintonizar o rádio a pilha e como a rádio avisa sobre mantimentos e abrigos são da equipe (plano-parte-3, seção 4.3). Confirmar quais fontes oficiais citar como exemplo (além da Defesa Civil)."
+  },
+  {
+    "id": "d08-posto-saude",
+    "falas": [
+      "Olá! Eu sou o Jorge, enfermeiro da UBS. Que bom que vocês vieram.",
+      "Quem teve contato com a água da enchente e não está se sentindo bem precisa de atendimento.",
+      "Essa água pode estar contaminada. Uma das doenças é a leptospirose, causada por uma bactéria que vem da urina de rato misturada à água.",
+      "Por isso: evite a água da enchente, cuide da higiene e procure a UBS se não estiver bem.",
+      "Aqui a gente também cuida das vacinas. Deixe a vacinação da família em dia.",
+      "E quem toma remédio todo dia precisa ter o remédio e uma cópia da receita separados para levar."
+    ],
+    "todoValidar": "Rascunho a partir da cena 7 do roteiro e do texto antigo da UBS. Precisa de revisão da área da saúde. Confirmar se há orientação específica sobre vacinas em período de enchente."
+  },
+  {
+    "id": "d09-animal-perdido",
+    "falas": [
+      "Oi! Eu sou o Caio, voluntário do abrigo de animais.",
+      "Depois de uma enchente, muitos animais se perdem das famílias.",
+      "Encontrou um animal perdido, sem identificação? Ele pode vir para cá.",
+      "Aqui os voluntários dão alimento e tratamento para os animais resgatados.",
+      "Por isso a coleira com a plaquinha de nome e telefone ajuda tanto: com ela, o animal volta para a família.",
+      "Animal silvestre, que veio da mata para a cidade, é diferente: quem cuida são os órgãos ambientais, como o IBAMA e a SEMA.",
+      "Cuidar das pessoas, dos animais e do ambiente faz parte da mesma corrente de proteção."
+    ],
+    "todoValidar": "Rascunho a partir da cena 8 do roteiro. O que fazer (e não fazer) ao encontrar um animal silvestre é da equipe (plano-parte-3, seção 4.3). Confirmar como acionar o abrigo de animais e os órgãos ambientais no município."
+  },
+  {
+    "id": "d10-primeiros-socorros",
+    "falas": [
+      "Olá! Eu sou a Helena, médica aqui do hospital.",
+      "Durante o temporal, muita gente se machucou em acidentes e desabamentos.",
+      "Quando alguém se machuca com gravidade, ligue para o SAMU no 192.",
+      "Até o socorro chegar, os primeiros socorros fazem diferença, como conter um sangramento e não mexer em quem pode ter uma fratura.",
+      "Primeiros socorros se aprendem num curso, com quem sabe ensinar. Na dúvida, chame um adulto e ligue para o SAMU."
+    ],
+    "todoValidar": "Rascunho a partir da cena 9 do roteiro. As orientações de primeiros socorros são da equipe (plano-parte-3, seção 4.3) e precisam de revisão da área da saúde."
   }
 ]

@@ -1,6 +1,398 @@
 [
   {
+    "id": "a01-plano-familia",
+    "tipo": "ordenar",
+    "titulo": "Plano da família",
+    "instrucao": "Toque nos passos do plano de emergência na ordem em que a família faz cada um.",
+    "passos": [
+      {
+        "texto": "Guardar documentos e papéis de saúde em sacos plásticos fechados",
+        "explicacao": "Fechados no saco plástico, os documentos ficam protegidos da água."
+      },
+      {
+        "texto": "Separar os remédios que cada pessoa toma todo dia",
+        "explicacao": "Quem toma remédio todo dia não pode ficar sem ele, mesmo longe de casa."
+      },
+      {
+        "texto": "Separar os remédios do animal de estimação, como o veterinário orientou",
+        "explicacao": "O animal também pode precisar de remédio. Vale o que o veterinário orientou."
+      },
+      {
+        "texto": "Pôr no animal a coleira com a plaquinha de nome e telefone",
+        "explicacao": "Com a plaquinha de nome e telefone, o animal que se perder volta mais fácil para a família."
+      },
+      {
+        "texto": "Abastecer a mochila com água e ração",
+        "explicacao": "Com água e ração, o animal fica alimentado longe de casa."
+      },
+      {
+        "texto": "Pôr o animal com calma na caixa de transporte",
+        "explicacao": "Na caixa de transporte, o animal viaja com segurança junto com a família."
+      },
+      {
+        "texto": "Seguir a rota de evacuação até um lugar seguro",
+        "explicacao": "A rota de evacuação leva a família por um caminho seguro, longe da água."
+      }
+    ],
+    "todoValidar": "Rascunho a partir da cena 1 do roteiro, na ordem da cena. A equipe precisa confirmar se a ordem dos passos importa (plano-parte-3, seção 4.3); se não importar, a atividade muda. Confirmar as explicações."
+  },
+  {
     "id": "a02-mochila",
     "tipo": "mochila"
+  },
+  {
+    "id": "a03-chegada-abrigo",
+    "tipo": "historia",
+    "titulo": "Chegada ao abrigo",
+    "instrucao": "Leia cada momento e escolha o que você faz.",
+    "momentos": [
+      {
+        "situacao": "Sua família vai para o abrigo, e as ruas da parte baixa estão alagadas. Por onde vocês vão?",
+        "alternativas": [
+          {
+            "texto": "Pelas ruas da parte alta, longe da água",
+            "explicacao": "Isso! A rota pela parte alta é a rota segura."
+          },
+          {
+            "texto": "Pela rua alagada, que é mais curta",
+            "explicacao": "O caminho mais curto nem sempre é o mais seguro. Rua alagada não se atravessa."
+          },
+          {
+            "texto": "Pela beira do rio, para ver a água subir",
+            "explicacao": "A beira do rio não é lugar seguro durante a cheia. Vá pela parte alta."
+          }
+        ],
+        "correta": 0
+      },
+      {
+        "situacao": "Vocês chegaram ao abrigo com o cachorro da família. O que você faz?",
+        "alternativas": [
+          {
+            "texto": "Pergunto para a equipe do abrigo como fazer com ele",
+            "explicacao": "Isso! Animais de estimação também precisam de cuidado, e a equipe do abrigo explica como fazer."
+          },
+          {
+            "texto": "Deixo o cachorro sozinho do lado de fora",
+            "explicacao": "Sozinho, o animal pode se perder ou se machucar. Pergunte para a equipe do abrigo como fazer com ele."
+          },
+          {
+            "texto": "Volto para casa para deixar ele lá",
+            "explicacao": "Enquanto não dá para voltar para casa, o lugar seguro é o abrigo. Pergunte para a equipe como fazer com o cachorro."
+          }
+        ],
+        "correta": 0
+      },
+      {
+        "situacao": "Uma criança chegou ao abrigo assustada e está chorando. O que você faz?",
+        "alternativas": [
+          {
+            "texto": "Chamo alguém da equipe do abrigo",
+            "explicacao": "Isso! No abrigo tem uma equipe para escutar e acalmar quem chega, criança ou adulto."
+          },
+          {
+            "texto": "Finjo que não vi",
+            "explicacao": "Todo mundo pode ajudar. Chame alguém da equipe do abrigo: ela está ali para escutar e acalmar quem chega."
+          }
+        ],
+        "correta": 0
+      },
+      {
+        "situacao": "Sua vizinha mora sozinha, e você não viu ela chegar ao abrigo. O que você faz?",
+        "alternativas": [
+          {
+            "texto": "Peço para um adulto ver se ela está bem",
+            "explicacao": "Muito bem! Ninguém fica para trás. Um adulto pode ver como ela está e chamar ajuda se precisar."
+          },
+          {
+            "texto": "Não faço nada, ela deve estar bem",
+            "explicacao": "Na dúvida, vale conferir. Peça para um adulto ver se ela está bem."
+          },
+          {
+            "texto": "Posto no grupo que ela sumiu",
+            "explicacao": "Isso pode espalhar boato e não ajuda. Peça para um adulto ir ver como ela está."
+          }
+        ],
+        "correta": 0
+      }
+    ],
+    "todoValidar": "Rascunho a partir do diálogo d03 e das perguntas q09 e q10. As atitudes de acolhimento e convivência no abrigo (como agir ao chegar e quais cuidados ter com outras pessoas) são da equipe (plano-parte-3, seção 4.3). Confirmar a regra para animais de estimação no abrigo do município."
+  },
+  {
+    "id": "a04-seguro-ou-perigoso",
+    "tipo": "classificar",
+    "titulo": "Seguro ou perigoso?",
+    "instrucao": "Toque num cartão e depois na coluna: durante uma inundação, essa atitude é segura ou perigosa?",
+    "grupos": ["Seguro", "Perigoso"],
+    "cartoes": [
+      {
+        "texto": "Atravessar a rua alagada a pé",
+        "grupo": 1,
+        "explicacao": "Rua alagada não se atravessa a pé: a água pode estar mais funda e mais forte do que parece."
+      },
+      {
+        "texto": "Passar de carro pela rua alagada",
+        "grupo": 1,
+        "explicacao": "De carro também não. Rua alagada não se atravessa, nem a pé, nem de carro."
+      },
+      {
+        "texto": "Procurar outro caminho pelas ruas da parte alta",
+        "grupo": 0,
+        "explicacao": "A rota pela parte alta, longe da água, é a rota segura."
+      },
+      {
+        "texto": "Ficar na beira do rio para ver a água subir",
+        "grupo": 1,
+        "explicacao": "A beira do rio não é lugar seguro durante a cheia. Fique longe e vá pela parte alta."
+      },
+      {
+        "texto": "Desligar a energia e o gás antes de sair de casa",
+        "grupo": 0,
+        "explicacao": "Desligar a energia e o gás antes de sair ajuda a evitar acidentes."
+      },
+      {
+        "texto": "Repassar um aviso sem saber quem mandou",
+        "grupo": 1,
+        "explicacao": "Repassar sem conferir pode espalhar boato e confusão. Primeiro confira na fonte oficial."
+      },
+      {
+        "texto": "Conferir o aviso com a Defesa Civil antes de acreditar",
+        "grupo": 0,
+        "explicacao": "Conferir na fonte oficial é o jeito de separar notícia de boato."
+      },
+      {
+        "texto": "Ligar para o 193 em vez de enfrentar o perigo sozinho",
+        "grupo": 0,
+        "explicacao": "Em perigo, ninguém enfrenta sozinho: os Bombeiros atendem pelo 193."
+      }
+    ],
+    "todoValidar": "Rascunho a partir dos textos de antes (perguntas q02, q07, q08 e q09 e diálogos). O texto sobre mudanças climáticas da Escola é da equipe (plano-parte-3, seção 4.3). Confirmar a explicação da água mais funda e mais forte."
+  },
+  {
+    "id": "a05-mapa-risco",
+    "tipo": "cena",
+    "titulo": "Mapa de risco",
+    "instrucao": "O rio está subindo rápido. Toque nos pontos do mapa e ache todas as áreas de risco da cidade.",
+    "pontos": [
+      {
+        "id": "beira-rio",
+        "nome": "Beira do rio",
+        "risco": true,
+        "explicacao": "A beira do rio não é lugar seguro durante a cheia: é a parte baixa da cidade, a primeira que a água cobre."
+      },
+      {
+        "id": "encosta",
+        "nome": "Encosta do morro",
+        "risco": true,
+        "explicacao": "Com muita chuva, a terra do morro pode deslizar. Fique de olho em rachaduras nas paredes, em árvores ou postes inclinados e em água barrenta minando do chão."
+      },
+      {
+        "id": "baixada",
+        "nome": "Rua da baixada",
+        "risco": true,
+        "explicacao": "As ruas da parte baixa alagam quando o rio transborda. Rua alagada não se atravessa, nem a pé, nem de carro."
+      },
+      {
+        "id": "casa",
+        "nome": "Sua casa",
+        "risco": true,
+        "explicacao": "Sua casa fica na beira do rio, numa área de risco."
+      },
+      {
+        "id": "parte-alta",
+        "nome": "Parte alta",
+        "risco": false,
+        "explicacao": "A parte alta fica longe da água. A rota pela parte alta é a rota segura."
+      },
+      {
+        "id": "abrigo",
+        "nome": "Abrigo",
+        "risco": false,
+        "explicacao": "O abrigo é um lugar seguro para a família ficar enquanto não dá para voltar para casa."
+      }
+    ],
+    "conclusao": "Sua casa fica na beira do rio, numa área de risco. Vocês já conhecem o caminho do abrigo: é para lá que a família vai, pela parte alta.",
+    "todoValidar": "Rascunho a partir do diálogo d05, da pergunta q09 e dos textos dos eixos. Quais pontos do mapa são de risco, e por quê, é decisão da equipe com a Defesa Civil (plano-parte-3, seção 4.3). Confirmar a explicação do deslizamento (a orientação completa ao notar os sinais ainda está pendente no d05)."
+  },
+  {
+    "id": "a06-ligacao-193",
+    "tipo": "chamada",
+    "titulo": "Ligação para o 193",
+    "instrucao": "Um poste caiu em cima de um carro, e tem uma pessoa presa. Ligue para pedir ajuda e responda ao atendente.",
+    "atendente": "Atendente do 193",
+    "discagem": {
+      "situacao": "Para qual número você liga para pedir o resgate dos Bombeiros?",
+      "alternativas": [
+        {
+          "texto": "190",
+          "explicacao": "O 190 é a Polícia. Para o resgate dos Bombeiros, o número é 193."
+        },
+        {
+          "texto": "192",
+          "explicacao": "O 192 é o SAMU. Para o resgate dos Bombeiros, o número é 193."
+        },
+        {
+          "texto": "193",
+          "explicacao": "Isso! O 193 é o telefone dos Bombeiros."
+        }
+      ],
+      "correta": 2
+    },
+    "momentos": [
+      {
+        "situacao": "Bombeiros. Qual é a emergência?",
+        "alternativas": [
+          {
+            "texto": "Um poste caiu em cima de um carro, e tem uma pessoa presa lá dentro.",
+            "explicacao": "Isso! Contar com calma o que aconteceu ajuda o atendente a entender do que você precisa."
+          },
+          {
+            "texto": "Está tudo uma bagunça aqui, venham logo!",
+            "explicacao": "Com calma, conte o que aconteceu. Assim o atendente entende do que você precisa."
+          },
+          {
+            "texto": "Desligo sem falar nada.",
+            "explicacao": "Não desligue. Fale com calma e responda ao que o atendente perguntar."
+          }
+        ],
+        "correta": 0
+      },
+      {
+        "situacao": "Onde está acontecendo?",
+        "alternativas": [
+          {
+            "texto": "Digo o nome da rua onde está o carro.",
+            "explicacao": "Isso! Sabendo onde é, a equipe consegue chegar."
+          },
+          {
+            "texto": "Digo só que é aqui perto.",
+            "explicacao": "“Aqui perto” não diz onde é. Diga o nome da rua, para a equipe achar o lugar."
+          }
+        ],
+        "correta": 0
+      },
+      {
+        "situacao": "A equipe está a caminho. O que você faz enquanto ela não chega?",
+        "alternativas": [
+          {
+            "texto": "Espero a equipe dos Bombeiros, sem tentar resolver sozinho.",
+            "explicacao": "Isso! Numa situação assim, nunca tente resolver sozinho. Quem faz o resgate é a equipe dos Bombeiros."
+          },
+          {
+            "texto": "Tento tirar a pessoa do carro sozinho.",
+            "explicacao": "Nunca tente resolver sozinho. Espere a equipe dos Bombeiros, que faz o resgate."
+          }
+        ],
+        "correta": 0
+      }
+    ],
+    "todoValidar": "Rascunho genérico a partir da cena 4 do roteiro e do diálogo d06. O que o atendente do 193 pergunta, o que responder e o que fazer (e não fazer) perto de poste e fio caídos são da equipe (plano-parte-3, seção 4.3). De propósito, nada aqui fala de distância do poste ou do fio."
+  },
+  {
+    "id": "a07-confiavel-ou-boato",
+    "tipo": "mensagens",
+    "titulo": "Confiável ou boato?",
+    "instrucao": "As mensagens estão chegando no celular. Para cada uma, escolha: dá para confiar ou é melhor conferir antes de repassar?",
+    "respostas": {
+      "confiar": "Pode confiar",
+      "conferir": "Conferir antes de repassar"
+    },
+    "mensagens": [
+      {
+        "de": "Defesa Civil (alerta por SMS)",
+        "texto": "Alerta: chuva forte nas próximas horas e risco de o rio subir. Siga as orientações da Defesa Civil.",
+        "confiavel": true,
+        "explicacao": "O alerta oficial da Defesa Civil chega por SMS para quem fez o cadastro. É uma fonte oficial."
+      },
+      {
+        "de": "Número desconhecido",
+        "texto": "Repassem! A ponte vai fechar hoje à noite!",
+        "confiavel": false,
+        "explicacao": "A mensagem não diz quem deu a informação. Confira se a Defesa Civil ou outra fonte oficial falou disso antes de repassar."
+      },
+      {
+        "de": "Grupo da turma",
+        "texto": "Meu primo falou que a água vai chegar na escola amanhã. Manda pra todo mundo!",
+        "confiavel": false,
+        "explicacao": "“Alguém falou” não é fonte. Confira na fonte oficial antes de acreditar ou repassar."
+      },
+      {
+        "de": "Rádio comunitária",
+        "texto": "Boletim de utilidade pública: o abrigo municipal está aberto e recebe as famílias.",
+        "confiavel": true,
+        "explicacao": "A rádio comunitária transmite os boletins com os avisos oficiais, inclusive onde tem abrigo."
+      },
+      {
+        "de": "Grupo da família",
+        "texto": "Vi um vídeo dizendo que a chuva já vai passar e ninguém precisa sair de casa.",
+        "confiavel": false,
+        "explicacao": "Mesmo quem a gente conhece pode repassar boato sem saber. Siga os avisos oficiais e confira na fonte."
+      },
+      {
+        "de": "Mensagem encaminhada",
+        "texto": "URGENTE: vai faltar comida na cidade. Corram para o mercado e comprem tudo!",
+        "confiavel": false,
+        "explicacao": "Mensagem sem fonte espalha confusão. Na dúvida, não compartilhe: confira antes na fonte oficial."
+      }
+    ],
+    "todoValidar": "As mensagens são exemplos inventados, como o plano prevê. As explicações vêm dos diálogos d05 e d07 e da pergunta q02. Confirmar quais fontes oficiais citar além da Defesa Civil e da rádio (pendente no d07). Sem número de SMS de propósito: ele ainda não foi definido (pendente no d05)."
+  },
+  {
+    "id": "a08-memoria-saude",
+    "tipo": "memoria",
+    "titulo": "Jogo da memória",
+    "instrucao": "Vire as cartas e forme os pares: cada situação tem um cuidado.",
+    "pares": [
+      {
+        "situacao": "Teve contato com a água da enchente e não está se sentindo bem",
+        "cuidado": "Procurar atendimento na UBS",
+        "explicacao": "Quem teve contato com a água da enchente e não está se sentindo bem precisa de atendimento."
+      },
+      {
+        "situacao": "A água da enchente pode estar contaminada",
+        "cuidado": "Evitar a água da enchente",
+        "explicacao": "Uma das doenças é a leptospirose, causada por uma bactéria que vem da urina de rato misturada à água."
+      },
+      {
+        "situacao": "Para evitar doenças depois da enchente",
+        "cuidado": "Cuidar da higiene",
+        "explicacao": "Depois da enchente, cuidar da higiene ajuda a evitar doenças."
+      },
+      {
+        "situacao": "A vacinação da família está atrasada",
+        "cuidado": "Deixar as vacinas em dia na UBS",
+        "explicacao": "A UBS também cuida das vacinas. Deixe a vacinação da família em dia."
+      },
+      {
+        "situacao": "Alguém da família toma remédio todo dia",
+        "cuidado": "Separar o remédio e uma cópia da receita",
+        "explicacao": "Com o remédio e a receita separados para levar, o tratamento não para, mesmo longe de casa."
+      }
+    ],
+    "todoValidar": "Rascunho a partir do diálogo d08 e da cena 7 do roteiro. Precisa de revisão da área da saúde. Confirmar se há orientação específica sobre vacinas em período de enchente (pendente no d08)."
+  },
+  {
+    "id": "a10-caca-palavras",
+    "tipo": "caca-palavras",
+    "titulo": "Caça-palavras",
+    "instrucao": "Ache na grade as palavras dos primeiros socorros. Toque na primeira e na última letra de cada palavra.",
+    "palavras": [
+      {
+        "palavra": "SOCORRO",
+        "explicacao": "Quando alguém se machuca com gravidade, peça socorro: ligue para o SAMU no 192."
+      },
+      {
+        "palavra": "PRESSÃO",
+        "explicacao": "Tem a ver com conter um sangramento até o socorro chegar. Como fazer se aprende num curso de primeiros socorros."
+      },
+      {
+        "palavra": "IMOBILIZAÇÃO",
+        "explicacao": "Tem a ver com não mexer em quem pode ter uma fratura até o socorro chegar."
+      },
+      {
+        "palavra": "PROTEÇÃO",
+        "explicacao": "Os primeiros socorros protegem quem se machucou até o SAMU chegar."
+      }
+    ],
+    "todoValidar": "Palavras da cena 9 do roteiro. As explicações são genéricas de propósito: a explicação de cada palavra e as orientações de primeiros socorros são da equipe (plano-parte-3, seção 4.3) e precisam de revisão da área da saúde. O roteiro não explica PROTEÇÃO."
   }
 ]

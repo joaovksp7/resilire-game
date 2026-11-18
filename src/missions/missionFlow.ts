@@ -33,6 +33,7 @@ const TEXT = {
   missionOfPlayer: (player: TeamPlayer, eixo: string) => `Missão ${player.typedName ? 'de' : 'do'} ${player.name} · ${eixo}`,
   destination: (name: string) => `Destino: ${name}`,
   go: 'Vamos lá',
+  placeKicker: 'Conheça o local',
   pinKicker: 'Pin conquistado',
   firstTry: 'Você acertou de primeira!',
   teamFirstTry: 'Acerto de primeira da equipe!',
@@ -71,8 +72,8 @@ export interface MissionFlowDeps {
 const sameCell = (a: Cell | null, b: Cell): boolean => !!a && a.col === b.col && a.row === b.row;
 
 /**
- * O loop das missões: cartão da missão → jogar o dado até a porta → diálogo → pergunta →
- * pin → (troca de eixo) → próxima missão. Salva o progresso a cada passo.
+ * O loop das missões: cartão da missão → jogar o dado até a porta → carta do local → diálogo →
+ * pergunta ou atividade → pin → (troca de eixo) → próxima missão. Salva o progresso a cada passo.
  * Cada jogador tem a sua missão, e quem para na porta de qualquer missão em andamento faz a visita.
  * Com 2 ou mais jogadores, a vez passa quando o peão chega e depois de cada visita.
  */
@@ -207,6 +208,16 @@ export class MissionFlow {
       const site = map.sites.get(mission.instituicao);
       if (site) pawns.active.placeAt(site.door.col, site.door.row, faceYawFor(map, site));
 
+      // A carta do local abre a visita: o que esse lugar faz pela cidade.
+      await showCard(uiRoot, {
+        kicker: TEXT.placeKicker,
+        title: inst.nome,
+        text: inst.carta,
+        icon: style.icon,
+        color: style.color,
+        button: TEXT.next,
+      });
+
       // Conversa (com a pergunta, se houver) e, depois, a atividade, se a missão tiver.
       const talk = await dialogue.run(
         { nome: inst.personagem.nome, funcao: inst.personagem.funcao, color: style.color, icon: style.icon },
@@ -338,20 +349,22 @@ export class MissionFlow {
   }
 
   /**
-   * Todo peão numa casa que a água cobriu vai para a rua seca mais perto
-   * (ou para a porta de casa). Evita ficar preso sem casa nenhuma ao alcance do dado.
+   * Todo peão numa casa que a água cobriu vai para a rua seca mais perto. Evita ficar preso sem
+   * casa nenhuma ao alcance do dado. A porta de casa não serve de saída: ela fica na beira-rio e
+   * também alaga em "Durante".
    */
   private moveOutOfWater(): boolean {
     const { pawns, map, climate } = this.d;
+    const isFlooded = (col: number, row: number): boolean => climate.isFlooded(col, row);
     let moved = false;
     for (const pawn of pawns.all) {
       const cell = pawn.cell;
       if (!cell || !climate.isFlooded(cell.col, cell.row)) continue;
       const { x, z } = pawn.position;
+      // Primeiro procura perto; se não achar, no mapa inteiro.
       const dry =
-        map.nearestWalkable(x, z, DRY_SEARCH_RADIUS, (col, row) => climate.isFlooded(col, row)) ??
-        map.sites.get('casa')?.door ??
-        null;
+        map.nearestWalkable(x, z, DRY_SEARCH_RADIUS, isFlooded) ??
+        map.nearestWalkable(x, z, Math.max(map.cols, map.rows), isFlooded);
       if (!dry) continue;
       pawn.placeAt(dry.col, dry.row);
       moved = true;

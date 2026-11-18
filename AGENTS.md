@@ -60,9 +60,11 @@ Roda em **computador fraco de laboratório, Chromebook e celular do aluno** — 
 
 - **`prompt-jogo-desastres-climaticos.md`** (raiz) — game design original, missões, instituições, fases 1 a 8 (concluídas) e critérios de aceite. Ler antes de começar qualquer fase nova.
 - **`plano-parte-2.md`** (raiz) — continuação: até 4 jogadores em equipe, as 10 missões divididas entre os jogadores, fases 9 a 14 (concluídas) e critérios de aceite. Ler antes de começar qualquer fase nova. Onde os dois planos discordam, vale este.
+- **`plano-parte-3.md`** (raiz) — continuação: uma atividade diferente em cada parada, a carta do local, o mapa e o roteiro novos (10 paradas, cada lugar uma vez só), fases 15 a 21 (concluídas) e critérios de aceite. Onde os planos discordam, vale o mais novo.
+- **`Tabuleiro Digital.docx (1).md`** (raiz) — o roteiro das cenas de cada parada, base do `plano-parte-3.md`.
 - **`content/*.json`** — todo o texto educativo do jogo. Revisado pela equipe antes de ir pro ar.
 
-Os três eixos são chaves fixas, sempre nesta ordem: `alerta` → `preparacao` → `durante`.
+Os quatro eixos são chaves fixas, sempre nesta ordem: `alerta` → `preparacao` → `durante` → `depois`.
 
 ---
 
@@ -89,7 +91,7 @@ src/
   world/               # cidade, rio, clima, prédios
   player/              # personagem, pathfinding A*
   missions/            # gerenciador de missões e eixos
-  minigames/           # atividades das paradas (hoje, a mochila de emergência)
+  minigames/           # atividades das paradas: activities.ts abre pelo tipo, um arquivo por tela
   ui/                  # HUD, diálogos, menus, tela final
   audio/               # Web Audio API, sons gerados por código
 content/
@@ -104,6 +106,8 @@ public/
   fontes/
 prompt-jogo-desastres-climaticos.md
 plano-parte-2.md
+plano-parte-3.md
+Tabuleiro Digital.docx (1).md
 README.md
 CLAUDE.md
 AGENTS.md
@@ -118,8 +122,9 @@ O único lugar onde mora texto educativo. **Nunca** tocar no código de renderiz
 - O formato de cada JSON fica documentado no `README.md`. Mudar formato = avisar antes, porque a equipe edita esses arquivos sem programar
 - `creditos.json` não é conteúdo educativo: fica aqui só para a equipe editar sem programar (seções com `titulo` e `linhas`)
 - Todo item tem `id` estável. Missão aponta para instituição, diálogo e pergunta (ou `atividade`) pelo `id`, nunca pelo texto
-- Toda missão tem `eixo` com uma das três chaves fixas
+- Toda missão tem `eixo` com uma das quatro chaves fixas
 - Pergunta: `correta` é o **índice** dentro de `alternativas`, não o texto. Alternativas embaralhadas na exibição
+- Atividade: os campos de cada `tipo` ficam documentados no `README.md`. Desenhos (itens da mochila, mapa de risco) ficam no código, ligados ao conteúdo pelo `id`
 - Os JSONs ficam formatados e legíveis, porque o conteúdo é revisado lendo esses arquivos
 - JSON não aceita comentário: o `// TODO validar` vira o campo `"todoValidar": "o que falta confirmar"` no próprio item (não aparece no jogo). Toda informação de segurança que não está no plano fica genérica no texto e anotada aí
 - Os JSONs entram no build (import estático): mudar texto exige `npm run build`. `src/missions/content.ts` confere formato (no build) e ligações por `id` (ao abrir o jogo)
@@ -128,13 +133,14 @@ O único lugar onde mora texto educativo. **Nunca** tocar no código de renderiz
 
 ## Mecânica — o que não pode quebrar
 
-- **Loop:** missão → andar até a instituição (jogando o dado) → diálogo → pergunta → pin → próxima missão
+- **Loop:** missão → andar até a instituição (jogando o dado) → carta do local → diálogo → pergunta ou atividade → pin → próxima missão
 - **Equipe e vez:** de 1 a 4 jogadores no mesmo aparelho, cada um com o seu peão. Uma vez é uma jogada do dado, na ordem da tela inicial; só o peão da vez anda. Com 1 jogador, o jogo funciona como uma missão por vez, na ordem de `missions.json`
 - **Missões divididas:** cada jogador cuida de uma missão, ao mesmo tempo, na ordem de `missions.json`. Quem parar na porta de qualquer missão em andamento faz a visita, e o dono recebe a próxima livre, mesmo que seja do eixo seguinte; só quando não sobra missão livre ele passa a ajudar a equipe. O eixo (clima, rio e ruas alagadas) só muda quando todas as missões dele acabam. Os pins são da equipe e guardam quem buscou. Sem ranking nem vencedor
-- **Eixos em ordem fixa.** Clima, nível do rio e ruas bloqueadas mudam por eixo. Na fase `durante`, ruas baixas alagadas obrigam rota pela parte alta
+- **Eixos em ordem fixa.** Clima, nível do rio e ruas bloqueadas mudam por eixo. Na fase `durante`, ruas baixas alagadas obrigam rota pela parte alta (inclusive a da casa do jogador, na beira-rio); na fase `depois`, a chuva para e a água baixa
+- **Uma atividade por parada.** Cada missão tem `pergunta` ou `atividade` (de `atividades.json`, aberta pelo `tipo`). Toda atividade funciona por toque (sem arrastar), mouse e só teclado, a 360px. Acerto de primeira = a primeira tentativa já certa; na memória e no caça-palavras, conta sempre
 - **Errar não reprova.** Explica e deixa tentar de novo. Sem cronômetro, sem penalidade
 - **Movimento por dado**, como jogo de tabuleiro: o jogador joga um dado (1 a 6) e escolhe uma das casas destacadas a até N passos (o número é o máximo; pode parar antes, inclusive na porta da instituição). Uma casa por passo, em grade de tiles com 4 direções. Ruas bloqueadas (ex.: alagadas) não entram nas casas destacadas. WASD e setas movem a câmera
-- **Save versão 2** (`resilire-game:progresso:v2`): equipe, vez, casa de cada peão, missão de cada um, pins com quem buscou e acertos de primeira. Mudar o formato = nova versão e chave nova, e o save antigo é ignorado sem quebrar o jogo
+- **Save versão 3** (`resilire-game:progresso:v3`): equipe, vez, casa de cada peão, missão de cada um, pins com quem buscou e acertos de primeira. Mudar o formato = nova versão e chave nova, e o save antigo é ignorado sem quebrar o jogo
 - **`localStorage` pode não existir.** Dentro de iframe cross-origin o Safari bloqueia e o Chrome particiona. Todo acesso em `try/catch`, degradando para estado em memória. Nunca deixar isso derrubar o jogo
 
 ---
@@ -180,3 +186,6 @@ Vale independente do que o plano mostra:
 
 - Todo o conteúdo inicial das missões é rascunho e **precisa de revisão da equipe e validação com a Defesa Civil** antes de publicar
 - Definir se as perguntas das instituições vão reaproveitar o banco do quiz Missão Clima ou ter banco próprio
+- O conteúdo que só a equipe pode escrever (`plano-parte-3.md`, seção 4.3) e as decisões da seção 7, que seguiram as recomendações e esperam aprovação
+- O conteúdo de saúde (UBS) e de primeiros socorros (Hospital) precisa também de revisão da área da saúde
+- Os testes com aparelho de verdade (Chromebook, celular, leitor de tela, máquina fraca) e a partida cronometrada com 4 alunos: lista no `README.md`, em "Antes de publicar"

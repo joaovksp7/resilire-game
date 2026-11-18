@@ -12,7 +12,8 @@ export const INSTITUTION_IDS = [
   'abrigo',
   'radio',
   'mercado',
-  'cras',
+  'hospital',
+  'abrigo-animais',
   'casa',
 ] as const;
 
@@ -45,6 +46,7 @@ export const INSTITUTION_STYLES: Readonly<Record<InstitutionId, InstitutionStyle
   abrigo: { color: 0x2f7fe0, icon: 'abrigo', shape: 'gym', floors: 2 },
   radio: { color: 0x8a5cd6, icon: 'radio', shape: 'radio', floors: 1 },
   mercado: { color: 0xe2559a, icon: 'sacola', shape: 'market', floors: 1 },
-  cras: { color: 0x4256b8, icon: 'pessoas', shape: 'school', floors: 1 },
+  hospital: { color: 0x4256b8, icon: 'hospital', shape: 'clinic', floors: 3 },
+  'abrigo-animais': { color: 0x9a6a3a, icon: 'pata', shape: 'school', floors: 1 },
   casa: { color: 0xff7a59, icon: 'casa', shape: 'house', floors: 1 },
 };

@@ -5,7 +5,7 @@ import { openModal, screenTitle, textEl, uiButton } from './cards';
 const TEXT = {
   title: 'Como jogar',
   goalTitle: 'O objetivo',
-  goal: 'Cumpra as missões visitando as instituições da cidade. Em cada visita, converse com quem trabalha lá, responda a uma pergunta e ganhe um pin. Junte todos os pins para completar o jogo.',
+  goal: 'Cumpra as missões visitando os lugares da cidade. Em cada visita, você lê uma carta sobre o que aquele lugar faz, conversa com quem trabalha lá, faz uma atividade (ou responde a uma pergunta) e ganha um pin. Junte todos os pins para completar o jogo.',
   diceTitle: 'Ande com o dado',
   dice: [
     'Jogue o dado. Ele mostra até quantas casas você pode andar.',
@@ -15,7 +15,7 @@ const TEXT = {
   ],
   cityTitle: 'A cidade muda',
   city: (eixos: string) =>
-    `O jogo é dividido em eixos: ${eixos}. A cada eixo, a chuva aumenta e o rio sobe. Ruas alagadas não aparecem entre as casas destacadas: o caminho é pela parte alta da cidade.`,
+    `O jogo é dividido em eixos: ${eixos}. A cada eixo, o tempo muda: a chuva aumenta e o rio sobe, até a chuva parar e a água baixar. Ruas alagadas não aparecem entre as casas destacadas: o caminho é pela parte alta da cidade.`,
   groupTitle: 'Jogando em grupo',
   group: [
     'De 1 a 4 pessoas jogam no mesmo aparelho, passando a vez. Cada uma tem um peão com uma cor e um número, e o peão da vez tem um anel no chão.',
@@ -25,8 +25,15 @@ const TEXT = {
     'Quem parar na porta de qualquer missão em andamento faz a visita. Todos acompanham na mesma tela e podem conversar antes de responder.',
     'Os pins são da equipe e mostram quem buscou cada um. Não tem vencedor: a equipe completa as missões junta.',
   ],
+  activitiesTitle: 'As atividades',
+  activities: [
+    'Cada lugar tem uma atividade diferente: pôr passos em ordem, separar cartões, montar a mochila, escolher o que fazer numa história, fazer uma ligação, achar áreas de risco num mapa, conferir mensagens, jogo da memória e caça-palavras.',
+    'Nada precisa ser arrastado: toque no cartão e depois no lugar onde ele vai.',
+    'Com o teclado: Tab para andar entre os botões e Enter para escolher. No caça-palavras, as setas andam pela grade de letras.',
+    'Não tem tempo: cada um faz no seu ritmo.',
+  ],
   mistakeTitle: 'Errar faz parte',
-  mistake: 'Se errar uma pergunta, você vê a explicação e tenta de novo. Não tem tempo nem penalidade.',
+  mistake: 'Se errar numa pergunta ou atividade, você vê a explicação e tenta de novo. Não tem tempo nem penalidade.',
   computerTitle: 'No computador',
   computer: [
     'Jogar o dado: botão “Jogar dado”, Enter ou Espaço.',
@@ -85,6 +92,7 @@ export function showHowToPlay(root: HTMLElement, eixoNames: readonly string[]): 
       section(TEXT.diceTitle, list('ol', TEXT.dice)),
       section(TEXT.cityTitle, textEl('p', '', TEXT.city(joinNames(eixoNames)))),
       section(TEXT.groupTitle, list('ul', TEXT.group)),
+      section(TEXT.activitiesTitle, list('ul', TEXT.activities)),
       section(TEXT.mistakeTitle, textEl('p', '', TEXT.mistake)),
       section(TEXT.computerTitle, list('ul', TEXT.computer)),
       section(TEXT.phoneTitle, list('ul', TEXT.phone)),

@@ -4,7 +4,7 @@ Continuação de [`prompt-jogo-desastres-climaticos.md`](prompt-jogo-desastres-c
 
 Base: o [`Tabuleiro Digital.docx (1).md`](<Tabuleiro Digital.docx (1).md>), que substitui o `refatoração-jogo.md`. Vale a **ordem da lista do início (1 a 10)**, com o **conteúdo das cenas do roteiro** em cada parada.
 
-> **Status: rascunho.** Aprovados em 16/11/2026: a ordem das paradas e as mudanças no mapa (seção 2). As decisões da seção 7 ainda não foram aprovadas. Onde há uma escolha, este plano segue a recomendação marcada lá.
+> **Status: Fases 15 a 21 prontas (18/11/2026).** Aprovados em 16/11/2026: a ordem das paradas e as mudanças no mapa (seção 2). As decisões da seção 7 seguiram as recomendações marcadas lá e ainda esperam a aprovação da equipe. O conteúdo da seção 4.3 continua com a equipe, e os testes com aparelho de verdade estão no `README.md` ("Antes de publicar").
 
 ## 1. Objetivo
 

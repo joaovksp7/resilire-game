@@ -23,6 +23,32 @@ function wheelPixels(event: WheelEvent): number {
   return event.deltaY;
 }
 
+/** O elemento tem rolagem própria e ainda pode rolar no sentido da roda? */
+function canScroll(el: Element, dx: number, dy: number): boolean {
+  const style = getComputedStyle(el);
+  const scrollable = (overflow: string): boolean => overflow === 'auto' || overflow === 'scroll';
+  if (dy !== 0 && scrollable(style.overflowY) && el.scrollHeight > el.clientHeight) {
+    if (dy < 0 ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight - 1) return true;
+  }
+  if (dx !== 0 && scrollable(style.overflowX) && el.scrollWidth > el.clientWidth) {
+    if (dx < 0 ? el.scrollLeft > 0 : el.scrollLeft + el.clientWidth < el.scrollWidth - 1) return true;
+  }
+  return false;
+}
+
+/**
+ * Roda sobre menus e janelas: rola a janela se ela ainda tiver para onde rolar; senão, não deixa
+ * a rolagem passar para a página do site que tem o jogo no iframe. Ctrl+roda (zoom do navegador)
+ * fica livre.
+ */
+function onDocumentWheel(event: WheelEvent): void {
+  if (event.defaultPrevented || event.ctrlKey) return;
+  for (let el = event.target instanceof Element ? event.target : null; el; el = el.parentElement) {
+    if (canScroll(el, event.deltaX, event.deltaY)) return;
+  }
+  event.preventDefault();
+}
+
 /** Campos de texto não devem mover a câmera enquanto a pessoa digita. */
 function isTextField(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -51,6 +77,7 @@ export class Input {
     window.addEventListener('blur', () => this.pressed.clear());
 
     surface.addEventListener('wheel', this.onWheel, { passive: false });
+    window.addEventListener('wheel', onDocumentWheel, { passive: false });
     surface.addEventListener('pointerdown', this.onPointerDown);
     surface.addEventListener('pointermove', this.onPointerMove);
     surface.addEventListener('pointerup', this.onPointerEnd);

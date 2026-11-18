@@ -150,7 +150,7 @@ export class MissionManager {
       mission: this.assigned[index]?.id ?? null,
     }));
     return {
-      version: 2,
+      version: 3,
       players,
       turn,
       pins: [...this.completed].map(([mission, by]) => ({ mission, by })),

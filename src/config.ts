@@ -83,6 +83,16 @@ export const CLIMATE = {
       waterColor: 0x6a90a6,
       rain: 1,
     },
+    // A chuva parou e a água está baixando: o rio ainda está cheio, mas as ruas já secaram.
+    depois: {
+      sky: 0xb9d3e3,
+      ambient: 1.5,
+      sun: 1.2,
+      /** Abaixo de 1: a parte baixa volta a ficar seca. */
+      waterLevel: 0.95,
+      waterColor: 0x5e9cc4,
+      rain: 0,
+    },
   },
 } as const;
 

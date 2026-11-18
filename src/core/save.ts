@@ -3,8 +3,11 @@
 
 import { TEAM } from '../config';
 
-/** Versão 2: a equipe inteira. O save da versão 1 (`progresso:v1`, de um jogador só) é ignorado. */
-const KEY = 'resilire-game:progresso:v2';
+/**
+ * Versão 3: o mesmo formato da versão 2, com o roteiro novo (as missões mudaram de id).
+ * Os saves das versões 1 (`progresso:v1`) e 2 (`progresso:v2`) ficam nas chaves antigas e são ignorados.
+ */
+const KEY = 'resilire-game:progresso:v3';
 /** Som ligado ou desligado. Fica à parte do progresso: "Começar de novo" não apaga. */
 const SOUND_KEY = 'resilire-game:som:v1';
 /** Nomes da última equipe. Também fica à parte: "Novo jogo" apaga o progresso, mas os nomes voltam preenchidos. */
@@ -71,7 +74,7 @@ export interface SavedPin {
 }
 
 export interface SaveData {
-  readonly version: 2;
+  readonly version: 3;
   /** A equipe, na ordem da vez (de 1 a TEAM.maxPlayers jogadores). */
   readonly players: readonly SavedPlayer[];
   /** De quem é a vez (posição em `players`). */
@@ -106,13 +109,13 @@ function parsePlayer(value: unknown): SavedPlayer | null {
 
 /**
  * Confere o formato do que veio do armazenamento (pode estar velho ou corrompido).
- * O save da versão 1 (de um jogador só) fica na chave antiga e nem chega aqui.
+ * Os saves das versões 1 e 2 ficam nas chaves antigas e nem chegam aqui.
  */
 function parse(text: string | null): SaveData | null {
   if (!text) return null;
   try {
     const data: unknown = JSON.parse(text);
-    if (!isRecord(data) || data.version !== 2) return null;
+    if (!isRecord(data) || data.version !== 3) return null;
     const rawPlayers = data.players;
     if (!Array.isArray(rawPlayers) || rawPlayers.length < 1 || rawPlayers.length > TEAM.maxPlayers) return null;
     const players = rawPlayers.map(parsePlayer);
@@ -126,7 +129,7 @@ function parse(text: string | null): SaveData | null {
       pins.push({ mission: pin.mission, by: pin.by });
     }
     if (!isStringArray(data.firstTry)) return null;
-    return { version: 2, players: players as SavedPlayer[], turn: data.turn, pins, firstTry: data.firstTry };
+    return { version: 3, players: players as SavedPlayer[], turn: data.turn, pins, firstTry: data.firstTry };
   } catch {
     return null;
   }

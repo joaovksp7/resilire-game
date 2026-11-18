@@ -178,5 +178,26 @@
       }
     ],
     "correta": 2
+  },
+  {
+    "id": "q11-animal-perdido",
+    "tipo": "acao",
+    "enunciado": "Depois da enchente, você encontra na rua um cachorro perdido, sem coleira e sem plaquinha.",
+    "alternativas": [
+      {
+        "texto": "Deixo ele na rua, alguém vai achar o dono",
+        "explicacao": "Sozinho na rua, o animal pode passar fome e se machucar. O abrigo de animais pode cuidar dele."
+      },
+      {
+        "texto": "Com a ajuda de um adulto, levo para o abrigo de animais",
+        "explicacao": "Muito bem! No abrigo de animais, os voluntários dão alimento e tratamento para ele."
+      },
+      {
+        "texto": "Posto a foto no grupo e não faço mais nada",
+        "explicacao": "Avisar pode ajudar a achar a família, mas o animal continua sozinho na rua. O abrigo de animais pode cuidar dele."
+      }
+    ],
+    "correta": 1,
+    "todoValidar": "Rascunho a partir da cena 8 do roteiro. Confirmar a orientação ao encontrar um animal perdido (quem leva, como se aproximar) e se o abrigo de animais recebe animais trazidos pela população."
   }
 ]

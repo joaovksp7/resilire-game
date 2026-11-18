@@ -4,62 +4,79 @@
     "nome": "Defesa Civil",
     "nomeComPreposicao": "na Defesa Civil",
     "personagem": { "nome": "Marta", "funcao": "agente da Defesa Civil" },
-    "todoValidar": "Nome do personagem é rascunho."
+    "carta": "A Defesa Civil acompanha a chuva e o nível do rio, mapeia as áreas de risco da cidade e avisa a população quando há perigo. Também indica as rotas de evacuação até um lugar seguro.",
+    "todoValidar": "Nome do personagem e texto da carta são rascunho."
   },
   {
     "id": "bombeiros",
     "nome": "Corpo de Bombeiros",
     "nomeComPreposicao": "no Corpo de Bombeiros",
     "personagem": { "nome": "Paulo", "funcao": "bombeiro" },
-    "todoValidar": "Nome do personagem é rascunho."
+    "carta": "O Corpo de Bombeiros faz o resgate de pessoas em perigo, em enchentes, deslizamentos e acidentes. Numa emergência, o telefone dos Bombeiros é 193.",
+    "todoValidar": "Nome do personagem e texto da carta são rascunho."
   },
   {
     "id": "escola",
     "nome": "Escola",
     "nomeComPreposicao": "na escola",
     "personagem": { "nome": "Ana", "funcao": "professora" },
-    "todoValidar": "Nome do personagem é rascunho."
+    "carta": "Na escola a gente aprende sobre o ambiente, as mudanças climáticas, as inundações e os deslizamentos. Conhecimento ajuda a proteger a família e a comunidade.",
+    "todoValidar": "Nome do personagem e texto da carta são rascunho. O texto sobre mudanças climáticas é da equipe."
   },
   {
     "id": "ubs",
     "nome": "UBS",
     "nomeComPreposicao": "na UBS",
     "personagem": { "nome": "Jorge", "funcao": "enfermeiro da UBS" },
-    "todoValidar": "Nome do personagem é rascunho."
+    "carta": "Na UBS, o posto de saúde do bairro, enfermeiros e agentes comunitários de saúde cuidam da população. Depois de uma enchente, eles atendem quem teve contato com a água e mantêm a vacinação em dia.",
+    "todoValidar": "Nome do personagem e texto da carta são rascunho. O nome que aparece no jogo (UBS ou Posto de Saúde) é escolha da equipe. Precisa de revisão da área da saúde."
   },
   {
     "id": "abrigo",
     "nome": "Abrigo municipal",
     "nomeComPreposicao": "no abrigo municipal",
     "personagem": { "nome": "Lúcia", "funcao": "coordenadora do abrigo" },
-    "todoValidar": "Nome do personagem é rascunho."
+    "carta": "O abrigo recebe as famílias que precisaram sair de casa. É um lugar seguro para descansar, com uma equipe que escuta, acolhe e ajuda a organizar a rotina de todos.",
+    "todoValidar": "Nome do personagem e texto da carta são rascunho."
   },
   {
     "id": "radio",
     "nome": "Rádio comunitária",
     "nomeComPreposicao": "na rádio comunitária",
     "personagem": { "nome": "Beto", "funcao": "locutor da rádio" },
-    "todoValidar": "Nome do personagem é rascunho."
+    "carta": "A rádio comunitária transmite boletins de utilidade pública: os avisos oficiais, onde há abrigo e mantimentos e os telefones de emergência. Informação certa salva vidas.",
+    "todoValidar": "Nome do personagem e texto da carta são rascunho. O nome que aparece no jogo (Rádio comunitária ou Comunicação) é escolha da equipe."
   },
   {
     "id": "mercado",
     "nome": "Mercado",
     "nomeComPreposicao": "no mercado",
     "personagem": { "nome": "Seu Valdir", "funcao": "dono do mercado" },
-    "todoValidar": "Nome do personagem é rascunho."
+    "carta": "No mercado do bairro dá para buscar o que vai na mochila de emergência: lanterna, pilhas, rádio a pilha, água em garrafa lacrada e comida que não estraga.",
+    "todoValidar": "Nome do personagem e texto da carta são rascunho. O nome que aparece no jogo (Mercado ou Loja) é escolha da equipe."
   },
   {
-    "id": "cras",
-    "nome": "CRAS",
-    "nomeComPreposicao": "no CRAS",
-    "personagem": { "nome": "Rosa", "funcao": "assistente social do CRAS" },
-    "todoValidar": "Nome do personagem é rascunho."
+    "id": "hospital",
+    "nome": "Hospital",
+    "nomeComPreposicao": "no hospital",
+    "personagem": { "nome": "Helena", "funcao": "médica do hospital" },
+    "carta": "O hospital atende as pessoas feridas com mais gravidade, como em acidentes e desabamentos. O SAMU, que atende pelo telefone 192, leva o socorro até a pessoa.",
+    "todoValidar": "Nome do personagem e texto da carta são rascunho. Precisa de revisão da área da saúde."
+  },
+  {
+    "id": "abrigo-animais",
+    "nome": "Abrigo de animais",
+    "nomeComPreposicao": "no abrigo de animais",
+    "personagem": { "nome": "Caio", "funcao": "voluntário do abrigo de animais" },
+    "carta": "O abrigo de animais acolhe os animais perdidos ou resgatados. Os voluntários dão alimento e tratamento para eles.",
+    "todoValidar": "Nome do personagem e texto da carta são rascunho. O nome que aparece no jogo é escolha da equipe."
   },
   {
     "id": "casa",
     "nome": "Sua casa",
     "nomeComPreposicao": "em casa",
     "personagem": { "nome": "Vó Cida", "funcao": "sua avó" },
-    "todoValidar": "Nome do personagem é rascunho."
+    "carta": "Em casa, a família combina o plano de emergência: como proteger os documentos, os remédios e os animais de estimação, e qual caminho seguir até um lugar seguro.",
+    "todoValidar": "Nome do personagem e texto da carta são rascunho."
   }
 ]

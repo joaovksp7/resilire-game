@@ -11,7 +11,8 @@
 //   Letras maiúsculas = prédio de instituição (o bloco de letras iguais vira um prédio só):
 //   D  Defesa Civil     B  Bombeiros         E  Escola
 //   U  UBS              A  Abrigo            R  Rádio comunitária
-//   M  Mercado          C  CRAS              J  casa do jogador
+//   M  Mercado          H  Hospital          N  Abrigo de animais
+//   J  casa do jogador
 //
 //   Cada bloco de instituição precisa ser um retângulo e ter exatamente um "*" encostado (a porta).
 //   Só rua (#, *), praça (+) e ponte (=) são caminháveis.
@@ -59,7 +60,8 @@ export const LEGEND: Readonly<Record<string, LegendEntry>> = {
   A: { kind: 'institution', institution: 'abrigo' },
   R: { kind: 'institution', institution: 'radio' },
   M: { kind: 'institution', institution: 'mercado' },
-  C: { kind: 'institution', institution: 'cras' },
+  H: { kind: 'institution', institution: 'hospital' },
+  N: { kind: 'institution', institution: 'abrigo-animais' },
   J: { kind: 'institution', institution: 'casa' },
 };
 
@@ -70,15 +72,15 @@ export const LAYOUT_TYPES: readonly string[] = [
   't.t.tt.t..tt.t.t.tttttt.t.tt.t', //  0  parte alta | mata | morro
   'th.hh.hh.th.hh.hhtttt.h.t.h.tt', //  1
   '.#################tttt.h.t.h.t', //  2
-  '.#hh.th.h#t.h.t.h#ttth.t.h.th.', //  3
-  '.#t.h.h.t#DD.tCC.#ttt.h.th.t.h', //  4
-  '.#h.tt.hh#DD.tCC.#tttt.h.t.h.t', //  5
-  '.#########*###*###ttth.t.h.t.h', //  6
+  '.#hAAAA.h#t.h.t.h#ttth.t.h.th.', //  3
+  '.#tAAAA.t#DD.tNN.#ttt.h.th.t.h', //  4
+  '.#hAAAAhh#DD.tNN.#tttt.h.t.h.t', //  5
+  '.###*#####*###*###ttth.t.h.t.h', //  6
   '.#hh.hh.t.hh.h.hh#tttt.h.tt.h.', //  7
   '.#t.t.tttt.ttttt.#ttt.tt.t.tt.', //  8
-  '.#.AAAAth.t.ht.t.############.', //  9  parte alta (oeste) | centro | baixada | centro
-  '.#.AAAAt.EEE.h.hh#.BBh.hh.h.h.', // 10
-  '.#.AAAAt.EEE..t.h#.BBhh.hJ.th.', // 11
+  '.#.HHHHth.t.ht.t.############.', //  9  parte alta (oeste) | centro | baixada | centro
+  '.#.HHHHt.EEE.h.hh#.BBh.hhRR.h.', // 10
+  '.#.HHHHt.EEE..t.h#.BBhh.hRRth.', // 11
   '.###*#####*########*#####*###.', // 12  rua principal (corta a baixada)
   '.#h.tt.hhp.phh#hh#+++++#hh.hh.', // 13
   '.#t.h.tth.t.ht#th#+++++#UU.th.', // 14
@@ -86,8 +88,8 @@ export const LAYOUT_TYPES: readonly string[] = [
   '.#t.hh.th.t.ht#t.#######*####.', // 16
   '.#hph.hhp.hph.#h.#hp.hhp.hph..', // 17  beira-rio (parte baixa)
   '.####*###################*###.', // 18
-  '.h.hMMM.hph.hp.h.#hph.h.hRRh..', // 19
-  '.t.tMMM.t.h.t.h.t#t.h.t.tRRt.t', // 20
+  '.h.hMMM.hph.hp.h.#hph.h.hJJh..', // 19
+  '.t.tMMM.t.h.t.h.t#t.h.t.tJJt.t', // 20
   ':::::::::::::::::=::::::::::::', // 21
   '~~~~~~~~~~~~~~~~~=~~~~~~~~~~~~', // 22  rio
   '~~~~~~~~~~~~~~~~~=~~~~~~~~~~~~', // 23
