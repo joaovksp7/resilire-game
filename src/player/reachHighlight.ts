@@ -19,6 +19,7 @@ export class ReachHighlight {
   readonly mesh: Mesh;
   private readonly map: CityMap;
   private readonly material: MeshBasicMaterial;
+  private readonly listeners: ((cells: readonly Cell[]) => void)[] = [];
   private time = 0;
 
   constructor(map: CityMap) {
@@ -33,6 +34,11 @@ export class ReachHighlight {
     this.mesh.name = 'casas-alcancaveis';
     this.mesh.visible = false;
     this.mesh.renderOrder = 1;
+  }
+
+  /** Avisa quando as casas destacadas mudam (lista vazia: sumiram). Ex.: apagar o que as tapa. */
+  onChange(listener: (cells: readonly Cell[]) => void): void {
+    this.listeners.push(listener);
   }
 
   /** Mostra as casas. `isSpecial` pinta algumas de outra cor. */
@@ -79,10 +85,13 @@ export class ReachHighlight {
     this.mesh.geometry = geometry;
     this.mesh.visible = cells.length > 0;
     this.time = 0;
+    for (const listener of this.listeners) listener(cells);
   }
 
   hide(): void {
+    if (!this.mesh.visible) return;
     this.mesh.visible = false;
+    for (const listener of this.listeners) listener([]);
   }
 
   update(dt: number): void {

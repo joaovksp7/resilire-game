@@ -1,6 +1,6 @@
 import { Color, MathUtils, type Scene } from 'three';
 import { CLIMATE, WORLD } from '../config';
-import type { EixoId, GameContent } from '../missions/content';
+import { destinationOf, type EixoId, type GameContent } from '../missions/content';
 import { prefersReducedMotion } from '../player/character';
 import type { CityMap } from './cityMap';
 import type { Rain } from './rain';
@@ -64,7 +64,7 @@ export function floodedTiles(map: CityMap, eixo: EixoId): Uint8Array {
 export function floodedDoorProblem(map: CityMap, content: GameContent): string | null {
   const byEixo = new Map<EixoId, Uint8Array>();
   for (const mission of content.missions) {
-    const door = map.sites.get(mission.instituicao)?.door;
+    const door = map.siteFor(mission)?.door;
     if (!door) continue;
     let flooded = byEixo.get(mission.eixo);
     if (!flooded) {
@@ -72,11 +72,11 @@ export function floodedDoorProblem(map: CityMap, content: GameContent): string |
       byEixo.set(mission.eixo, flooded);
     }
     if (flooded[door.row * map.cols + door.col] !== 1) continue;
-    const inst = content.institutions.get(mission.instituicao)?.nome ?? mission.instituicao;
+    const place = destinationOf(content, mission)?.nome ?? mission.instituicao;
     const eixo = content.eixos.find((e) => e.id === mission.eixo)?.nome ?? mission.eixo;
     return (
-      `content/missions.json: missão "${mission.id}": no eixo "${eixo}" a porta da instituição "${inst}" ` +
-      'fica embaixo d’água e o jogador não consegue chegar. Escolha uma instituição da parte alta da cidade.'
+      `content/missions.json: missão "${mission.id}": no eixo "${eixo}" a porta de "${place}" ` +
+      'fica embaixo d’água e o jogador não consegue chegar. Escolha um lugar da parte alta da cidade.'
     );
   }
   return null;

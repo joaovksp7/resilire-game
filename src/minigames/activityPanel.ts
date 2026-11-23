@@ -46,9 +46,18 @@ export interface ActivityPanel {
   close(): void;
 }
 
-/** Abre a janela de uma atividade, já no tema da instituição. */
-export function openActivityPanel(root: HTMLElement, theme: ActivityTheme, title: string, instruction: string): ActivityPanel {
-  const box = el('div', 'atividade');
+/**
+ * Abre a janela de uma atividade, já no tema da instituição.
+ * `wide`: janela mais larga, para atividade em duas colunas na tela larga (o caça-palavras).
+ */
+export function openActivityPanel(
+  root: HTMLElement,
+  theme: ActivityTheme,
+  title: string,
+  instruction: string,
+  options: { wide?: boolean } = {},
+): ActivityPanel {
+  const box = el('div', options.wide ? 'atividade atividade--larga' : 'atividade');
   box.style.setProperty('--cor-inst', cssColor(theme.color));
   const titleId = uid('atividade-titulo');
   const header = el('div', 'atividade__cabecalho');

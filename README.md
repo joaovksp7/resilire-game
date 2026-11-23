@@ -22,6 +22,18 @@ npm run dev     # abre o servidor de desenvolvimento
 
 Depois, abra o endereço que aparecer no terminal (normalmente `http://localhost:5173`).
 
+### Modo de teste (só no `npm run dev`)
+
+Para testar uma missão sem jogar as anteriores, abra `http://localhost:5173/?teste`. A tela inicial é pulada e abre a lista das missões. Ao escolher uma:
+
+- as missões anteriores contam como feitas (buscadas pelo Jogador 1);
+- o clima, o rio e as ruas alagadas ficam como no eixo da missão;
+- o peão vai direto para a porta e a visita começa: carta do local, diálogo e pergunta ou atividade.
+
+Depois do pin, o jogo segue normal a partir dali. O botão **T**, na borda esquerda, abre a lista de novo. A equipe é a última usada (ou 1 jogador). O modo de teste **apaga o progresso salvo** ao escolher uma missão.
+
+O modo de teste não entra no `npm run build`: no build publicado, o `?teste` não faz nada.
+
 ### Telas
 
 - **Tela inicial:** o nome do jogo sobre uma cena animada desenhada em código (nuvens, sol, garoa leve, rio e os peões pulando, um para cada jogador escolhido). Com `prefers-reduced-motion`, a cena fica parada. Na primeira vez, mostra **Quantos vão jogar?** (de 1 a 4, começando no número da última partida) e **Jogar**. Com 1, vai direto para a cidade. Com 2 ou mais, abre **Quem vai jogar?**, com um campo de nome por jogador (opcional, até 12 letras; vazio vira "Jogador 1", "Jogador 2"…) e a cor do peão. Se já houver progresso, mostra quem está jogando, os pins, **Continuar** e **Novo jogo**; depois de completar tudo, **Ver resultado** e **Jogar de novo**. Novo jogo e Jogar de novo apagam o progresso depois de confirmar e voltam ao seletor. Sempre tem **Como jogar**, **Créditos** e **Som** (liga e desliga). Se o navegador não deixar salvar o progresso, uma linha avisa.
@@ -72,13 +84,19 @@ São 10 missões, uma em cada instituição, entregues nesta ordem:
 | 3 | Um lugar seguro | Preparação | Abrigo (atividade "Chegada ao abrigo": uma história com momentos de "O que você faz?") |
 | 4 | Conhecimento que protege | Preparação | Escola (atividade "Seguro ou perigoso?": separar atitudes em colunas) |
 | 5 | Informação e prevenção | Durante o evento | Defesa Civil (atividade "Mapa de risco": achar as áreas de risco no mapa da cidade) |
-| 6 | Segurança em primeiro lugar | Durante o evento | Bombeiros (atividade "Ligação para o 193": escolher o número e conversar com o atendente) |
+| 6 | Segurança em primeiro lugar | Durante o evento | Bombeiros, no local do acidente (atividade "Ligação para o 193": escolher o número, conversar com o atendente e dizer o endereço) |
 | 7 | Informação salva vidas | Durante o evento | Rádio (atividade "Confiável ou boato?": decidir se dá para confiar em cada mensagem) |
 | 8 | Cuidar também é prevenir | Depois do evento | UBS (atividade "Jogo da memória": formar pares de situação e cuidado) |
-| 9 | Animal perdido | Depois do evento | Abrigo de animais |
+| 9 | Animal perdido | Depois do evento | Abrigo de animais (atividade "Caça-palavras": achar as palavras dos cuidados com os animais) |
 | 10 | Primeiros socorros | Depois do evento | Hospital (atividade "Caça-palavras": achar as palavras dos primeiros socorros) |
 
-Todos os peões começam na porta de casa, então o Jogador 1 faz a visita da Casa logo na primeira vez, sem jogar o dado. Cada visita segue esta ordem: a carta do local (o que aquele lugar faz pela cidade), a conversa com o personagem, a pergunta ou a atividade e o pin.
+Todos os peões começam na porta de casa, então o Jogador 1 faz a visita da Casa logo na primeira vez, sem jogar o dado. Cada visita segue esta ordem: o banner da missão (só nas que têm: Casa, Escola e Abrigo de animais), a carta do local (o que aquele lugar faz pela cidade, com o endereço), a conversa com o personagem, a pergunta ou a atividade e o pin.
+
+**A missão dos Bombeiros não é no quartel.** Ela leva ao **local do acidente**, na Rua das Araucárias, onde um poste caiu em cima de um carro (o desenho só aparece enquanto a missão está em andamento). Lá a atividade vem **antes** da conversa: primeiro o aluno liga para o 193 e diz o endereço, que ele lê no nome escrito no chão da rua e na placa com o número do lugar; depois o bombeiro chega com a equipe e conversa.
+
+### Ruas e endereços
+
+Toda rua da cidade tem nome, de bicho ou planta do Rio Grande do Sul (`content/ruas.json`), escrito no asfalto ao longo da própria rua, como num mapa (nas ruas compridas, o nome se repete). Cada lugar tem número, calculado pela posição na rua: começa em 101 (lado esquerdo, ímpar) e 102 (lado direito, par) numa ponta e sobe de 20 em 20. Assim nenhum endereço tem 190, 192 ou 193, os telefones de emergência. A carta de cada instituição mostra o endereço dela (ex.: "Endereço: Avenida dos Ipês, 461").
 
 ### Clima em cada eixo
 
@@ -218,8 +236,32 @@ Tem duas listas:
 | `pergunta` | `id` da pergunta (de `questions.json`) |
 | `atividade` | No lugar da `pergunta`: `id` da atividade (de `atividades.json`), por exemplo `"a02-mochila"`. Cada missão tem **ou** `pergunta` **ou** `atividade`, nunca as duas. (Este campo se chamava `minijogo`, com o valor `"kit"`.) |
 | `aprendizado` | Um tópico curto com o que foi aprendido, para o resumo da tela final |
+| `banner` | Opcional. Uma imagem que abre a visita, logo ao chegar, antes da carta do local. Veja "Banners" logo abaixo |
+| `local` | Opcional. Faz a missão acontecer num lugar do mapa que não é a instituição (hoje, só o `acidente`). Tem `id` (o lugar no mapa), `nome` (aparece em "Destino:") e `nomeComPreposicao` (ex.: `"no local do acidente"`). A carta, o personagem e o pin continuam sendo da `instituicao`. Com `local` e `atividade`, a atividade vem antes da conversa |
 
 **Atenção no eixo `durante`:** a parte baixa da cidade fica alagada, então as missões desse eixo precisam ir para instituições da parte alta. Hoje, a Casa e o Mercado ficam na parte alagada. Se uma missão de `durante` apontar para uma delas, o jogo avisa qual missão corrigir. No eixo `depois` a água baixa, e a cidade toda volta a ficar seca.
+
+#### Banners
+
+Uma missão pode ter um **banner**: uma imagem (cartaz, infográfico, quadrinho) que aparece numa tela própria assim que o peão chega ao local, antes da carta do local. A tela mostra a imagem inteira, com o botão **Ampliar** (a imagem em tamanho real, para ler no celular, rolando com o dedo ou com as setas) e **Continuar**. Hoje têm banner a Casa (`m01`), a Escola (`m04`) e o Abrigo de animais (`m09`).
+
+```json
+"banner": {
+  "arquivo": "m01-casa.jpg",
+  "titulo": "Nossa casa também se prepara!",
+  "descricao": "O que a imagem mostra e tudo o que está escrito nela."
+}
+```
+
+| Campo do banner | O que é |
+|---|---|
+| `arquivo` | Nome do arquivo da imagem, que fica na pasta [`content/banners/`](content/banners/) (`.jpg`, `.jpeg`, `.png` ou `.webp`). Se o arquivo não estiver lá, o jogo avisa ao abrir |
+| `titulo` | O título que aparece em cima da imagem |
+| `descricao` | O texto lido pelo leitor de tela no lugar da imagem: o que ela mostra e tudo o que está escrito nela. Também aparece no lugar da imagem se ela não carregar |
+
+- **Para trocar um banner**, ponha a imagem nova em `content/banners/`, ajuste `arquivo`, `titulo` e `descricao`, e rode `npm run build`.
+- **Prefira JPEG**, com até uns 500 KB e cerca de 1500 pixels de largura: a imagem só carrega quando a visita abre, mas pesa no celular e na rede da escola. Os banners de hoje foram convertidos dos PNGs originais (que ficam na raiz do projeto) para JPEG com qualidade 82.
+- **O que está escrito na imagem também é conteúdo de segurança** e precisa da mesma validação da Defesa Civil que o resto do texto. Anote no `todoValidar` da missão o que falta confirmar.
 
 ### `dialogues.json` — falas dos personagens
 
@@ -441,9 +483,14 @@ O desenho do mapa e a posição dos pontos ficam no código (`src/minigames/spot
 
 | Campo | O que é |
 |---|---|
-| `palavras` | De 3 a 8 palavras, cada uma com `palavra` e `explicacao`. **Escreva a palavra certo, com acento**: a lista mostra assim, e a grade usa a mesma palavra sem acento (Ç vira C, Ã vira A). Cada palavra tem de 3 a 12 letras, só letras (sem espaço, hífen ou número), e não pode estar dentro de outra da lista |
+| `palavras` | De 3 a 10 palavras, cada uma com `palavra` e `explicacao`. **Escreva a palavra certo, com acento e hífen**: a lista mostra assim, e a grade usa a mesma palavra sem acento e sem hífen (Ç vira C, Ã vira A, BEM-ESTAR vira BEMESTAR). Cada palavra tem de 3 a 12 letras, só letras e hífen (sem espaço ou número), e não pode estar dentro de outra da lista |
 
-A grade tem 8 colunas (para caber no celular) e pelo menos 8 linhas; uma palavra com mais de 8 letras fica na vertical, e a grade cresce até 12 linhas. Se as palavras não couberem, o jogo avisa ao abrir.
+O formato da grade depende da tela, na hora em que a atividade abre:
+
+- **Celular (até 640px de largura):** 8 colunas (para cada letra ter uns 35px a 360px) e pelo menos 8 linhas; uma palavra com mais de 8 letras fica na vertical, e a grade cresce até 12 linhas. A lista fica em cima da grade, e a tela rola.
+- **Tela larga (computador, Chromebook, tablet deitado):** a grade é quadrada, com o lado do tamanho da maior palavra (no mínimo 8, até 12). A lista fica à esquerda e a grade à direita, e a grade encolhe com a altura da tela para tudo caber sem rolar.
+
+Se as palavras não couberem num dos dois formatos, o jogo avisa ao abrir.
 
 ```json
 {
@@ -477,6 +524,17 @@ Tem duas partes:
 
 Para mudar o tamanho da mochila, mude o `espaco` dos itens úteis: o espaço total é a soma deles. Os desenhos dos itens ficam em [`src/minigames/kitIcons.ts`](src/minigames/kitIcons.ts), pelo `id`. Um item novo, sem desenho próprio, aparece com o desenho de uma caixa.
 
+### `ruas.json` — nomes das ruas
+
+Não é conteúdo educativo, mas fica aqui para a equipe trocar os nomes sem programar. É uma lista com o `id` e o `nome` de cada rua:
+
+```json
+{ "id": "araucarias", "nome": "Rua das Araucárias" }
+```
+
+- O `id` liga o nome ao trecho de rua no mapa (`STREETS`, em [`src/world/layout.ts`](src/world/layout.ts)). Não mude o `id`, só o `nome`. Se faltar o nome de uma rua do mapa, ou sobrar um nome que não está no mapa, o jogo avisa ao abrir.
+- **Atenção:** a ligação para o 193 (`a06-ligacao-193`, em `atividades.json`) pede o endereço do acidente, "Rua das Araucárias, 241". Se mudar o nome dessa rua, mude também a resposta certa da atividade. O jogo confere e avisa ao abrir se o endereço da resposta certa não for o que está escrito na cidade.
+
 ### `creditos.json` — tela de créditos
 
 Não é conteúdo educativo, mas fica aqui para a equipe editar sem programar. É uma lista de seções, mostradas na ordem do arquivo, embaixo do nome do jogo:
@@ -503,7 +561,8 @@ O nome do jogo fica em [`src/config.ts`](src/config.ts) (`GAME_NAME`). Ele apare
 
 A cidade é fixa (não muda a cada partida), para o professor saber onde fica cada coisa. O mapa é um desenho em texto no arquivo [`src/world/layout.ts`](src/world/layout.ts), com duas grades do mesmo tamanho (30 × 30):
 
-- **`LAYOUT_TYPES`**: o que tem em cada quadradinho. Cada letra ou símbolo tem um significado, listado no começo do arquivo: rua, casa, árvore, rio e assim por diante. Cada instituição é um retângulo de letras iguais, por exemplo `A` para o Abrigo, e precisa de exatamente um `*` encostado nele. O `*` marca a rua em frente à porta.
+- **`LAYOUT_TYPES`**: o que tem em cada quadradinho. Cada letra ou símbolo tem um significado, listado no começo do arquivo: rua, casa, árvore, rio e assim por diante. Cada instituição é um retângulo de letras iguais, por exemplo `A` para o Abrigo, e precisa de exatamente um `*` encostado nele. O `*` marca a rua em frente à porta. O `X` é o local do acidente (missão dos Bombeiros), com o seu `*` também.
+- **`STREETS`**: os trechos retos de rua, cada um com o `id` do nome (de `content/ruas.json`), a linha ou coluna, de onde até onde, e onde o nome aparece escrito no chão (`signs`: o ponto preferido; o nome anda até 4 casas para cada lado, para onde prédios e casas menos o tapam na tela). Toda rua e ponte do mapa precisa estar em algum trecho. O número de cada lugar sai da posição na rua (regra no próprio arquivo).
 - **`LAYOUT_LEVELS`**: a altura do terreno em cada quadradinho, de `0` (fundo do rio) a `9` (topo do morro). O nível `1` é a parte baixa (onde ficam a casa do jogador e o Mercado), que alaga na fase "Durante o evento". A ponte fica na altura das ruas das pontas, então também alaga. Rua de nível `2` ou mais fica seca.
 
 Regras:
@@ -518,6 +577,8 @@ A aparência de cada instituição (cor, ícone e formato do prédio) fica em [`
 ```
 index.html            página principal
 content/              texto educativo e créditos (ver "Como editar o conteúdo")
+  banners/           imagens dos banners das missões
+  ruas.json          nomes das ruas (não é conteúdo educativo)
 src/
   main.ts             liga tudo: conteúdo, cidade, câmera, personagem, missões e interface
   config.ts           nome do jogo e constantes (câmera, render, mundo, personagem, cores, clima e chuva)
@@ -528,7 +589,7 @@ src/
   missions/
     content.ts        lê content/*.json (e os créditos) e confere as ligações por id
     missionManager.ts missões em andamento e de quem é cada uma, pins e acertos de primeira
-    missionFlow.ts    o loop: missão → porta → carta do local → diálogo → pergunta (ou atividade) → pin → próxima
+    missionFlow.ts    o loop: missão → porta (da instituição ou do local) → banner (se tiver) → carta do local → diálogo → pergunta (ou atividade) → pin → próxima
   minigames/
     activities.ts     abre a atividade da missão (de content/atividades.json) pelo tipo
     activityPanel.ts  o que as telas das atividades dividem (janela, rodapé, aviso e resultado)
@@ -556,7 +617,7 @@ src/
     diceHud.ts        botão "Jogar dado", "Ir rumo ao objetivo", avisos e de quem é a vez
     missionHud.ts     barra da missão no topo, painel de pins (com quem buscou) e botão de som
     dialogue.ts       caixa de diálogo e pergunta
-    cards.ts          cartões (missão, pin, eixo), confirmação, botão de som e janelas com foco preso
+    cards.ts          cartões (missão, pin, eixo), banner da missão, confirmação, botão de som e janelas com foco preso
     edgeArrow.ts      seta na borda da tela apontando o destino
     titleScreen.ts    tela inicial (com o seletor de jogadores) e créditos
     titleScene.ts     cena animada ao fundo da tela inicial
@@ -565,8 +626,8 @@ src/
     endScreen.ts      tela final (pins, quem buscou, acertos de primeira e resumo por eixo)
     howToPlay.ts      janela "Como jogar"
   world/
-    layout.ts         mapa da cidade em texto (tipos e alturas)
-    cityMap.ts        lê o mapa: tiles, alturas, instituições e portas
+    layout.ts         mapa da cidade em texto (tipos e alturas), lugares (o acidente) e trechos de rua
+    cityMap.ts        lê o mapa: tiles, alturas, instituições, lugares, portas e endereços
     city.ts           monta a cidade inteira
     terrain.ts        terreno e laterais da maquete
     water.ts          água do rio (nível e cor)
@@ -576,6 +637,7 @@ src/
     institutions.ts   cor, ícone e formato de cada instituição
     icons.ts          desenhos dos ícones (placas 3D e interface)
     markers.ts        seta flutuante e anel na porta de cada missão em andamento
-    decor.ts          casas, prédios, árvores e ponte
+    decor.ts          casas, prédios, árvores, ponte e o desenho dos lugares (o acidente)
+    streetSigns.ts    nome das ruas escrito no chão, placa de número e o endereço em texto
     scene.ts          céu e luzes
 ```

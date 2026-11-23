@@ -88,7 +88,7 @@ src/
   main.ts
   config.ts            # nome do jogo e constantes
   core/                # loop, input, câmera, save
-  world/               # cidade, rio, clima, prédios
+  world/               # cidade, rio, clima, prédios, ruas e placas
   player/              # personagem, pathfinding A*
   missions/            # gerenciador de missões e eixos
   minigames/           # atividades das paradas: activities.ts abre pelo tipo, um arquivo por tela
@@ -102,6 +102,8 @@ content/
   atividades.json      # atividade de cada missão que não tem pergunta
   kit-items.json
   creditos.json        # texto da tela de créditos (não é educativo)
+  ruas.json            # nomes das ruas do mapa (não é educativo)
+  banners/             # imagens dos banners das missões (campo `banner` do missions.json)
 public/
   fontes/
 prompt-jogo-desastres-climaticos.md
@@ -120,11 +122,12 @@ AGENTS.md
 O único lugar onde mora texto educativo. **Nunca** tocar no código de renderização para mudar conteúdo.
 
 - O formato de cada JSON fica documentado no `README.md`. Mudar formato = avisar antes, porque a equipe edita esses arquivos sem programar
-- `creditos.json` não é conteúdo educativo: fica aqui só para a equipe editar sem programar (seções com `titulo` e `linhas`)
+- `creditos.json` não é conteúdo educativo: fica aqui só para a equipe editar sem programar (seções com `titulo` e `linhas`). O mesmo vale para `ruas.json` (`id` e `nome` de cada rua)
 - Todo item tem `id` estável. Missão aponta para instituição, diálogo e pergunta (ou `atividade`) pelo `id`, nunca pelo texto
 - Toda missão tem `eixo` com uma das quatro chaves fixas
 - Pergunta: `correta` é o **índice** dentro de `alternativas`, não o texto. Alternativas embaralhadas na exibição
 - Atividade: os campos de cada `tipo` ficam documentados no `README.md`. Desenhos (itens da mochila, mapa de risco) ficam no código, ligados ao conteúdo pelo `id`
+- Banner: imagem opcional da missão em `content/banners/`, com `titulo` e `descricao` (o texto para leitor de tela) no `missions.json`. Abre a visita, antes da carta do local. O que está escrito na imagem também é conteúdo de segurança e passa pela mesma validação
 - Os JSONs ficam formatados e legíveis, porque o conteúdo é revisado lendo esses arquivos
 - JSON não aceita comentário: o `// TODO validar` vira o campo `"todoValidar": "o que falta confirmar"` no próprio item (não aparece no jogo). Toda informação de segurança que não está no plano fica genérica no texto e anotada aí
 - Os JSONs entram no build (import estático): mudar texto exige `npm run build`. `src/missions/content.ts` confere formato (no build) e ligações por `id` (ao abrir o jogo)
@@ -133,7 +136,8 @@ O único lugar onde mora texto educativo. **Nunca** tocar no código de renderiz
 
 ## Mecânica — o que não pode quebrar
 
-- **Loop:** missão → andar até a instituição (jogando o dado) → carta do local → diálogo → pergunta ou atividade → pin → próxima missão
+- **Loop:** missão → andar até a instituição (jogando o dado) → banner (se a missão tiver) → carta do local → diálogo → pergunta ou atividade → pin → próxima missão. Missão com `local` (o acidente dos Bombeiros) leva até esse lugar do mapa, não à instituição, e lá a atividade vem antes do diálogo
+- **Ruas e endereços:** toda rua tem nome (`content/ruas.json`, ligado aos trechos de `STREETS` em `src/world/layout.ts`), escrito no chão da própria rua. O número dos lugares é calculado pela posição na rua e nunca dá 190, 192 ou 193. O endereço que a ligação do 193 pede tem que bater com o que está escrito na cidade (o jogo confere ao abrir)
 - **Equipe e vez:** de 1 a 4 jogadores no mesmo aparelho, cada um com o seu peão. Uma vez é uma jogada do dado, na ordem da tela inicial; só o peão da vez anda. Com 1 jogador, o jogo funciona como uma missão por vez, na ordem de `missions.json`
 - **Missões divididas:** cada jogador cuida de uma missão, ao mesmo tempo, na ordem de `missions.json`. Quem parar na porta de qualquer missão em andamento faz a visita, e o dono recebe a próxima livre, mesmo que seja do eixo seguinte; só quando não sobra missão livre ele passa a ajudar a equipe. O eixo (clima, rio e ruas alagadas) só muda quando todas as missões dele acabam. Os pins são da equipe e guardam quem buscou. Sem ranking nem vencedor
 - **Eixos em ordem fixa.** Clima, nível do rio e ruas bloqueadas mudam por eixo. Na fase `durante`, ruas baixas alagadas obrigam rota pela parte alta (inclusive a da casa do jogador, na beira-rio); na fase `depois`, a chuva para e a água baixa

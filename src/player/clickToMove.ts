@@ -1,5 +1,6 @@
 import { type Camera, type Object3D, Raycaster, Vector2, type Vector3 } from 'three';
-import type { CityMap, InstitutionSite } from '../world/cityMap';
+import type { CityMap, InstitutionSite, Site } from '../world/cityMap';
+import { isFaded } from '../world/fade';
 import type { InstitutionId } from '../world/institutions';
 
 export interface TapPickerOptions {
@@ -15,8 +16,8 @@ export type TapTarget =
   | { kind: 'institution'; site: InstitutionSite; faceYaw: number }
   | { kind: 'ground'; point: Vector3 };
 
-/** Direção para ficar de frente para o prédio: da porta em direção ao centro do bloco. */
-export function faceYawFor(map: CityMap, site: InstitutionSite): number {
+/** Direção para ficar de frente para o prédio (ou o lugar): da porta em direção ao centro do bloco. */
+export function faceYawFor(map: CityMap, site: Site): number {
   const bx = map.colToX((site.minCol + site.maxCol + 1) / 2) - map.colToX(site.door.col + 0.5);
   const bz = map.rowToZ((site.minRow + site.maxRow + 1) / 2) - map.rowToZ(site.door.row + 0.5);
   return Math.atan2(bx, bz);
@@ -51,7 +52,9 @@ export class TapPicker {
     this.ndc.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
     this.raycaster.setFromCamera(this.ndc, camera);
 
-    const hit = this.raycaster.intersectObject(pickRoot, true)[0];
+    // O que está transparente (tapando um nome de rua ou uma casa destacada) não segura o toque:
+    // ele passa e acerta o que está atrás.
+    const hit = this.raycaster.intersectObject(pickRoot, true).find((h) => !isFaded(h.object));
     if (!hit) return null;
 
     const id = institutionOf(hit.object);

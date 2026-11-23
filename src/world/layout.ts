@@ -13,15 +13,24 @@
 //   U  UBS              A  Abrigo            R  Rádio comunitária
 //   M  Mercado          H  Hospital          N  Abrigo de animais
 //   J  casa do jogador
+//   X  lugar do acidente (parada de missão fora de instituição: poste caído em cima de um carro)
 //
-//   Cada bloco de instituição precisa ser um retângulo e ter exatamente um "*" encostado (a porta).
-//   Só rua (#, *), praça (+) e ponte (=) são caminháveis.
+//   Cada bloco de instituição (e cada lugar, como o X) precisa ser um retângulo e ter exatamente
+//   um "*" encostado (a porta). Só rua (#, *), praça (+) e ponte (=) são caminháveis.
+//   Toda rua (#, *, =) precisa estar num trecho de STREETS, lá embaixo, que dá o nome dela.
 //
 // NÍVEIS — altura do terreno em cada tile (0 = fundo do rio):
 //   0 rio   1 parte baixa (beira-rio, baixada, outro lado)   2 centro   3 parte alta   4–9 morro
 //   Na fase "Durante o evento", a água vai cobrir o nível 1.
 
 import type { InstitutionId } from './institutions';
+
+/**
+ * Lugares do mapa que não são instituição, mas podem ser a parada de uma missão
+ * (campo "local" em content/missions.json). Cada um tem o seu desenho (src/world/decor.ts).
+ */
+export const PLACE_IDS = ['acidente'] as const;
+export type PlaceId = (typeof PLACE_IDS)[number];
 
 export type TileKind =
   | 'grass'
@@ -33,13 +42,15 @@ export type TileKind =
   | 'house'
   | 'building'
   | 'tree'
-  | 'institution';
+  | 'institution'
+  | 'place';
 
 export interface LegendEntry {
   kind: TileKind;
   /** Rua em frente à porta de uma instituição. */
   door?: boolean;
   institution?: InstitutionId;
+  place?: PlaceId;
 }
 
 export const LEGEND: Readonly<Record<string, LegendEntry>> = {
@@ -63,6 +74,7 @@ export const LEGEND: Readonly<Record<string, LegendEntry>> = {
   H: { kind: 'institution', institution: 'hospital' },
   N: { kind: 'institution', institution: 'abrigo-animais' },
   J: { kind: 'institution', institution: 'casa' },
+  X: { kind: 'place', place: 'acidente' },
 };
 
 // prettier-ignore
@@ -70,8 +82,8 @@ export const LAYOUT_TYPES: readonly string[] = [
 // 0         1         2
 // 012345678901234567890123456789
   't.t.tt.t..tt.t.t.tttttt.t.tt.t', //  0  parte alta | mata | morro
-  'th.hh.hh.th.hh.hhtttt.h.t.h.tt', //  1
-  '.#################tttt.h.t.h.t', //  2
+  'th.hh.hhXth.hh.hhtttt.h.t.h.tt', //  1  X = acidente da missão dos Bombeiros
+  '.#######*#########tttt.h.t.h.t', //  2
   '.#hAAAA.h#t.h.t.h#ttth.t.h.th.', //  3
   '.#tAAAA.t#DD.tNN.#ttt.h.th.t.h', //  4
   '.#hAAAAhh#DD.tNN.#tttt.h.t.h.t', //  5
@@ -135,4 +147,38 @@ export const LAYOUT_LEVELS: readonly string[] = [
   '111111111111111111111111111111', // 27
   '111111111111111111111111111111', // 28
   '111111111111111111111111111111', // 29
+];
+
+// RUAS — cada trecho reto de rua, com o id do nome dela (content/ruas.json).
+// `row` = rua leste–oeste naquela linha; `col` = rua norte–sul naquela coluna; de `from` até `to`.
+// Os números dos lugares saem da posição na rua: começam em 101/102 na ponta `from` e sobem de 20
+// em 20 a cada casa. Andando de `from` para `to`, o lado esquerdo é ímpar e o direito, par
+// (assim nenhum número dá 190, 192 ou 193, os telefones de emergência).
+// `signs`: onde o nome aparece escrito no chão (colunas, numa rua de linha; linhas, numa rua de coluna).
+// É o ponto preferido: o texto anda até 4 tiles para cada lado, para onde prédios e casas menos o tapam
+// na tela (src/world/streetSigns.ts), e é empurrado para dentro do trecho se passar da ponta.
+
+export interface StreetSegment {
+  /** Id do nome em content/ruas.json. */
+  readonly street: string;
+  readonly row?: number;
+  readonly col?: number;
+  readonly from: number;
+  readonly to: number;
+  readonly signs: readonly number[];
+}
+
+export const STREETS: readonly StreetSegment[] = [
+  { street: 'araucarias', row: 2, from: 1, to: 17, signs: [12] },
+  { street: 'quero-queros', row: 6, from: 1, to: 17, signs: [7, 12] },
+  { street: 'graxains', col: 1, from: 2, to: 18, signs: [5, 14] },
+  { street: 'bugios', col: 9, from: 2, to: 6, signs: [4] },
+  { street: 'figueiras', col: 17, from: 2, to: 27, signs: [5, 15, 24] },
+  { street: 'bem-te-vis', row: 9, from: 17, to: 28, signs: [24] },
+  { street: 'ipes', row: 12, from: 1, to: 28, signs: [7, 16, 22] },
+  { street: 'sabias', col: 14, from: 12, to: 18, signs: [15] },
+  { street: 'corticeiras', col: 23, from: 12, to: 16, signs: [14] },
+  { street: 'joao-de-barro', row: 16, from: 17, to: 28, signs: [26] },
+  { street: 'jerivas', row: 18, from: 1, to: 28, signs: [3, 11, 21] },
+  { street: 'capivaras', row: 27, from: 1, to: 28, signs: [6, 20] },
 ];

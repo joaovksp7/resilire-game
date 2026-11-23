@@ -5,6 +5,7 @@ import { type CityMap, type Tile, tileNoise } from './cityMap';
 function tileColor(map: CityMap, tile: Tile, out: Color): Color {
   switch (tile.kind) {
     case 'street':
+    case 'place': // o lugar do acidente fica no asfalto, na beira da rua
       return out.setHex(TERRAIN_COLORS.street);
     case 'plaza':
       return out.setHex(TERRAIN_COLORS.plaza);

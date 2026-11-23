@@ -1,12 +1,11 @@
 import {
+  Box3,
   BoxGeometry,
-  Color,
   ConeGeometry,
   CylinderGeometry,
   type BufferGeometry,
   Group,
   IcosahedronGeometry,
-  InstancedMesh,
   Matrix4,
   Mesh,
   MeshLambertMaterial,
@@ -15,6 +14,9 @@ import {
 } from 'three';
 import { PartBuilder } from './buildings';
 import { type CityMap, tileNoise } from './cityMap';
+import { FadeableInstances, type Fader } from './fade';
+import type { PlaceId } from './layout';
+import { createNumberPlate } from './streetSigns';
 
 const HOUSE_WALLS = [0xf5e6c8, 0xe8d5b7, 0xf2c6a0, 0xdce8f0, 0xf7f3e8, 0xe9c9c9, 0xcfe3c6];
 const HOUSE_ROOFS = [0xb5533c, 0x8d4e3a, 0xc9763c, 0x7a6a5a, 0xa4473a];
@@ -30,24 +32,42 @@ interface Placement {
   color: number;
 }
 
-/** Cria um InstancedMesh a partir de uma lista de posições (um desenho só para todas). */
-function instanced(geometry: BufferGeometry, items: Placement[], name: string): InstancedMesh {
-  const mesh = new InstancedMesh(geometry, new MeshLambertMaterial(), Math.max(1, items.length));
-  mesh.name = name;
-  mesh.count = items.length;
-  const m = new Matrix4();
+/** Os objetos repetidos de um tipo, com o par normal/apagado (um desenho só para cada lista). */
+function instanced(geometry: BufferGeometry, items: Placement[], name: string): FadeableInstances {
   const q = new Quaternion();
   const up = new Vector3(0, 1, 0);
-  const c = new Color();
-  items.forEach((it, i) => {
-    q.setFromAxisAngle(up, it.rotationY);
-    mesh.setMatrixAt(i, m.compose(it.position, q, it.scale));
-    mesh.setColorAt(i, c.setHex(it.color));
+  return new FadeableInstances(
+    geometry,
+    items.map((it) => ({
+      matrix: new Matrix4().compose(it.position, q.setFromAxisAngle(up, it.rotationY), it.scale),
+      color: it.color,
+    })),
+    name,
+  );
+}
+
+/**
+ * Duas peças do mesmo objeto (corpo e telhado, tronco e copa) apagam juntas.
+ * As duas listas têm o mesmo tamanho: o item i de uma é a outra metade do item i da outra.
+ */
+function addPairs(fader: Fader, a: FadeableInstances, b: FadeableInstances): Box3[] {
+  const boxes: Box3[] = [];
+  for (let i = 0; i < a.count; i++) {
+    const box = a.boxOf(i).union(b.boxOf(i, new Box3()));
+    boxes.push(box);
+    fader.add({
+      box,
+      setFaded: (faded) => {
+        a.setFaded(i, faded);
+        b.setFaded(i, faded);
+      },
+    });
+  }
+  fader.onCommit(() => {
+    a.commit();
+    b.commit();
   });
-  mesh.instanceMatrix.needsUpdate = true;
-  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  mesh.computeBoundingSphere();
-  return mesh;
+  return boxes;
 }
 
 function pick<T>(list: readonly T[], r: number): T {
@@ -66,8 +86,14 @@ function groundRange(map: CityMap, x: number, z: number, half: number): [number,
   return [Math.min(...hs), Math.max(...hs)];
 }
 
-/** Casas, prédios comuns, árvores e ponte. */
-export function createDecor(map: CityMap): Group {
+export interface Decor {
+  readonly group: Group;
+  /** Caixa de cada casa e prédio comum (sem as árvores): os nomes das ruas fogem delas. */
+  readonly obstacles: readonly Box3[];
+}
+
+/** Casas, prédios comuns, árvores e ponte. O que tapa a vista é registrado no `fader`. */
+export function createDecor(map: CityMap, fader: Fader): Decor {
   const group = new Group();
   group.name = 'decoracao';
 
@@ -136,17 +162,20 @@ export function createDecor(map: CityMap): Group {
   const trunk = new CylinderGeometry(0.1, 0.14, 1, 5).translate(0, 0.5, 0);
   const crown = new IcosahedronGeometry(1, 0);
 
-  group.add(
-    instanced(box, houseBodies, 'casas'),
-    instanced(roof, houseRoofs, 'telhados'),
-    instanced(box, blocks, 'predios'),
-    instanced(box, blockTops, 'predios-topo'),
-    instanced(trunk, trunks, 'troncos'),
-    instanced(crown, crowns, 'copas'),
-  );
+  const pairs: [FadeableInstances, FadeableInstances, boolean][] = [
+    [instanced(box, houseBodies, 'casas'), instanced(roof, houseRoofs, 'telhados'), true],
+    [instanced(box, blocks, 'predios'), instanced(box, blockTops, 'predios-topo'), true],
+    [instanced(trunk, trunks, 'troncos'), instanced(crown, crowns, 'copas'), false],
+  ];
+  const obstacles: Box3[] = [];
+  for (const [a, b, isObstacle] of pairs) {
+    const boxes = addPairs(fader, a, b);
+    if (isObstacle) obstacles.push(...boxes);
+    group.add(a.solid, a.faded, b.solid, b.faded);
+  }
 
   for (const bridge of createBridges(map)) group.add(bridge);
-  return group;
+  return { group, obstacles };
 }
 
 /** Árvores nos quatro cantos de fora da praça. */
@@ -203,4 +232,66 @@ function createBridges(map: CityMap): Mesh[] {
     meshes.push(mesh);
   }
   return meshes;
+}
+
+/** O desenho de um lugar (src/world/layout.ts, PLACE_IDS) e o ponto onde fica o marcador da missão. */
+export interface PlaceScene {
+  readonly group: Group;
+  readonly anchor: Vector3;
+}
+
+/**
+ * Os lugares que não são instituição. O do acidente: um carro com um poste caído por cima, e a
+ * placa com o número do lugar (o aluno lê para dizer o endereço na ligação). Sem fogo, sem fio e
+ * sem pessoa à vista: a cena fica calma. Começa escondido; quem mostra é o loop das missões.
+ */
+export function createPlaceScenes(map: CityMap): Map<PlaceId, PlaceScene> {
+  const scenes = new Map<PlaceId, PlaceScene>();
+  const material = new MeshLambertMaterial({ vertexColors: true });
+
+  for (const site of map.places.values()) {
+    const cx = map.colToX((site.minCol + site.maxCol + 1) / 2);
+    const cz = map.rowToZ((site.minRow + site.maxRow + 1) / 2);
+    const y = map.heightAt(cx, cz);
+    const group = new Group();
+    group.name = `lugar-${site.id}`;
+    group.visible = false;
+
+    // Carro de lado para a rua, um pouco mais perto dela.
+    const toStreet = { north: [0, -1], south: [0, 1], east: [1, 0], west: [-1, 0] }[site.doorSide];
+    const along = toStreet[0] === 0; // a rua corre ao longo de x
+    const carX = cx + toStreet[0] * 0.25;
+    const carZ = cz + toStreet[1] * 0.25;
+    const b = new PartBuilder();
+    const rotY = along ? 0 : Math.PI / 2;
+    b.box(1.6, 0.42, 0.82, 0, 0.16, 0, 0x3d7cc9);
+    b.box(0.85, 0.34, 0.74, -0.08, 0.58, 0, 0x9cc7ea);
+    for (const [wx, wz] of [
+      [-0.5, 0.42],
+      [0.5, 0.42],
+      [-0.5, -0.42],
+      [0.5, -0.42],
+    ]) {
+      b.add(new CylinderGeometry(0.17, 0.17, 0.12, 10), 0x2b2b2b, wx, 0.17, wz, Math.PI / 2);
+    }
+    // Poste de concreto deitado em cima do carro: a base no chão, a ponta passando por cima do teto.
+    b.add(new CylinderGeometry(0.08, 0.1, 2.6, 8), 0xb8b4ac, 0.25, 0.78, 0, 0, 0, 0.95);
+    b.box(0.7, 0.08, 0.08, -0.72, 1.42, 0, 0x8d8a83, 0.0);
+    const car = new Mesh(b.build(), material);
+    car.position.set(carX, y, carZ);
+    car.rotation.y = rotY;
+    group.add(car);
+
+    // Placa com o número do lugar, na beira da rua.
+    const address = map.addressOf(site);
+    if (address) {
+      const side = along ? [-0.8, 0] : [0, 0.8];
+      const px = cx + side[0] + toStreet[0] * 0.8;
+      const pz = cz + side[1] + toStreet[1] * 0.8;
+      group.add(createNumberPlate(address.number, px, map.heightAt(px, pz), pz));
+    }
+
+    scenes.set(site.id, { group, anchor: new Vector3(cx, y + 3.2, cz) });
+  }
+  return scenes;
 }

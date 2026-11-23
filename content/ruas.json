@@ -1,0 +1,14 @@
+[
+  { "id": "araucarias", "nome": "Rua das Araucárias" },
+  { "id": "quero-queros", "nome": "Rua dos Quero-queros" },
+  { "id": "graxains", "nome": "Rua dos Graxains" },
+  { "id": "bugios", "nome": "Rua dos Bugios" },
+  { "id": "figueiras", "nome": "Avenida das Figueiras" },
+  { "id": "bem-te-vis", "nome": "Rua dos Bem-te-vis" },
+  { "id": "ipes", "nome": "Avenida dos Ipês" },
+  { "id": "sabias", "nome": "Rua dos Sabiás" },
+  { "id": "corticeiras", "nome": "Rua das Corticeiras" },
+  { "id": "joao-de-barro", "nome": "Rua do João-de-barro" },
+  { "id": "jerivas", "nome": "Rua dos Jerivás" },
+  { "id": "capivaras", "nome": "Rua das Capivaras" }
+]

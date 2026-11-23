@@ -29,6 +29,7 @@ import { createCity } from './world/city';
 import { Climate, floodedDoorProblem } from './world/climate';
 import { MissionMarkers } from './world/markers';
 import { Rain } from './world/rain';
+import { missionAddressProblem } from './world/streetSigns';
 import { createScene } from './world/scene';
 
 function showWebGLError(): void {
@@ -53,13 +54,14 @@ function showContentError(message: string): void {
 
 function start(container: HTMLElement, hudRoot: HTMLElement, content: GameContent): void {
   const { scene, lights } = createScene();
-  const city = createCity(scene);
+  const city = createCity(scene, content.streets);
 
-  // Missão do eixo "Durante o evento" numa porta alagada deixaria o jogador sem caminho.
-  const floodProblem = floodedDoorProblem(city.map, content);
-  if (floodProblem) {
-    console.error(new ContentError(floodProblem));
-    showContentError(floodProblem);
+  // Missão do eixo "Durante o evento" numa porta alagada deixaria o jogador sem caminho; e a ligação
+  // do acidente precisa pedir o endereço que está nas placas da cidade.
+  const mapProblem = floodedDoorProblem(city.map, content) ?? missionAddressProblem(city.map, content);
+  if (mapProblem) {
+    console.error(new ContentError(mapProblem));
+    showContentError(mapProblem);
     return;
   }
 
@@ -117,6 +119,8 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
   const highlight = new ReachHighlight(city.map);
   const markers = new MissionMarkers();
   scene.add(dice.mesh, highlight.mesh, markers.object);
+  // Prédio, casa ou árvore na frente de uma casa destacada fica transparente enquanto ela aparece.
+  highlight.onChange((cells) => city.fadeOverCells(cells));
   const turn = new DiceTurn({
     map: city.map,
     pawns,
@@ -128,7 +132,7 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     // As portas das missões em andamento aparecem em amarelo entre as casas destacadas.
     isSpecial: (cell) =>
       manager.active.some(({ mission }) => {
-        const door = city.map.sites.get(mission.instituicao)?.door;
+        const door = city.map.siteFor(mission)?.door;
         return !!door && door.col === cell.col && door.row === cell.row;
       }),
   });
@@ -175,6 +179,8 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     turn,
     markers,
     markerAnchors: city.markerAnchors,
+    placeAnchors: city.placeAnchors,
+    placeScenes: city.placeScenes,
     climate,
     dialogue,
     activities: new Activities(hudRoot, content, () => sound.right()),
@@ -249,7 +255,21 @@ function start(container: HTMLElement, hudRoot: HTMLElement, content: GameConten
     gameRenderer.renderer.render(scene, iso.camera);
   });
   loop.start();
-  openTitle();
+
+  // Modo de teste (só no `npm run dev`, com ?teste na URL): pula a tela inicial e abre a lista de missões.
+  // No build, import.meta.env.DEV vira false e o devTools.ts nem entra no pacote.
+  if (import.meta.env.DEV) {
+    void import('./core/devTools').then(({ wantsTestMode, installTestMenu }) => {
+      if (!wantsTestMode()) {
+        openTitle();
+        return;
+      }
+      const openTestMenu = installTestMenu(hudRoot, { content, run: (mission) => void flow.testVisit(mission) });
+      openTestMenu();
+    });
+  } else {
+    openTitle();
+  }
 }
 
 document.title = GAME_NAME;

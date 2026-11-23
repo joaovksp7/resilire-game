@@ -25,16 +25,38 @@ const TEXT = {
   next: 'Continuar',
 } as const;
 
-/** Colunas da grade: 8 cabem em 360px com cada letra perto de 40px. */
+/** Colunas da grade no celular: 8 cabem em 360px com cada letra perto de 40px. */
 export const GRID_COLS = 8;
-/** A grade tem pelo menos 8 linhas; mais, se a maior palavra for maior que isso (ela fica na vertical). */
+/** A grade tem pelo menos 8 linhas; mais, se a maior palavra for maior que isso (no celular, ela fica na vertical). */
 const MIN_ROWS = 8;
+/** Tela larga: a atividade abre em duas colunas e a grade fica quadrada. */
+const WIDE_QUERY = '(min-width: 40rem)';
+
+/**
+ * Formato da grade. `narrow` (celular): 8 colunas, e cresce para baixo. `square` (tela larga): quadrada,
+ * com o lado do tamanho da maior palavra (no mínimo 8), como num caça-palavras comum.
+ */
+export type GridShape = 'narrow' | 'square';
+
+function gridSize(words: readonly string[], shape: GridShape): { rows: number; cols: number } {
+  const side = Math.max(MIN_ROWS, ...words.map((w) => w.length));
+  return shape === 'square' ? { rows: side, cols: side } : { rows: side, cols: GRID_COLS };
+}
+
+/** A tela é larga o bastante para a grade quadrada e as duas colunas? */
+function isWideScreen(): boolean {
+  try {
+    return typeof window.matchMedia === 'function' && window.matchMedia(WIDE_QUERY).matches;
+  } catch {
+    return false;
+  }
+}
 const ATTEMPTS = 200;
 const FILLER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-/** Como a palavra aparece na grade: maiúscula e sem acento (Ç vira C, Ã vira A). */
+/** Como a palavra aparece na grade: maiúscula, sem acento e sem hífen (Ç vira C, Ã vira A, BEM-ESTAR vira BEMESTAR). */
 export function gridWord(palavra: string): string {
-  return palavra.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
+  return palavra.replace(/-/g, '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
 }
 
 export interface WordPlace {
@@ -71,10 +93,13 @@ function occurrences(letters: readonly (readonly string[])[], word: string): num
  * se cruzar numa letra igual. O resto é sorteado, e a grade só vale se cada palavra aparecer uma vez só.
  * Devolve null se não der para montar (as palavras não cabem).
  */
-export function buildWordGrid(palavras: readonly string[], random: () => number = Math.random): WordGrid | null {
+export function buildWordGrid(
+  palavras: readonly string[],
+  shape: GridShape = 'narrow',
+  random: () => number = Math.random,
+): WordGrid | null {
   const words = palavras.map(gridWord);
-  const cols = GRID_COLS;
-  const rows = Math.max(MIN_ROWS, ...words.map((w) => w.length));
+  const { rows, cols } = gridSize(words, shape);
   // As maiores primeiro: são as mais difíceis de encaixar.
   const order = words.map((_, i) => i).sort((a, b) => words[b].length - words[a].length);
 
@@ -133,9 +158,14 @@ export class WordSearchMinigame {
   run(activity: CacaPalavrasActivity, theme: ActivityTheme): Promise<ActivityResult> {
     return new Promise((resolve) => {
       const { palavras } = activity;
-      // O conteúdo já foi conferido ao abrir o jogo (as palavras cabem), então a grade sai.
-      const grid = buildWordGrid(palavras.map((p) => p.palavra)) as WordGrid;
-      const panel = openActivityPanel(this.root, theme, activity.titulo, activity.instrucao);
+      // Tela larga: grade quadrada, lista ao lado e tudo cabendo sem rolar. Celular: 8 colunas, uma coisa embaixo da outra.
+      const wide = isWideScreen();
+      // O conteúdo já foi conferido ao abrir o jogo (as palavras cabem nos dois formatos), então a grade sai.
+      const grid = buildWordGrid(
+        palavras.map((p) => p.palavra),
+        wide ? 'square' : 'narrow',
+      ) as WordGrid;
+      const panel = openActivityPanel(this.root, theme, activity.titulo, activity.instrucao, { wide });
       const found = new Set<number>();
       let first: { row: number; col: number } | null = null;
       let focusRow = 0;
@@ -164,6 +194,7 @@ export class WordSearchMinigame {
       gridBox.setAttribute('role', 'group');
       gridBox.setAttribute('aria-label', TEXT.grid);
       gridBox.style.setProperty('--colunas', String(grid.cols));
+      gridBox.style.setProperty('--linhas', String(grid.rows));
       const letterButtons = grid.letters.map((line, row) =>
         line.map((letter, col) => {
           const b = button(letter, 'caca__letra');
@@ -205,7 +236,8 @@ export class WordSearchMinigame {
         letterButtons[row][col].tabIndex = 0;
       };
 
-      // Rodapé fixo: a dica ou a explicação da última palavra achada e, no fim, "Continuar".
+      // A dica ou a explicação da última palavra achada e, no fim, "Continuar". No celular ficam no
+      // rodapé fixo; na tela larga, na coluna da lista (sem rodapé, para a grade caber sem rolar).
       const feedback = el('div', 'dialogo__retorno caca__retorno');
       const feedbackTitle = textEl('p', 'dialogo__retorno-titulo', '');
       const feedbackText = textEl('p', 'dialogo__retorno-texto', '');
@@ -213,7 +245,6 @@ export class WordSearchMinigame {
       const action = button(TEXT.next, 'botao botao--primario');
       action.hidden = true;
       action.addEventListener('click', () => finish());
-      const footer = panel.footer(feedback, action, panel.notice);
 
       const showFeedback = (kind: 'dica' | 'certo' | 'errado', title: string, text: string): void => {
         feedback.className = `dialogo__retorno caca__retorno${kind === 'certo' ? ' dialogo__retorno--certo' : kind === 'errado' ? ' dialogo__retorno--errado' : ''}`;
@@ -309,7 +340,18 @@ export class WordSearchMinigame {
 
       render();
       showFeedback('dica', '', TEXT.pickFirst);
-      panel.show(panel.instruction, counter, listSection, gridBox, footer);
+      if (wide) {
+        // "Continuar" na linha do contador ("10 de 10"), para a coluna não passar da altura da grade.
+        const top = el('div', 'caca__topo');
+        top.append(counter, action);
+        const side = el('div', 'caca__lado');
+        side.append(panel.instruction, top, listSection, feedback, panel.notice);
+        const layout = el('div', 'caca__layout');
+        layout.append(side, gridBox);
+        panel.show(layout);
+      } else {
+        panel.show(panel.instruction, counter, listSection, gridBox, panel.footer(feedback, action, panel.notice));
+      }
       letterButtons[0][0].focus();
     });
   }

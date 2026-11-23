@@ -1,7 +1,16 @@
 import { Vector3 } from 'three';
 import { WORLD } from '../config';
 import { INSTITUTION_IDS, type InstitutionId } from './institutions';
-import { LAYOUT_LEVELS, LAYOUT_TYPES, LEGEND, type TileKind } from './layout';
+import {
+  LAYOUT_LEVELS,
+  LAYOUT_TYPES,
+  LEGEND,
+  PLACE_IDS,
+  type PlaceId,
+  STREETS,
+  type StreetSegment,
+  type TileKind,
+} from './layout';
 
 export type Side = 'north' | 'south' | 'east' | 'west';
 
@@ -14,10 +23,11 @@ export interface Tile {
   /** Rua, praça ou ponte. */
   readonly walkable: boolean;
   readonly institution?: InstitutionId;
+  readonly place?: PlaceId;
 }
 
-export interface InstitutionSite {
-  readonly id: InstitutionId;
+/** Um bloco do mapa com porta: o prédio de uma instituição ou um lugar (como o do acidente). */
+export interface Site {
   readonly minCol: number;
   readonly maxCol: number;
   readonly minRow: number;
@@ -26,6 +36,26 @@ export interface InstitutionSite {
   readonly door: { col: number; row: number };
   /** Lado do prédio onde fica a porta. */
   readonly doorSide: Side;
+}
+
+export interface InstitutionSite extends Site {
+  readonly id: InstitutionId;
+}
+
+export interface PlaceSite extends Site {
+  readonly id: PlaceId;
+}
+
+/** Para onde vai uma missão: a porta do `local`, se tiver, ou a da instituição. */
+export interface MissionTarget {
+  readonly instituicao: InstitutionId;
+  readonly local?: { readonly id: PlaceId };
+}
+
+/** Endereço de um lugar: o id do nome da rua (content/ruas.json) e o número. */
+export interface Address {
+  readonly street: string;
+  readonly number: number;
 }
 
 export interface Bridge {
@@ -63,18 +93,50 @@ export class CityMap {
   readonly tileSize = WORLD.tileSize;
   readonly tiles: readonly Tile[];
   readonly sites: ReadonlyMap<InstitutionId, InstitutionSite>;
+  /** Lugares que não são instituição (src/world/layout.ts, PLACE_IDS). */
+  readonly places: ReadonlyMap<PlaceId, PlaceSite>;
   readonly bridges: readonly Bridge[];
   /** Altura (mundo) de cada canto de tile: (cols + 1) × (rows + 1). */
   private readonly corners: Float32Array;
   private readonly bridgeByTile = new Map<Tile, Bridge>();
 
-  constructor(tiles: Tile[], cols: number, rows: number, sites: Map<InstitutionId, InstitutionSite>) {
+  constructor(
+    tiles: Tile[],
+    cols: number,
+    rows: number,
+    sites: Map<InstitutionId, InstitutionSite>,
+    places: Map<PlaceId, PlaceSite>,
+  ) {
     this.tiles = tiles;
     this.cols = cols;
     this.rows = rows;
     this.sites = sites;
+    this.places = places;
     this.corners = this.computeCorners();
     this.bridges = this.computeBridges();
+  }
+
+  /** O bloco aonde a missão leva: o `local`, se tiver, ou a instituição. */
+  siteFor(target: MissionTarget): Site | undefined {
+    return target.local ? this.places.get(target.local.id) : this.sites.get(target.instituicao);
+  }
+
+  /**
+   * Endereço de um bloco: a rua da porta e o número pela posição nela (regra em src/world/layout.ts).
+   * Porta ao norte ou ao sul do bloco = rua leste–oeste; a leste ou a oeste = rua norte–sul.
+   */
+  addressOf(site: Site): Address | null {
+    const { col, row } = site.door;
+    const alongRow = site.doorSide === 'north' || site.doorSide === 'south';
+    const segment = STREETS.find((s) =>
+      alongRow ? s.row === row && col >= s.from && col <= s.to : s.col === col && row >= s.from && row <= s.to,
+    );
+    if (!segment) return null;
+    const index = alongRow ? col - segment.from : row - segment.from;
+    // Andando de `from` para `to`: numa rua de linha (para leste) a esquerda é o norte;
+    // numa rua de coluna (para o sul) a esquerda é o leste. O bloco fica do lado oposto ao da porta.
+    const left = alongRow ? site.doorSide === 'south' : site.doorSide === 'west';
+    return { street: segment.street, number: 101 + index * 20 + (left ? 0 : 1) };
   }
 
   /** Metade do lado maior do mapa (unidades do mundo). */
@@ -263,6 +325,33 @@ function fail(message: string): never {
   throw new Error(`Mapa da cidade (src/world/layout.ts): ${message}`);
 }
 
+/** Confere os trechos de rua: cada um em cima de rua ou ponte, e toda rua dentro de algum trecho. */
+function checkStreets(tiles: readonly Tile[], cols: number, rows: number, streets: readonly StreetSegment[] = STREETS): void {
+  const named = new Set<Tile>();
+  for (const s of streets) {
+    const where = `o trecho da rua "${s.street}"`;
+    if ((s.row === undefined) === (s.col === undefined)) fail(`${where} precisa de "row" ou "col" (um dos dois).`);
+    if (!(s.from < s.to)) fail(`${where}: "from" precisa ser menor que "to".`);
+    for (let i = s.from; i <= s.to; i++) {
+      const col = s.row !== undefined ? i : (s.col as number);
+      const row = s.row !== undefined ? s.row : i;
+      const tile = col >= 0 && row >= 0 && col < cols && row < rows ? tiles[row * cols + col] : undefined;
+      if (!tile || (tile.kind !== 'street' && tile.kind !== 'bridge')) {
+        fail(`${where} passa pela linha ${row}, coluna ${col}, que não é rua nem ponte.`);
+      }
+      named.add(tile);
+    }
+    for (const at of s.signs) {
+      if (at < s.from || at > s.to) fail(`${where}: a placa em ${at} fica fora do trecho (${s.from} a ${s.to}).`);
+    }
+  }
+  for (const tile of tiles) {
+    if ((tile.kind === 'street' || tile.kind === 'bridge') && !named.has(tile)) {
+      fail(`a rua da linha ${tile.row}, coluna ${tile.col} não está em nenhum trecho de STREETS (fica sem nome).`);
+    }
+  }
+}
+
 /** Lê o layout, confere se está consistente e monta o CityMap. */
 export function parseCityMap(types: readonly string[] = LAYOUT_TYPES, levels: readonly string[] = LAYOUT_LEVELS): CityMap {
   const rows = types.length;
@@ -289,6 +378,7 @@ export function parseCityMap(types: readonly string[] = LAYOUT_TYPES, levels: re
         level,
         walkable: WALKABLE.has(entry.kind),
         institution: entry.institution,
+        place: entry.place,
       });
       if (entry.door) doors.push({ col, row });
     }
@@ -297,17 +387,16 @@ export function parseCityMap(types: readonly string[] = LAYOUT_TYPES, levels: re
   const at = (col: number, row: number): Tile | undefined =>
     col >= 0 && row >= 0 && col < cols && row < rows ? tiles[row * cols + col] : undefined;
 
-  // Blocos de instituição: precisam ser retângulos completos.
-  const sites = new Map<InstitutionId, InstitutionSite>();
-  for (const id of INSTITUTION_IDS) {
-    const own = tiles.filter((t) => t.institution === id);
-    if (own.length === 0) fail(`a instituição "${id}" não aparece no mapa.`);
+  // Blocos de instituição (e de lugar): precisam ser retângulos completos, com uma porta só.
+  // `name` vem com o artigo: "a instituição "escola"", "o lugar "acidente"".
+  const block = (own: readonly Tile[], name: string): Site => {
+    if (own.length === 0) fail(`${name} não aparece no mapa.`);
     const minCol = Math.min(...own.map((t) => t.col));
     const maxCol = Math.max(...own.map((t) => t.col));
     const minRow = Math.min(...own.map((t) => t.row));
     const maxRow = Math.max(...own.map((t) => t.row));
     if ((maxCol - minCol + 1) * (maxRow - minRow + 1) !== own.length) {
-      fail(`o bloco da instituição "${id}" precisa ser um retângulo.`);
+      fail(`o bloco de ${name} precisa ser um retângulo.`);
     }
 
     const touching = doors.filter(
@@ -316,21 +405,31 @@ export function parseCityMap(types: readonly string[] = LAYOUT_TYPES, levels: re
         (d.row >= minRow && d.row <= maxRow && (d.col === minCol - 1 || d.col === maxCol + 1)),
     );
     if (touching.length !== 1) {
-      fail(`a instituição "${id}" precisa de exatamente um "*" encostado (encontrei ${touching.length}).`);
+      fail(`${name} precisa de exatamente um "*" encostado (encontrei ${touching.length}).`);
     }
     const door = touching[0];
     const doorSide: Side =
       door.row > maxRow ? 'south' : door.row < minRow ? 'north' : door.col > maxCol ? 'east' : 'west';
-    sites.set(id, { id, minCol, maxCol, minRow, maxRow, door, doorSide });
+    return { minCol, maxCol, minRow, maxRow, door, doorSide };
+  };
+
+  const sites = new Map<InstitutionId, InstitutionSite>();
+  for (const id of INSTITUTION_IDS) {
+    sites.set(id, { id, ...block(tiles.filter((t) => t.institution === id), `a instituição "${id}"`) });
+  }
+  const places = new Map<PlaceId, PlaceSite>();
+  for (const id of PLACE_IDS) {
+    places.set(id, { id, ...block(tiles.filter((t) => t.place === id), `o lugar "${id}"`) });
   }
 
-  // Toda porta precisa pertencer a alguma instituição.
+  // Toda porta precisa pertencer a alguma instituição ou lugar.
   for (const d of doors) {
     const neighbors = [at(d.col + 1, d.row), at(d.col - 1, d.row), at(d.col, d.row + 1), at(d.col, d.row - 1)];
-    if (!neighbors.some((t) => t?.institution)) {
-      fail(`o "*" da linha ${d.row}, coluna ${d.col} não encosta em nenhuma instituição.`);
+    if (!neighbors.some((t) => t?.institution || t?.place)) {
+      fail(`o "*" da linha ${d.row}, coluna ${d.col} não encosta em nenhuma instituição nem lugar.`);
     }
   }
 
-  return new CityMap(tiles, cols, rows, sites);
+  checkStreets(tiles, cols, rows);
+  return new CityMap(tiles, cols, rows, sites, places);
 }

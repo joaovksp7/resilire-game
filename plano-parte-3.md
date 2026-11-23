@@ -58,7 +58,7 @@ Eixos como na recomendação da decisão 1, com o eixo novo "Depois":
 | 6 | Durante | Bombeiros (`bombeiros`) | Ligação para o 193 | Escolher o número e responder ao atendente, como numa conversa de celular |
 | 7 | Durante | Comunicação (`radio`) | Confiável ou boato? | As mensagens chegam no celular, uma por vez: confiar ou conferir antes |
 | 8 | Depois | Posto de Saúde (`ubs`) | Jogo da memória | Formar pares de situação e cuidado |
-| 9 | Depois | Abrigo de animais (id novo) | Pergunta | A pergunta de múltipla escolha de hoje |
+| 9 | Depois | Abrigo de animais (id novo) | Caça-palavras | Achar as 10 palavras dos cuidados com os animais na grade |
 | 10 | Depois | Hospital (id novo) | Caça-palavras | Achar as palavras de primeiros socorros na grade |
 
 - Ficam 1 parada no Alerta, 3 na Preparação, 3 em Durante e 3 em Depois. Com 3 eixos (decisão 1, opção b), as paradas 5 a 10 ficam todas em "Durante".
@@ -77,10 +77,13 @@ Eixos como na recomendação da decisão 1, com o eixo novo "Depois":
 - **Ligação para o 193 (`chamada`):** uma tela de celular. Primeiro o aluno escolhe para qual número ligar (190, 192 ou 193). Depois o atendente faz perguntas sobre o poste que caiu em cima do carro, e o aluno escolhe as respostas, como numa conversa. Usa a mesma lógica da `historia`, com cara de conversa.
 - **Confiável ou boato? (`mensagens`):** as mensagens aparecem uma por vez, como num celular, com quem mandou. O aluno escolhe "Pode confiar" ou "Conferir antes de repassar" e vê a explicação.
 - **Jogo da memória (`memoria`):** de 4 a 6 pares de situação e cuidado, com cartas que são botões. O texto da carta virada é anunciado ao leitor de tela.
-- **Pergunta (Abrigo de animais):** a pergunta de múltipla escolha que já existe, no `questions.json`. Não é uma atividade nova: a missão usa `pergunta`.
+- **Caça-palavras do Abrigo de animais (`caca-palavras`):** o mesmo tipo do Hospital, com as 10 palavras do caça-palavras da cena 8 ("Missão proteção animal"): ABRIGO, ANIMAIS, ALIMENTOS, CUIDADOS, ÁGUA, PROTEÇÃO, VETERINÁRIO, SEGURANÇA, RESGATE e BEM-ESTAR. Mudança pedida depois da Fase 21: antes, esta parada usava a pergunta de múltipla escolha `q11-animal-perdido`, que continua no `questions.json` sem uso.
+  - A grade do roteiro (15×15, com palavras de trás para frente e na diagonal) não é copiada: o jogo monta a grade sozinho, como no Hospital. Com 10 palavras, a grade fica com 8×11 letras no celular e 11×11 na tela larga.
+  - O caça-palavras passa a aceitar até 10 palavras, e o hífen: a lista mostra BEM-ESTAR, e a grade usa BEMESTAR.
 - **Caça-palavras (`caca-palavras`):** uma grade de letras. O aluno toca na primeira e depois na última letra de uma palavra. A lista de palavras fica à vista e vai sendo riscada, e cada palavra achada mostra a sua explicação.
   - Palavras só na horizontal e na vertical, sem diagonal e sem escrita de trás para frente.
   - IMOBILIZAÇÃO tem 12 letras e fica na vertical. Assim a grade cabe em 8 colunas a 360px, com cada letra perto de 40px, um tamanho bom para tocar.
+  - Na tela larga (a partir de 640px), a grade fica quadrada (lado do tamanho da maior palavra) e a lista vai para o lado, para tudo caber sem rolar. Mudança pedida depois da Fase 21: a grade de 8 colunas ficava comprida demais no computador.
   - Teclado: as setas andam pela grade e `Enter` ou `Espaço` marca a letra. Cada letra é um botão com rótulo ("linha 3, coluna 5, letra P").
 
 ### 3.2 Regras para todas as atividades
@@ -257,7 +260,7 @@ Nas fases 17 a 20, uma atividade só fica pronta quando funciona só com teclado
 4. **Carta do local:** abrir a visita antes do diálogo? **Recomendado: sim.** A outra opção é mostrar a carta junto com o pin.
 5. **Caça-palavras:** **recomendado** usar letras sem acento na grade (Ç vira C, Ã vira A), com a palavra escrita certa, com acento, na lista.
 6. **Acerto de primeira na memória e no caça-palavras:** **recomendado** contar sempre como acerto de primeira, porque virar a carta errada ou tocar na letra errada faz parte do jogo e não tem uma resposta errada a explicar.
-7. **Atividades:** confirmar a atividade de cada parada da seção 3, inclusive o Abrigo de animais com a pergunta de hoje.
+7. **Atividades:** confirmar a atividade de cada parada da seção 3. O Abrigo de animais começou com a pergunta de hoje e depois passou para o caça-palavras da cena 8 (seção 3.1).
 
 ## 8. Critérios de aceite
 
@@ -286,4 +289,3 @@ Nas fases 17 a 20, uma atividade só fica pronta quando funciona só com teclado
 - Todo o conteúdo continua sendo rascunho e precisa da validação da Defesa Civil antes de publicar. O de primeiros socorros (Hospital) e o de saúde (Posto de Saúde) precisam também de revisão da área da saúde
 - O conteúdo da seção 4.3 precisa ser escrito pela equipe
 - Os nomes que aparecem no jogo (Loja ou Mercado, Posto de Saúde ou UBS, Comunicação ou Rádio comunitária, Hospital, Abrigo de animais) ficam no `institutions.json` e são escolha da equipe
-- Fora deste plano: o aviso no topo do `prompt-jogo-desastres-climaticos.md` ainda diz que a Parte 2 tem "5 missões" e "fases 9 a 13", e o link "Game design completo:" do `README.md` está vazio

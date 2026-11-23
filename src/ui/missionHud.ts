@@ -1,4 +1,4 @@
-import type { GameContent, Mission } from '../missions/content';
+import { destinationOf, type GameContent, type Mission } from '../missions/content';
 import type { MissionManager } from '../missions/missionManager';
 import type { Team } from '../player/team';
 import { INSTITUTION_STYLES } from '../world/institutions';
@@ -102,11 +102,11 @@ export class MissionHud {
 
   /** Linha do destino: selo da instituição e o texto. */
   private destinationLine(mission: Mission, label: (name: string) => string): HTMLElement {
-    const inst = this.content.institutions.get(mission.instituicao);
+    const place = destinationOf(this.content, mission);
     const style = INSTITUTION_STYLES[mission.instituicao];
     const dest = document.createElement('p');
     dest.className = 'hud-missao__destino';
-    dest.append(badge(style.icon, style.color, 'selo selo--pequeno'), document.createTextNode(label(inst?.nome ?? '')));
+    dest.append(badge(style.icon, style.color, 'selo selo--pequeno'), document.createTextNode(label(place?.nome ?? '')));
     return dest;
   }
 
@@ -174,7 +174,7 @@ export class MissionHud {
     list.className = 'painel__lista';
     for (const [index, player] of team.entries()) {
       const mission = manager.missionOf(index);
-      const place = mission ? (content.institutions.get(mission.instituicao)?.nome ?? '') : '';
+      const place = mission ? (destinationOf(content, mission)?.nome ?? '') : '';
       list.append(textEl('li', '', mission ? TEXT.activeItem(player.name, mission.titulo, place) : TEXT.helpingItem(player.name)));
     }
     const section = document.createElement('section');

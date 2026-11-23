@@ -61,14 +61,14 @@
   {
     "id": "d06-ligacao-193",
     "falas": [
-      "E aí! Eu sou o Paulo, bombeiro.",
-      "Com o temporal, um poste caiu em cima de um carro, e tem uma pessoa presa lá dentro.",
+      "Chegamos! Eu sou o Paulo, bombeiro. Agora a nossa equipe cuida do resgate.",
+      "Você fez certo: ligou para o 193 e disse o endereço, com o nome da rua e o número. Assim a equipe achou o lugar.",
       "Numa situação assim, nunca tente resolver sozinho. Peça ajuda: o telefone dos Bombeiros é 193.",
       "Na ligação, fale com calma e responda ao que o atendente perguntar.",
       "Guarde também os outros números de emergência: 190 é a Polícia e 192 é o SAMU.",
       "E lembre: rua alagada não se atravessa, nem a pé, nem de carro. A água pode estar mais funda e mais forte do que parece."
     ],
-    "todoValidar": "O que o atendente do 193 pergunta, o que responder e o que fazer (e não fazer) perto de poste e fio caídos são da equipe (plano-parte-3, seção 4.3). Confirmar a explicação do porquê da rua alagada."
+    "todoValidar": "O que o atendente do 193 pergunta, o que responder e o que fazer (e não fazer) perto de poste e fio caídos são da equipe (plano-parte-3, seção 4.3). Confirmar a explicação do porquê da rua alagada. Este diálogo vem depois da ligação: o Paulo chega com a equipe ao lugar do acidente."
   },
   {
     "id": "d07-confiavel",

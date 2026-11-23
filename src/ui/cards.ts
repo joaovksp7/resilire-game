@@ -170,6 +170,90 @@ export function showCard(root: HTMLElement, opts: CardOptions): Promise<void> {
   });
 }
 
+export interface BannerOptions {
+  /** Linha pequena acima do título (o nome do local). */
+  kicker: string;
+  title: string;
+  /** Endereço da imagem e o texto dela para leitor de tela. */
+  url: string;
+  alt: string;
+  color?: number;
+  /** Texto dos botões: ampliar, ver inteira e continuar. */
+  zoomIn: string;
+  zoomOut: string;
+  button: string;
+}
+
+/**
+ * Tela do banner de uma missão: a imagem inteira e um botão que amplia (tamanho real, com rolagem
+ * dentro da moldura, pelo toque ou pelas setas). Se a imagem não carregar, mostra o texto dela.
+ * Resolve quando o botão Continuar é apertado.
+ */
+export function showBanner(root: HTMLElement, opts: BannerOptions): Promise<void> {
+  return new Promise((resolve) => {
+    const card = document.createElement('div');
+    card.className = 'cartao cartao--banner';
+    if (opts.color !== undefined) card.style.setProperty('--cor-inst', cssColor(opts.color));
+
+    const titleId = uid('banner-titulo');
+    const title = textEl('h2', 'cartao__titulo', opts.title);
+    title.id = titleId;
+
+    const frame = document.createElement('div');
+    frame.className = 'banner__moldura';
+    const image = document.createElement('img');
+    image.className = 'banner__imagem';
+    image.src = opts.url;
+    image.alt = opts.alt;
+    image.decoding = 'async';
+    frame.append(image);
+
+    const zoom = uiButton(opts.zoomIn, 'botao botao--secundario');
+    zoom.setAttribute('aria-pressed', 'false');
+    const next = uiButton(opts.button, 'botao botao--primario');
+    next.dataset.autofocus = '';
+    const actions = document.createElement('div');
+    actions.className = 'cartao__acoes';
+    actions.append(zoom, next);
+
+    card.append(textEl('p', 'cartao__kicker', opts.kicker), title, frame, actions);
+
+    // Ampliada, a moldura rola e entra no Tab, para rolar pelas setas do teclado.
+    const setZoom = (on: boolean): void => {
+      frame.classList.toggle('banner__moldura--ampliada', on);
+      zoom.textContent = on ? opts.zoomOut : opts.zoomIn;
+      zoom.setAttribute('aria-pressed', String(on));
+      if (on) {
+        frame.tabIndex = 0;
+        frame.setAttribute('aria-label', opts.title);
+      } else {
+        frame.removeAttribute('tabindex');
+        frame.removeAttribute('aria-label');
+        frame.scrollTo(0, 0);
+      }
+    };
+    zoom.addEventListener('click', () => setZoom(!frame.classList.contains('banner__moldura--ampliada')));
+    // Tocar na imagem também amplia (o botão continua sendo o caminho pelo teclado).
+    frame.addEventListener('click', () => {
+      if (!zoom.hidden && !frame.classList.contains('banner__moldura--ampliada')) setZoom(true);
+    });
+
+    // Sem a imagem (rede caiu), o texto dela fica no lugar e o jogo segue.
+    image.addEventListener('error', () => {
+      setZoom(false);
+      frame.replaceChildren(textEl('p', 'cartao__texto banner__texto', opts.alt));
+      frame.classList.add('banner__moldura--texto');
+      zoom.hidden = true;
+    });
+
+    const modal = openModal(root, card, { labelledBy: titleId, variant: 'tela' });
+    next.addEventListener('click', () => {
+      modal.close();
+      resolve();
+    });
+  });
+}
+
 /** Botão comum da interface (sempre type="button"). */
 export function uiButton(label: string, className: string): HTMLButtonElement {
   const b = textEl('button', className, label);

@@ -1,4 +1,5 @@
 import {
+  Box3,
   BoxGeometry,
   BufferAttribute,
   type BufferGeometry,
@@ -245,7 +246,8 @@ function buildModel(
   return { geometry: b.build(), top };
 }
 
-const SIGN_ROTATION = new Euler(-MathUtils.degToRad(CAMERA.pitchDeg), MathUtils.degToRad(CAMERA.yawDeg), 0, 'YXZ');
+/** Rotação das placas (ícone das instituições e nome das ruas): de frente para a câmera. */
+export const SIGN_ROTATION = new Euler(-MathUtils.degToRad(CAMERA.pitchDeg), MathUtils.degToRad(CAMERA.yawDeg), 0, 'YXZ');
 
 function createSite(map: CityMap, site: InstitutionSite, material: MeshLambertMaterial): Group {
   const style = INSTITUTION_STYLES[site.id];
@@ -284,6 +286,8 @@ function createSite(map: CityMap, site: InstitutionSite, material: MeshLambertMa
   // Usado pelo clique: tocar no prédio ou na placa leva o personagem até a porta.
   group.userData.institution = site.id;
   group.add(building);
+  // Os nomes das ruas fogem do prédio (src/world/streetSigns.ts).
+  group.userData.obstacle = new Box3().setFromObject(building);
 
   // Placa com o ícone, sempre virada para a câmera.
   const signSize = cols * rows === 1 ? 1.2 : 1.5;
@@ -308,6 +312,8 @@ export interface InstitutionBuildings {
   readonly group: Group;
   /** Ponto acima da placa de cada instituição, para o marcador da missão. */
   readonly markerAnchors: ReadonlyMap<InstitutionId, Vector3>;
+  /** Caixa de cada prédio (sem a placa): os nomes das ruas fogem delas. */
+  readonly obstacles: readonly Box3[];
 }
 
 /** Prédios das instituições (e da casa do jogador), com placa de ícone no topo. */
@@ -316,10 +322,12 @@ export function createInstitutionBuildings(map: CityMap): InstitutionBuildings {
   group.name = 'instituicoes';
   const material = new MeshLambertMaterial({ vertexColors: true });
   const markerAnchors = new Map<InstitutionId, Vector3>();
+  const obstacles: Box3[] = [];
   for (const site of map.sites.values()) {
     const siteGroup = createSite(map, site, material);
     markerAnchors.set(site.id, siteGroup.userData.markerAnchor as Vector3);
+    obstacles.push(siteGroup.userData.obstacle as Box3);
     group.add(siteGroup);
   }
-  return { group, markerAnchors };
+  return { group, markerAnchors, obstacles };
 }

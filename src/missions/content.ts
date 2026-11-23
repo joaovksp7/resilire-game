@@ -9,9 +9,11 @@ import institutionsJson from '../../content/institutions.json';
 import kitJson from '../../content/kit-items.json';
 import missionsJson from '../../content/missions.json';
 import questionsJson from '../../content/questions.json';
+import streetsJson from '../../content/ruas.json';
 import { SPOT_IDS, type SpotId } from '../minigames/spotScenes';
 import { buildWordGrid, gridWord } from '../minigames/wordSearchMinigame';
 import { INSTITUTION_IDS, type InstitutionId } from '../world/institutions';
+import { PLACE_IDS, type PlaceId, STREETS } from '../world/layout';
 
 /** Eixos em ordem fixa. */
 export const EIXO_IDS = ['alerta', 'preparacao', 'durante', 'depois'] as const;
@@ -64,7 +66,29 @@ interface RawMission {
   pergunta?: string;
   atividade?: string;
   aprendizado: string;
+  /** Imagem que abre a visita, antes da carta do local (opcional). */
+  banner?: RawBanner;
+  /** Parada fora da instituição (opcional), como o lugar do acidente. */
+  local?: RawLocal;
   todoValidar?: string;
+}
+/** O lugar de uma missão que não acontece na instituição: o id no mapa e o nome que aparece no jogo. */
+interface RawLocal {
+  id: string;
+  nome: string;
+  nomeComPreposicao: string;
+}
+/** O nome de uma rua do mapa (content/ruas.json). */
+interface RawStreet {
+  id: string;
+  nome: string;
+  todoValidar?: string;
+}
+/** O banner de uma missão: a imagem em content/banners/, o título e o texto para leitor de tela. */
+interface RawBanner {
+  arquivo: string;
+  titulo: string;
+  descricao: string;
 }
 /** Uma atividade como está no arquivo: os campos além de `id` e `tipo` dependem do tipo. */
 interface RawActivity {
@@ -143,6 +167,7 @@ const rawQuestions: RawQuestion[] = questionsJson;
 const rawActivities: RawActivity[] = activitiesJson;
 const rawKit: RawKit = kitJson;
 const rawCredits: RawCreditSection[] = creditsJson;
+const rawStreets: RawStreet[] = streetsJson;
 
 export interface InstitutionContent extends RawInstitution {
   id: InstitutionId;
@@ -150,10 +175,29 @@ export interface InstitutionContent extends RawInstitution {
 export interface Eixo extends RawEixo {
   id: EixoId;
 }
+export interface MissionBanner extends RawBanner {
+  /** Endereço da imagem no build (com o hash do Vite, funciona em subpasta e iframe). */
+  url: string;
+}
+export interface MissionLocal extends RawLocal {
+  id: PlaceId;
+}
 export interface Mission extends RawMission {
   eixo: EixoId;
   instituicao: InstitutionId;
+  banner?: MissionBanner;
+  local?: MissionLocal;
 }
+
+/**
+ * As imagens de content/banners/, pelo nome do arquivo. Só o endereço entra no pacote:
+ * a imagem carrega quando a visita abre.
+ */
+const BANNER_URLS: ReadonlyMap<string, string> = new Map(
+  Object.entries(
+    import.meta.glob<string>('../../content/banners/*.{jpg,jpeg,png,webp}', { eager: true, query: '?url', import: 'default' }),
+  ).map(([path, url]) => [path.slice(path.lastIndexOf('/') + 1), url]),
+);
 export type Dialogue = RawDialogue;
 export interface Question extends RawQuestion {
   tipo: QuestionType;
@@ -304,6 +348,13 @@ export interface GameContent {
   readonly activities: ReadonlyMap<string, Activity>;
   readonly kit: KitContent;
   readonly credits: readonly CreditSection[];
+  /** Nome de cada rua do mapa, pelo id (content/ruas.json). */
+  readonly streets: ReadonlyMap<string, string>;
+}
+
+/** Para onde a missão leva o jogador: o `local`, se tiver, ou a instituição (nome e nome com preposição). */
+export function destinationOf(content: GameContent, mission: Mission): { nome: string; nomeComPreposicao: string } | undefined {
+  return mission.local ?? content.institutions.get(mission.instituicao);
 }
 
 /** Erro de conteúdo, com mensagem em português dizendo o arquivo e o item a corrigir. */
@@ -347,6 +398,9 @@ function checkItems(where: string, field: string, items: readonly { texto: strin
 /** Quantos pares o jogo da memória pode ter. */
 const MIN_PAIRS = 4;
 const MAX_PAIRS = 6;
+/** Quantas palavras o caça-palavras pode ter (10 ainda cabem na grade de 8 colunas). */
+const MIN_WORDS = 3;
+const MAX_WORDS = 10;
 /** Tamanho das palavras do caça-palavras (12 cabe na vertical da grade). */
 const MIN_LETTERS = 3;
 const MAX_LETTERS = 12;
@@ -466,15 +520,15 @@ function checkActivity(a: RawActivity): Activity {
 
   if (tipo === 'caca-palavras') {
     const palavras = a.palavras;
-    if (!Array.isArray(palavras) || palavras.length < MIN_ITEMS || palavras.length > MAX_ITEMS) {
-      fail('atividades.json', `${where}: "palavras" precisa ter de ${MIN_ITEMS} a ${MAX_ITEMS} palavras.`);
+    if (!Array.isArray(palavras) || palavras.length < MIN_WORDS || palavras.length > MAX_WORDS) {
+      fail('atividades.json', `${where}: "palavras" precisa ter de ${MIN_WORDS} a ${MAX_WORDS} palavras.`);
     }
     palavras.forEach((p, i) => {
       requireText('atividades.json', where, `palavras[${i}].palavra`, p.palavra);
       requireText('atividades.json', where, `palavras[${i}].explicacao`, p.explicacao);
       const letters = gridWord(p.palavra);
       if (!/^[A-Z]+$/.test(letters)) {
-        fail('atividades.json', `${where}: a palavra "${p.palavra}" só pode ter letras (sem espaço, hífen ou número).`);
+        fail('atividades.json', `${where}: a palavra "${p.palavra}" só pode ter letras e hífen (sem espaço ou número).`);
       }
       if (letters.length < MIN_LETTERS || letters.length > MAX_LETTERS) {
         fail('atividades.json', `${where}: a palavra "${p.palavra}" precisa ter de ${MIN_LETTERS} a ${MAX_LETTERS} letras.`);
@@ -492,7 +546,9 @@ function checkActivity(a: RawActivity): Activity {
         );
       }
     });
-    if (buildWordGrid(palavras.map((p) => p.palavra)) === null) {
+    // A grade do celular (8 colunas) e a da tela larga (quadrada) precisam sair.
+    const names = palavras.map((p) => p.palavra);
+    if (buildWordGrid(names, 'narrow') === null || buildWordGrid(names, 'square') === null) {
       fail('atividades.json', `${where}: as palavras não cabem na grade. Use menos palavras ou palavras menores.`);
     }
     return { id: a.id, tipo, titulo, instrucao, palavras };
@@ -536,6 +592,7 @@ export function loadContent(
   kitFile: RawKit = rawKit,
   credits: readonly RawCreditSection[] = rawCredits,
   activities: readonly RawActivity[] = rawActivities,
+  streets: readonly RawStreet[] = rawStreets,
 ): GameContent {
   // Instituições: todas as do mapa precisam ter nome, personagem e carta.
   const institutionMap = indexById('institutions.json', institutions, 'a instituição');
@@ -625,6 +682,17 @@ export function loadContent(
     for (const [j, linha] of s.linhas.entries()) requireText('creditos.json', `${where} ("${s.titulo}")`, `linhas[${j}]`, linha);
   }
 
+  // Ruas: cada trecho do mapa (src/world/layout.ts, STREETS) com um nome, e nenhum nome sobrando.
+  const streetMap = indexById('ruas.json', streets, 'a rua');
+  for (const st of streets) requireText('ruas.json', `rua "${st.id}"`, 'nome', st.nome);
+  const usedStreets = new Set(STREETS.map((seg) => seg.street));
+  for (const id of usedStreets) {
+    if (!streetMap.has(id)) fail('ruas.json', `falta a rua "${id}", que existe no mapa (src/world/layout.ts).`);
+  }
+  for (const st of streets) {
+    if (!usedStreets.has(st.id)) fail('ruas.json', `a rua "${st.id}" não existe no mapa (src/world/layout.ts).`);
+  }
+
   // Missões: ligações por id e eixos em ordem.
   const missions = missionsFile.missoes;
   if (missions.length === 0) fail('missions.json', 'não há nenhuma missão.');
@@ -654,16 +722,36 @@ export function loadContent(
     if (m.atividade !== undefined && !activityMap.has(m.atividade)) {
       fail('missions.json', `${where}: a atividade "${m.atividade}" não existe em atividades.json.`);
     }
+    if (m.banner !== undefined) {
+      for (const field of ['arquivo', 'titulo', 'descricao'] as const) requireText('missions.json', where, `banner.${field}`, m.banner[field]);
+      if (!BANNER_URLS.has(m.banner.arquivo)) {
+        fail('missions.json', `${where}: a imagem "${m.banner.arquivo}" do banner não está em content/banners/.`);
+      }
+    }
+    if (m.local !== undefined) {
+      for (const field of ['id', 'nome', 'nomeComPreposicao'] as const) requireText('missions.json', where, `local.${field}`, m.local[field]);
+      if (!(PLACE_IDS as readonly string[]).includes(m.local.id)) {
+        fail('missions.json', `${where}: o lugar "${m.local.id}" não existe no mapa. Lugares que existem: ${PLACE_IDS.join(', ')}.`);
+      }
+    }
   }
+
+  // O banner ganha o endereço da imagem no build.
+  const gameMissions: Mission[] = missions.map((m) => {
+    const mission = m as Mission;
+    const url = m.banner && BANNER_URLS.get(m.banner.arquivo);
+    return m.banner && url ? { ...mission, banner: { ...m.banner, url } } : mission;
+  });
 
   return {
     institutions: institutionMap as Map<InstitutionId, InstitutionContent>,
     eixos: eixos as readonly Eixo[],
-    missions: missions as readonly Mission[],
+    missions: gameMissions,
     dialogues: dialogueMap,
     questions: questionMap as Map<string, Question>,
     activities: activityMap,
     kit: { titulo: kitFile.mochila.titulo, instrucao: kitFile.mochila.instrucao, itens: kitItems, capacidade },
     credits,
+    streets: new Map(streets.map((st) => [st.id, st.nome])),
   };
 }

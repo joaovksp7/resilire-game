@@ -257,15 +257,23 @@
         "correta": 0
       },
       {
-        "situacao": "Onde está acontecendo?",
+        "situacao": "Qual é o endereço?",
         "alternativas": [
           {
-            "texto": "Digo o nome da rua onde está o carro.",
-            "explicacao": "Isso! Sabendo onde é, a equipe consegue chegar."
+            "texto": "É na Rua das Araucárias, 241.",
+            "explicacao": "Isso! Com o nome da rua e o número, a equipe sabe aonde ir."
           },
           {
-            "texto": "Digo só que é aqui perto.",
-            "explicacao": "“Aqui perto” não diz onde é. Diga o nome da rua, para a equipe achar o lugar."
+            "texto": "É na Rua dos Quero-queros, 241.",
+            "explicacao": "Confira a placa da rua: o carro está na Rua das Araucárias, número 241. Com o endereço certo, a equipe acha o lugar."
+          },
+          {
+            "texto": "É na Rua das Araucárias, 214.",
+            "explicacao": "Confira o número na placa do lugar: é o 241. Com o endereço certo, a equipe acha o lugar."
+          },
+          {
+            "texto": "É aqui perto.",
+            "explicacao": "“Aqui perto” não diz onde é. Diga o nome da rua e o número, que estão nas placas, para a equipe achar o lugar."
           }
         ],
         "correta": 0
@@ -285,7 +293,7 @@
         "correta": 0
       }
     ],
-    "todoValidar": "Rascunho genérico a partir da cena 4 do roteiro e do diálogo d06. O que o atendente do 193 pergunta, o que responder e o que fazer (e não fazer) perto de poste e fio caídos são da equipe (plano-parte-3, seção 4.3). De propósito, nada aqui fala de distância do poste ou do fio."
+    "todoValidar": "Rascunho genérico a partir da cena 4 do roteiro e do diálogo d06. O que o atendente do 193 pergunta, o que responder e o que fazer (e não fazer) perto de poste e fio caídos são da equipe (plano-parte-3, seção 4.3). De propósito, nada aqui fala de distância do poste ou do fio. O endereço (Rua das Araucárias, 241) é o que aparece nas placas do lugar do acidente: se o nome da rua mudar em ruas.json, mudar aqui também (o jogo avisa ao abrir)."
   },
   {
     "id": "a07-confiavel-ou-boato",
@@ -369,6 +377,55 @@
       }
     ],
     "todoValidar": "Rascunho a partir do diálogo d08 e da cena 7 do roteiro. Precisa de revisão da área da saúde. Confirmar se há orientação específica sobre vacinas em período de enchente (pendente no d08)."
+  },
+  {
+    "id": "a09-caca-palavras-animais",
+    "tipo": "caca-palavras",
+    "titulo": "Caça-palavras: proteção animal",
+    "instrucao": "Ache na grade 10 palavras sobre os cuidados com os animais. Toque na primeira e na última letra de cada palavra.",
+    "palavras": [
+      {
+        "palavra": "ABRIGO",
+        "explicacao": "O abrigo de animais acolhe os animais perdidos e resgatados depois da enchente."
+      },
+      {
+        "palavra": "ANIMAIS",
+        "explicacao": "Depois de uma enchente, muitos animais se perdem das famílias e precisam de ajuda."
+      },
+      {
+        "palavra": "ALIMENTOS",
+        "explicacao": "No abrigo, os voluntários garantem alimento para os animais resgatados."
+      },
+      {
+        "palavra": "CUIDADOS",
+        "explicacao": "Os animais que chegam ao abrigo recebem cuidados e tratamento dos voluntários."
+      },
+      {
+        "palavra": "ÁGUA",
+        "explicacao": "Assim como as pessoas, os animais precisam de água limpa para beber."
+      },
+      {
+        "palavra": "PROTEÇÃO",
+        "explicacao": "Cuidar das pessoas, dos animais e do ambiente faz parte da mesma corrente de proteção."
+      },
+      {
+        "palavra": "VETERINÁRIO",
+        "explicacao": "O veterinário cuida da saúde dos animais e trata os que chegam machucados ou doentes."
+      },
+      {
+        "palavra": "SEGURANÇA",
+        "explicacao": "A coleira com a plaquinha de nome e telefone ajuda o animal perdido a voltar em segurança para a família."
+      },
+      {
+        "palavra": "RESGATE",
+        "explicacao": "Os animais resgatados vão para o abrigo. Animal silvestre, que veio da mata para a cidade, é caso para os órgãos ambientais, como o IBAMA e a SEMA."
+      },
+      {
+        "palavra": "BEM-ESTAR",
+        "explicacao": "Bem-estar animal é o animal ter alimento, água, abrigo e cuidado."
+      }
+    ],
+    "todoValidar": "Palavras do caça-palavras da cena 8 do roteiro (Missão proteção animal). As explicações são rascunho a partir da cena 8 e do diálogo d09: o roteiro não explica as palavras. ÁGUA, VETERINÁRIO e BEM-ESTAR não aparecem no texto da cena, então a explicação delas precisa ser confirmada pela equipe."
   },
   {
     "id": "a10-caca-palavras",

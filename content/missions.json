@@ -34,7 +34,13 @@
       "instituicao": "casa",
       "dialogo": "d01-plano-familia",
       "atividade": "a01-plano-familia",
-      "aprendizado": "No plano de emergência da família entram o ponto de encontro, os contatos de todos, os documentos protegidos, os remédios, o animal de estimação e o caminho até um lugar seguro."
+      "aprendizado": "No plano de emergência da família entram o ponto de encontro, os contatos de todos, os documentos protegidos, os remédios, o animal de estimação e o caminho até um lugar seguro.",
+      "banner": {
+        "arquivo": "m01-casa.jpg",
+        "titulo": "Nossa casa também se prepara!",
+        "descricao": "Ilustração de uma família reunida em casa, com chuva forte lá fora. Na TV, um alerta da Defesa Civil: previsão de chuvas intensas e risco de alagamentos na região, siga as orientações. A família lê o Plano Familiar de Emergência: conhecer os riscos da nossa região; separar documentos em sacos impermeáveis; preparar medicamentos; montar uma mochila de emergência (água, alimentos, itens de higiene); definir rotas de evacuação e um local seguro. O que não pode faltar: documentos importantes, medicamentos, água e alimentos não perecíveis, cuidados com os pets, lanterna e pilhas, rádio ou celular com bateria. Em caso de emergência, siga as orientações da Defesa Civil, evite áreas de risco e mantenha a calma. Uma casa preparada faz a diferença!"
+      },
+      "todoValidar": "As orientações escritas na imagem do banner precisam de validação da Defesa Civil."
     },
     {
       "id": "m02-mochila",
@@ -64,7 +70,13 @@
       "instituicao": "escola",
       "dialogo": "d04-escola",
       "atividade": "a04-seguro-ou-perigoso",
-      "aprendizado": "Numa inundação, ir pela parte alta, desligar a energia e o gás, conferir os avisos e pedir ajuda no 193 protegem. Atravessar rua alagada, ficar na beira do rio e repassar boato colocam em perigo."
+      "aprendizado": "Numa inundação, ir pela parte alta, desligar a energia e o gás, conferir os avisos e pedir ajuda no 193 protegem. Atravessar rua alagada, ficar na beira do rio e repassar boato colocam em perigo.",
+      "banner": {
+        "arquivo": "m04-escola.jpg",
+        "titulo": "Escola preparada, comunidade protegida!",
+        "descricao": "Infográfico sobre o papel da escola na prevenção de riscos e desastres: informação, planejamento e participação salvam vidas. 1. Qual é o papel da escola na prevenção? A escola é um espaço estratégico para promover conhecimentos, atitudes e práticas que reduzem os riscos de desastres. Sua atuação envolve: educar para a prevenção (ensinar sobre mudanças climáticas, reconhecer sinais de perigo, valorizar os alertas da Defesa Civil, estimular atitudes responsáveis); identificar e conhecer os riscos (mapear ameaças no entorno, conhecer áreas de alagamento e deslizamento, saber as rotas de evacuação); planejar ações de emergência (criar ou atualizar o plano de contingência, definir rotas e pontos de encontro); preparar e capacitar a comunidade escolar (realizar simulados, promover palestras, orientar estudantes, famílias e equipe); fortalecer a resiliência comunitária (incentivar a participação das famílias, cuidar do meio ambiente, aprender com as experiências). 2. Como a escola deve se preparar? A preparação deve acontecer antes da ocorrência de um evento climático severo. Antes, prevenir e planejar: conhecer os riscos do território, acompanhar os alertas meteorológicos, elaborar o plano de contingência, identificar rotas e locais seguros, realizar simulados e atividades, manter contatos atualizados. Durante, proteger e orientar: seguir as orientações oficiais, manter todos sob supervisão, evitar áreas de risco, não fazer evacuações improvisadas, comunicar a situação aos responsáveis. Depois, acolher e aprender: retornar às atividades com segurança, verificar a estrutura, acolher a comunidade escolar, dialogar sobre os impactos, atualizar o planejamento. 3. A prevenção é uma responsabilidade coletiva! Todos têm um papel importante: gestores e equipes escolares, professores, estudantes, famílias, Defesa Civil e serviços de emergência. 4. Lembre-se! Conheça os riscos do território. Não ignore os alertas. Respeite as rotas de evacuação. Nunca atravesse áreas alagadas. Compartilhe informações confiáveis. Conhecimento protege vidas! Prevenir é responsabilidade de todos!"
+      },
+      "todoValidar": "As orientações escritas na imagem do banner precisam de validação da Defesa Civil."
     },
     {
       "id": "m05-mapa-risco",
@@ -80,8 +92,13 @@
       "id": "m06-ligacao-193",
       "eixo": "durante",
       "titulo": "Segurança em primeiro lugar",
-      "descricao": "Com o temporal, um poste caiu em cima de um carro e tem uma pessoa presa. Vá até o Corpo de Bombeiros e aprenda a pedir ajuda.",
+      "descricao": "Com o temporal, um poste caiu em cima de um carro e tem uma pessoa presa. Vá até o local do acidente, olhe a placa da rua e o número do lugar e ligue para pedir ajuda.",
       "instituicao": "bombeiros",
+      "local": {
+        "id": "acidente",
+        "nome": "Local do acidente",
+        "nomeComPreposicao": "no local do acidente"
+      },
       "dialogo": "d06-ligacao-193",
       "atividade": "a06-ligacao-193",
       "aprendizado": "Em perigo, ninguém enfrenta sozinho: ligue para os Bombeiros no 193. Rua alagada não se atravessa, nem a pé, nem de carro."
@@ -114,9 +131,14 @@
       "descricao": "Passando pela rua, você encontrou um animal perdido, sem identificação. Vá até o abrigo de animais e descubra o que fazer.",
       "instituicao": "abrigo-animais",
       "dialogo": "d09-animal-perdido",
-      "pergunta": "q11-animal-perdido",
+      "atividade": "a09-caca-palavras-animais",
       "aprendizado": "Animal perdido sem identificação vai para o abrigo de animais. Animal silvestre na cidade é caso para os órgãos ambientais, como o IBAMA e a SEMA.",
-      "todoValidar": "Título é rascunho (o roteiro não dá título a esta parada)."
+      "banner": {
+        "arquivo": "m09-abrigo-animais.jpg",
+        "titulo": "Missão proteção animal",
+        "descricao": "Quadrinho sobre o abrigo para animais. Quando acontecem desastres ambientais, como enchentes, deslizamentos e incêndios, muitos animais também são afetados e precisam de ajuda. Eles também sentem medo, fome e frio, e merecem proteção. O abrigo para animais é um espaço temporário e seguro destinado a acolher pets que foram afetados por desastres, garantindo proteção, cuidado e bem-estar. É um espaço acolhedor, com estrutura adequada para que cada animal se sinta seguro e bem cuidado: aqui eles têm um novo começo. Para que serve? Proteger: oferecer segurança contra os perigos do ambiente. Acolher: disponibilizar um local adequado e protegido, onde os animais são tratados com carinho e respeito. Garantir cuidados: fornecer água, alimentação e higiene. Preservar a saúde: oferecer atendimento veterinário quando necessário, com vacinação, tratamento e acompanhamento. Facilitar o reencontro: identificar e cadastrar os animais para que possam retornar aos seus responsáveis; com identificação e cadastro, as chances de reencontro aumentam. Em momentos difíceis, o que faz a diferença é a solidariedade. Juntos, protegemos vidas! Animais também importam!"
+      },
+      "todoValidar": "Título é rascunho (o roteiro não dá título a esta parada). O título do banner vem do nome do arquivo (o banner não tem título escrito). As orientações escritas na imagem do banner precisam de validação da Defesa Civil."
     },
     {
       "id": "m10-primeiros-socorros",
