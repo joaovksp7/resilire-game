@@ -27,6 +27,11 @@ const FADE_RENDER_ORDER = 4;
  */
 export const LABEL_COVER_SHARE = 0.3;
 export const CELL_COVER_POINTS = 4;
+/**
+ * Os prédios altos são estreitos e, na vista de cima, costumam tapar só um canto da casa destacada:
+ * apagam se taparem um ponto que seja.
+ */
+export const TALL_CELL_COVER_POINTS = 1;
 
 /** Os pontos de uma coisa que não pode ficar tapada (um nome de rua, uma casa) e quantos precisam estar tapados. */
 export interface PointGroup {
@@ -51,6 +56,8 @@ export function fadedMaterial<T extends Material>(material: T): T {
 /** Algo que pode tapar a vista: a caixa que ocupa no mundo e como apagar/voltar ao normal. */
 export interface Occluder {
   readonly box: Box3;
+  /** Quantos pontos de uma casa destacada precisa tapar para apagar (sem valor: o do grupo). */
+  readonly cellCoverPoints?: number;
   setFaded(faded: boolean): void;
 }
 
@@ -161,22 +168,24 @@ export class Fader {
 
   /** Quem tapa boa parte de algum destes grupos fica apagado o tempo todo (os nomes das ruas). */
   setFixedGroups(groups: readonly PointGroup[]): void {
-    this.apply(this.covering(groups), this.current);
+    this.apply(this.covering(groups, false), this.current);
   }
 
   /** Quem tapa boa parte de algum destes grupos fica apagado até a próxima chamada (as casas destacadas). */
   setGroups(groups: readonly PointGroup[]): void {
-    this.apply(this.fixed, this.covering(groups));
+    this.apply(this.fixed, this.covering(groups, true));
   }
 
-  private covering(groups: readonly PointGroup[]): Set<number> {
+  /** `cells`: os grupos são casas destacadas (vale o limite próprio de cada objeto, se tiver). */
+  private covering(groups: readonly PointGroup[], cells: boolean): Set<number> {
     const hit = new Set<number>();
     this.occluders.forEach((occluder, i) => {
       const { box } = occluder;
       for (const group of groups) {
+        const min = cells && occluder.cellCoverPoints !== undefined ? occluder.cellCoverPoints : group.min;
         let covered = 0;
         for (const p of group.points) {
-          if (covers(box, p) && ++covered >= group.min) {
+          if (covers(box, p) && ++covered >= min) {
             hit.add(i);
             return;
           }

@@ -14,7 +14,7 @@ import {
 } from 'three';
 import { PartBuilder } from './buildings';
 import { type CityMap, tileNoise } from './cityMap';
-import { FadeableInstances, type Fader } from './fade';
+import { FadeableInstances, type Fader, TALL_CELL_COVER_POINTS } from './fade';
 import type { PlaceId } from './layout';
 import { createNumberPlate } from './streetSigns';
 
@@ -49,14 +49,16 @@ function instanced(geometry: BufferGeometry, items: Placement[], name: string): 
 /**
  * Duas peças do mesmo objeto (corpo e telhado, tronco e copa) apagam juntas.
  * As duas listas têm o mesmo tamanho: o item i de uma é a outra metade do item i da outra.
+ * `cellCoverPoints`: quantos pontos de uma casa destacada o objeto precisa tapar para apagar (ver fade.ts).
  */
-function addPairs(fader: Fader, a: FadeableInstances, b: FadeableInstances): Box3[] {
+function addPairs(fader: Fader, a: FadeableInstances, b: FadeableInstances, cellCoverPoints?: number): Box3[] {
   const boxes: Box3[] = [];
   for (let i = 0; i < a.count; i++) {
     const box = a.boxOf(i).union(b.boxOf(i, new Box3()));
     boxes.push(box);
     fader.add({
       box,
+      cellCoverPoints,
       setFaded: (faded) => {
         a.setFaded(i, faded);
         b.setFaded(i, faded);
@@ -162,14 +164,15 @@ export function createDecor(map: CityMap, fader: Fader): Decor {
   const trunk = new CylinderGeometry(0.1, 0.14, 1, 5).translate(0, 0.5, 0);
   const crown = new IcosahedronGeometry(1, 0);
 
-  const pairs: [FadeableInstances, FadeableInstances, boolean][] = [
+  // [corpo, topo, é obstáculo para os nomes das ruas, pontos tapados de uma casa destacada para apagar]
+  const pairs: [FadeableInstances, FadeableInstances, boolean, number?][] = [
     [instanced(box, houseBodies, 'casas'), instanced(roof, houseRoofs, 'telhados'), true],
-    [instanced(box, blocks, 'predios'), instanced(box, blockTops, 'predios-topo'), true],
+    [instanced(box, blocks, 'predios'), instanced(box, blockTops, 'predios-topo'), true, TALL_CELL_COVER_POINTS],
     [instanced(trunk, trunks, 'troncos'), instanced(crown, crowns, 'copas'), false],
   ];
   const obstacles: Box3[] = [];
-  for (const [a, b, isObstacle] of pairs) {
-    const boxes = addPairs(fader, a, b);
+  for (const [a, b, isObstacle, cellCoverPoints] of pairs) {
+    const boxes = addPairs(fader, a, b, cellCoverPoints);
     if (isObstacle) obstacles.push(...boxes);
     group.add(a.solid, a.faded, b.solid, b.faded);
   }
