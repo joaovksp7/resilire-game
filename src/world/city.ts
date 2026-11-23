@@ -69,13 +69,18 @@ function cellGroups(map: CityMap, cells: readonly { col: number; row: number }[]
 
 /**
  * Monta a cidade inteira (terreno, água, instituições, decoração, lugares e nome das ruas no chão) e põe
- * na cena. `streetNames`: o nome de cada rua pelo id (content/ruas.json).
+ * na cena. `streetNames`: o nome de cada rua pelo id (content/ruas.json). `institutionNames`: o nome
+ * de cada instituição pelo id (content/institutions.json), escrito ao lado do ícone do prédio.
  */
-export function createCity(scene: Scene, streetNames: ReadonlyMap<string, string>): City {
+export function createCity(
+  scene: Scene,
+  streetNames: ReadonlyMap<string, string>,
+  institutionNames: ReadonlyMap<InstitutionId, string>,
+): City {
   const map = parseCityMap();
   const water = new Water(map);
   const fader = new Fader();
-  const buildings = createInstitutionBuildings(map);
+  const buildings = createInstitutionBuildings(map, institutionNames);
   const places = createPlaceScenes(map);
   const decor = createDecor(map, fader);
   // Os nomes das ruas fogem dos prédios e das casas (as árvores ficam transparentes, se taparem).

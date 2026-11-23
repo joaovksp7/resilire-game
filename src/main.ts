@@ -54,7 +54,11 @@ function showContentError(message: string): void {
 
 function start(container: HTMLElement, hudRoot: HTMLElement, content: GameContent): void {
   const { scene, lights } = createScene();
-  const city = createCity(scene, content.streets);
+  const city = createCity(
+    scene,
+    content.streets,
+    new Map([...content.institutions].map(([id, inst]) => [id, inst.nome])),
+  );
 
   // Missão do eixo "Durante o evento" numa porta alagada deixaria o jogador sem caminho; e a ligação
   // do acidente precisa pedir o endereço que está nas placas da cidade.

@@ -3,6 +3,7 @@ import {
   BoxGeometry,
   BufferAttribute,
   type BufferGeometry,
+  CanvasTexture,
   Color,
   CylinderGeometry,
   Euler,
@@ -15,6 +16,7 @@ import {
   PlaneGeometry,
   Quaternion,
   SphereGeometry,
+  SRGBColorSpace,
   Vector3,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -249,7 +251,60 @@ function buildModel(
 /** Rotação das placas (ícone das instituições e nome das ruas): de frente para a câmera. */
 export const SIGN_ROTATION = new Euler(-MathUtils.degToRad(CAMERA.pitchDeg), MathUtils.degToRad(CAMERA.yawDeg), 0, 'YXZ');
 
-function createSite(map: CityMap, site: InstitutionSite, material: MeshLambertMaterial): Group {
+/** Direção da direita da tela no mundo: a placa do nome fica desse lado do ícone. */
+const SCREEN_RIGHT = new Vector3(1, 0, 0).applyEuler(SIGN_ROTATION);
+
+const NAME_FONT = "system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif";
+const NAME_TEXT = '#1b2430';
+const NAME_BG = '#ffffff';
+/** Altura da placa do nome em relação ao ícone e folga entre os dois. */
+const NAME_HEIGHT = 0.75;
+const NAME_GAP = 0.12;
+
+/** Placa com o nome da instituição: letra escura sobre branco, com borda na cor dela. */
+function nameTexture(text: string, color: number): { texture: CanvasTexture; aspect: number } {
+  const height = 128;
+  const size = 72;
+  const border = 9;
+  const padX = 30;
+  const font = `bold ${size}px ${NAME_FONT}`;
+  const canvas = document.createElement('canvas');
+  const measure = canvas.getContext('2d');
+  if (measure) measure.font = font;
+  const width = Math.ceil((measure?.measureText(text).width ?? text.length * size * 0.55) + padX * 2);
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    const roundRect = (x: number, y: number, w: number, h: number, r: number): void => {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    };
+    const r = height * 0.3;
+    ctx.fillStyle = `#${color.toString(16).padStart(6, '0')}`;
+    roundRect(0, 0, width, height, r);
+    ctx.fill();
+    ctx.fillStyle = NAME_BG;
+    roundRect(border, border, width - border * 2, height - border * 2, r - border / 2);
+    ctx.fill();
+    ctx.font = font;
+    ctx.fillStyle = NAME_TEXT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, width / 2, height / 2 + size * 0.04);
+  }
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  texture.anisotropy = 4;
+  return { texture, aspect: width / height };
+}
+
+function createSite(map: CityMap, site: InstitutionSite, material: MeshLambertMaterial, name?: string): Group {
   const style = INSTITUTION_STYLES[site.id];
   const ts = map.tileSize;
   const cols = site.maxCol - site.minCol + 1;
@@ -303,6 +358,18 @@ function createSite(map: CityMap, site: InstitutionSite, material: MeshLambertMa
   sign.rotation.copy(SIGN_ROTATION);
   group.add(sign);
 
+  // Nome da instituição (content/institutions.json) ao lado do ícone, à direita na tela.
+  if (name) {
+    const { texture, aspect } = nameTexture(name, style.color);
+    const nameH = signSize * NAME_HEIGHT;
+    const nameW = nameH * aspect;
+    const plate = new Mesh(new PlaneGeometry(nameW, nameH), new MeshBasicMaterial({ map: texture, alphaTest: 0.5 }));
+    plate.name = `nome-${site.id}`;
+    plate.position.set(cx, signY, cz).addScaledVector(SCREEN_RIGHT, signSize / 2 + NAME_GAP + nameW / 2);
+    plate.rotation.copy(SIGN_ROTATION);
+    group.add(plate);
+  }
+
   // Ponto logo acima da placa: onde fica o marcador da missão (Fase 4).
   group.userData.markerAnchor = new Vector3(cx, signY + signSize / 2 + 0.3, cz);
   return group;
@@ -316,15 +383,21 @@ export interface InstitutionBuildings {
   readonly obstacles: readonly Box3[];
 }
 
-/** Prédios das instituições (e da casa do jogador), com placa de ícone no topo. */
-export function createInstitutionBuildings(map: CityMap): InstitutionBuildings {
+/**
+ * Prédios das instituições (e da casa do jogador), com placa de ícone no topo e o nome ao lado.
+ * `names`: o nome de cada instituição pelo id (content/institutions.json).
+ */
+export function createInstitutionBuildings(
+  map: CityMap,
+  names: ReadonlyMap<InstitutionId, string> = new Map(),
+): InstitutionBuildings {
   const group = new Group();
   group.name = 'instituicoes';
   const material = new MeshLambertMaterial({ vertexColors: true });
   const markerAnchors = new Map<InstitutionId, Vector3>();
   const obstacles: Box3[] = [];
   for (const site of map.sites.values()) {
-    const siteGroup = createSite(map, site, material);
+    const siteGroup = createSite(map, site, material, names.get(site.id));
     markerAnchors.set(site.id, siteGroup.userData.markerAnchor as Vector3);
     obstacles.push(siteGroup.userData.obstacle as Box3);
     group.add(siteGroup);
