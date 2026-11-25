@@ -622,11 +622,16 @@ body {
 
 /* ---------- Banner da missão (abre a visita, antes da carta do local) ---------- */
 
-/* Ocupa a altura da tela: a imagem fica com o espaço que sobra do título e dos botões. */
-.cartao--banner {
+/* Só a imagem, sobre o fundo escurecido, e o botão Continuar embaixo. Ocupa a altura da tela:
+   a imagem fica com o espaço que sobra do botão. */
+.banner {
+  width: 100%;
   max-width: 60rem;
   height: 100%;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .banner__moldura {
@@ -634,10 +639,6 @@ body {
   align-self: stretch;
   min-height: 0;
   overflow: hidden;
-  border: 2px solid var(--cor-linha);
-  border-radius: var(--raio);
-  background: var(--cor-fundo-suave);
-  cursor: zoom-in;
 }
 
 .banner__imagem {
@@ -647,38 +648,23 @@ body {
   object-fit: contain;
 }
 
-/* Ampliada: a imagem em tamanho real, com rolagem só dentro da moldura (a página não rola). */
-.banner__moldura--ampliada {
-  overflow: auto;
-  overscroll-behavior: contain;
-  cursor: auto;
-}
-
-.banner__moldura--ampliada .banner__imagem {
-  width: auto;
-  height: auto;
-  max-width: none;
-}
-
-/* Sem a imagem: o texto dela, com rolagem. */
+/* Sem a imagem: o texto dela, numa caixa clara, com rolagem. */
 .banner__moldura--texto {
+  flex: 0 1 auto;
   overflow-y: auto;
   padding: 0.75rem;
-  cursor: auto;
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
 }
 
 .banner__texto {
+  margin: 0;
   text-align: left;
 }
 
-.cartao--banner .cartao__acoes {
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.cartao--banner .cartao__acoes .botao {
-  flex: 1 1 10rem;
+.banner .botao {
+  flex: none;
+  width: 100%;
   max-width: 18rem;
 }
 
@@ -1782,7 +1768,7 @@ body {
   }
 }
 
-/* ---------- Atividades (ordenar, classificar, historia, chamada, cena, mensagens, memoria, caca-palavras) ---------- */
+/* ---------- Atividades (ordenar, classificar, historia, chamada, cena, mensagens, memoria, caca-palavras, ligar) ---------- */
 
 .atividade {
   max-width: 40rem;
@@ -2409,6 +2395,194 @@ body {
 @media (min-width: 40rem) {
   .memoria {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Ligar os pontos: números à esquerda, letras à direita e as linhas (SVG) no vão do meio. */
+.ligar {
+  position: relative;
+  display: grid;
+  /* As situações costumam ser mais longas que as respostas: a coluna dos números é mais larga. */
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  column-gap: 2.25rem;
+}
+
+.ligar__coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ligar__coluna-titulo {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--cor-texto-suave);
+}
+
+.ligar__lista {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ligar__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.5rem 0.6rem;
+  border: 2px solid var(--cor-linha);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: left;
+  overflow-wrap: break-word;
+  cursor: grab;
+  /* O dedo no card arrasta (não rola a tela): para rolar, desliza-se fora dos cards. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  scroll-margin: 1rem 0 9rem;
+}
+
+.ligar--arrastando,
+.ligar--arrastando .ligar__item {
+  cursor: grabbing;
+}
+
+.ligar__item--ligado {
+  border-color: var(--cor-borda);
+}
+
+/* Número ou letra escolhido, esperando o outro lado. */
+.ligar__item[aria-pressed='true'] {
+  border: 3px solid var(--cor-borda);
+  background: var(--cor-destaque);
+  color: var(--cor-destaque-texto);
+}
+
+/* O card do outro lado embaixo do dedo, durante o arraste: soltar aqui liga. */
+.ligar__item--alvo {
+  border: 3px solid var(--cor-borda);
+  background: var(--cor-destaque);
+  color: var(--cor-destaque-texto);
+  box-shadow: 0 0 0 3px var(--cor-foco);
+}
+
+.ligar__marca {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: var(--cor-borda);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.ligar__item--letra .ligar__marca {
+  border: 2px solid var(--cor-borda);
+  border-radius: 6px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+}
+
+.ligar__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+/* "→ B": a letra ligada, escrita no próprio número (a linha não é a única pista). */
+.ligar__ligado {
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+/* O ponto de onde sai a linha, na borda do botão virada para o vão. */
+.ligar__ponto {
+  position: absolute;
+  top: 50%;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid var(--cor-borda);
+  border-radius: 50%;
+  background: var(--cor-superficie);
+  transform: translateY(-50%);
+}
+
+.ligar__item--numero .ligar__ponto {
+  right: -0.55rem;
+}
+
+.ligar__item--letra .ligar__ponto {
+  left: -0.55rem;
+}
+
+.ligar__item--ligado .ligar__ponto {
+  background: var(--cor-borda);
+}
+
+.ligar__linhas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ligar__linha {
+  stroke: var(--cor-borda);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.ligar__linha--escolhida {
+  stroke: var(--cor-foco);
+  stroke-width: 5;
+}
+
+/* A linha que segue o dedo durante o arraste. */
+.ligar__linha--arraste {
+  stroke-width: 4;
+  stroke-dasharray: 8 6;
+}
+
+/* Celular: vão menor e, nas letras, a marca em cima do texto (sobra largura para a palavra inteira). */
+@media (max-width: 30rem) {
+  .ligar {
+    column-gap: 1.6rem;
+  }
+
+  .ligar__item {
+    gap: 0.35rem;
+    padding: 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  .ligar__item--letra {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ligar__marca {
+    width: 1.4rem;
+    height: 1.4rem;
   }
 }
 

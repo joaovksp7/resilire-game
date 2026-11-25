@@ -34,7 +34,7 @@
       "instituicao": "casa",
       "dialogo": "d01-plano-familia",
       "atividade": "a01-plano-familia",
-      "aprendizado": "No plano de emergência da família entram o ponto de encontro, os contatos de todos, os documentos protegidos, os remédios, o animal de estimação e o caminho até um lugar seguro.",
+      "aprendizado": "Com o aviso de temporal, a família começa o plano de emergência: documentos em sacos plásticos fechados, os remédios de todo dia separados e o animal com coleira de identificação, levado com calma numa caixa de transporte que ele já conhece.",
       "banner": {
         "arquivo": "m01-casa.jpg",
         "titulo": "Nossa casa também se prepara!",
@@ -50,7 +50,13 @@
       "instituicao": "mercado",
       "dialogo": "d02-mochila",
       "atividade": "a02-mochila",
-      "aprendizado": "Na mochila de emergência vão documentos num saco plástico, lanterna, pilhas, água, comida que não estraga e remédios."
+      "aprendizado": "Na mochila de emergência vão documentos num saco plástico, lanterna, pilhas, água, comida que não estraga e remédios.",
+      "banner": {
+        "arquivo": "m02-loja.jpg",
+        "titulo": "Loja — Abastecendo o Kit de Emergência",
+        "descricao": "Ilustração de uma família numa loja, recebendo da atendente uma mochila de emergência. Nas prateleiras, água, comida, lanternas, pilhas, rádios, cobertores e kits de primeiros socorros; lá fora, chove forte. Texto: local para adquirir itens de extrema necessidade diante de um evento climático severo ou emergência. Itens do kit: mochila pronta, água e comida, kit de primeiros socorros, luz e energia, informação e comunicação, abrigo e calor."
+      },
+      "todoValidar": "As orientações escritas na imagem do banner precisam de validação da Defesa Civil. As etiquetas das prateleiras na imagem estão com palavras sem sentido e em inglês (ex.: \"Non-perishable food\", \"Flasshbas\"): corrigir no Canva."
     },
     {
       "id": "m03-abrigo",
@@ -60,7 +66,13 @@
       "instituicao": "abrigo",
       "dialogo": "d03-abrigo",
       "atividade": "a03-chegada-abrigo",
-      "aprendizado": "O abrigo é um lugar seguro para a família ficar. Para chegar, use a rota pela parte alta e leve a mochila de emergência."
+      "aprendizado": "O abrigo comunitário acolhe quem precisou sair de casa: oferece proteção, acolhimento, descanso, alimentação e higiene, convivência e atividades para reorganizar a rotina. Ele também ajuda as famílias a recomeçar depois do desastre.",
+      "banner": {
+        "arquivo": "m03-abrigo.jpg",
+        "titulo": "O que o Abrigo Comunitário oferece?",
+        "descricao": "Quadrinho sobre o abrigo comunitário. Quando acontecem desastres, como enchentes, deslizamentos ou outros eventos climáticos extremos, muitas famílias precisam deixar suas casas, e é nesse momento que o Abrigo Comunitário faz toda a diferença. Ele serve para acolher e proteger pessoas e famílias que precisam deixar suas casas durante uma situação de desastre e, além do espaço físico seguro, oferece serviços e cuidados para que todos se sintam protegidos e acolhidos. O que o abrigo comunitário oferece: proteção (local seguro para permanecer enquanto durar a situação de risco); acolhimento (apoio emocional, escuta e atenção às necessidades das famílias); descanso (espaço para dormir, repousar e recuperar as energias); alimentação e higiene (acesso a refeições, água potável e condições básicas de higiene); convivência (integração, solidariedade e apoio entre as pessoas acolhidas); reorganização da rotina (atividades educativas e recreativas para crianças e adultos, contribuindo para a adaptação e a reconstrução da vida comunitária). Em resumo: o Abrigo Comunitário é um espaço de proteção, acolhimento e solidariedade, onde as pessoas encontram segurança, apoio e condições para recomeçar após um desastre. Acolher também é reconstruir vidas!"
+      },
+      "todoValidar": "As orientações escritas na imagem do banner precisam de validação da Defesa Civil. Confirmar como funciona o abrigo no município."
     },
     {
       "id": "m04-escola",
@@ -70,7 +82,7 @@
       "instituicao": "escola",
       "dialogo": "d04-escola",
       "atividade": "a04-seguro-ou-perigoso",
-      "aprendizado": "Numa inundação, ir pela parte alta, desligar a energia e o gás, conferir os avisos e pedir ajuda no 193 protegem. Atravessar rua alagada, ficar na beira do rio e repassar boato colocam em perigo.",
+      "aprendizado": "Seguir os alertas da Defesa Civil, avisar um adulto responsável e treinar as rotas seguras nos simulados protegem. Brincar na água da inundação, atravessar ponte ou rua coberta pela água e voltar para casa antes da orientação das autoridades colocam em perigo.",
       "banner": {
         "arquivo": "m04-escola.jpg",
         "titulo": "Escola preparada, comunidade protegida!",
@@ -82,11 +94,17 @@
       "id": "m05-mapa-risco",
       "eixo": "durante",
       "titulo": "Informação e prevenção",
-      "descricao": "O rio está subindo rápido. Vá até a Defesa Civil e descubra se a sua casa fica numa área de risco.",
+      "descricao": "O rio está subindo rápido. Vá até a Defesa Civil e descubra o que ajuda e o que atrapalha a cidade nas chuvas fortes.",
       "instituicao": "defesa-civil",
       "dialogo": "d05-mapa-risco",
-      "atividade": "a05-mapa-risco",
-      "aprendizado": "A Defesa Civil mapeia as áreas de risco e manda alertas oficiais por SMS. Rachaduras em paredes, árvores ou postes inclinados e água barrenta minando do chão são sinais de deslizamento."
+      "pergunta": "q12-intruso",
+      "aprendizado": "A Defesa Civil mapeia as áreas de risco, aciona as sirenes de aviso e indica as rotas seguras até o abrigo. Lixo jogado no lugar errado entope os bueiros, a água tem menos espaço para escoar e o alagamento piora.",
+      "banner": {
+        "arquivo": "m05-defesa-civil.jpg",
+        "titulo": "Defesa Civil: conhecer os riscos para proteger",
+        "descricao": "Ilustração da sala da Defesa Civil num dia de chuva. A equipe analisa o mapa da cidade, com a zona de risco e a rota de evacuação segura marcadas; na parede, uma sirene de alerta e uma tela que acompanha a chuva e a subida do rio. Uma família segue a rota até o abrigo. Lá fora, o rio está cheio, e tem lixo na rua perto de um bueiro."
+      },
+      "todoValidar": "O banner não tem título escrito: o título é sugestão e precisa de confirmação. As orientações escritas na imagem do banner precisam de validação da Defesa Civil."
     },
     {
       "id": "m06-ligacao-193",
@@ -101,17 +119,29 @@
       },
       "dialogo": "d06-ligacao-193",
       "atividade": "a06-ligacao-193",
-      "aprendizado": "Em perigo, ninguém enfrenta sozinho: ligue para os Bombeiros no 193. Rua alagada não se atravessa, nem a pé, nem de carro."
+      "aprendizado": "Em perigo, ninguém enfrenta sozinho: ligue para os Bombeiros no 193. Rua alagada não se atravessa, nem a pé, nem de carro.",
+      "banner": {
+        "arquivo": "m06-bombeiros.jpg",
+        "titulo": "Bombeiros (193)",
+        "descricao": "Ilustração de uma rua em dia de temporal: um poste de luz caiu em cima de um carro vermelho, com uma pessoa presa lá dentro, e uma moça liga para o 193 dos Bombeiros. Texto: com as fortes chuvas e temporais, um poste de luz cai em cima de um carro e uma pessoa fica presa. É hora de acionar os Bombeiros pelo número 193! Tenha em mãos as informações: local exato da ocorrência (endereço ou referência); o que aconteceu (poste caiu, carro atingido, pessoa presa); número de vítimas (se souber); seu nome e um telefone para contato."
+      },
+      "todoValidar": "As orientações escritas na imagem do banner precisam de validação da Defesa Civil."
     },
     {
       "id": "m07-confiavel",
       "eixo": "durante",
       "titulo": "Informação salva vidas",
-      "descricao": "Muitas mensagens estão circulando nos grupos. Vá até a rádio comunitária e descubra como saber se uma informação é confiável.",
+      "descricao": "Os temporais derrubaram a energia e a internet em parte da cidade. Vá até a rádio comunitária e descubra como ela mantém todo mundo informado.",
       "instituicao": "radio",
       "dialogo": "d07-confiavel",
       "atividade": "a07-confiavel-ou-boato",
-      "aprendizado": "Antes de acreditar ou repassar uma mensagem, confira se ela veio de uma fonte oficial. Os telefones de emergência são 190 (Polícia), 192 (SAMU) e 193 (Bombeiros)."
+      "aprendizado": "Quando a energia e a internet caem, o rádio a pilha e a rádio comunitária trazem os boletins e alertas oficiais. Para cada emergência, um número: 192 (SAMU), 193 (Bombeiros) e 190 (Polícia).",
+      "banner": {
+        "arquivo": "m07-radio.jpg",
+        "titulo": "Rádio comunitária no ar",
+        "descricao": "Ilustração de um radialista falando ao microfone no estúdio da rádio comunitária, com chuva forte na janela e um rádio a pilha na mesa. Na parede, uma placa com os telefones de emergência: SAMU 192, Bombeiros 193, Polícia 190."
+      },
+      "todoValidar": "O banner não tem título escrito: o título é sugestão e precisa de confirmação. As orientações escritas na imagem do banner precisam de validação da Defesa Civil."
     },
     {
       "id": "m08-posto-saude",

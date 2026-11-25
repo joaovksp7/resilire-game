@@ -199,5 +199,30 @@
     ],
     "correta": 1,
     "todoValidar": "Rascunho a partir da cena 8 do roteiro. Confirmar a orientação ao encontrar um animal perdido (quem leva, como se aproximar) e se o abrigo de animais recebe animais trazidos pela população."
+  },
+  {
+    "id": "q12-intruso",
+    "tipo": "multipla-escolha",
+    "enunciado": "Caça ao intruso! A Defesa Civil mapeia os riscos e ajuda a proteger a nossa comunidade. Qual destas NÃO ajuda a nos manter seguros durante as chuvas fortes?",
+    "alternativas": [
+      {
+        "texto": "Mapeamento de riscos",
+        "explicacao": "O mapeamento de riscos ajuda: mostra as áreas vulneráveis antes da chuva forte. Procure o que atrapalha."
+      },
+      {
+        "texto": "Lixo e bueiro entupido",
+        "explicacao": "Isso! Lixo jogado no lugar errado entope o bueiro, a água tem menos espaço para escoar e o alagamento piora."
+      },
+      {
+        "texto": "Sirene de alerta",
+        "explicacao": "A sirene ajuda: dá o aviso antes, quando o rio sobe rápido. Procure o que atrapalha."
+      },
+      {
+        "texto": "Abrigo seguro",
+        "explicacao": "O abrigo ajuda: é o lugar seguro aonde as famílias chegam pela rota de evacuação. Procure o que atrapalha."
+      }
+    ],
+    "correta": 1,
+    "todoValidar": "Pergunta e gabarito do Canva (cena 5, Defesa Civil: \"Caça ao intruso\"). As explicações são rascunho a partir do texto da mesma cena: o Canva só traz o gabarito. Confirmar se a cidade tem sirenes de aviso (pendente também no d05)."
   }
 ]

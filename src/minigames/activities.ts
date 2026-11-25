@@ -1,6 +1,7 @@
 import type { Activity, GameContent } from '../missions/content';
 import type { IconId } from '../world/icons';
 import { KitMinigame } from './kitMinigame';
+import { MatchMinigame } from './matchMinigame';
 import { MemoryMinigame } from './memoryMinigame';
 import { MessagesMinigame } from './messagesMinigame';
 import { OrderMinigame } from './orderMinigame';
@@ -33,6 +34,7 @@ export class Activities {
   private readonly messages: MessagesMinigame;
   private readonly memory: MemoryMinigame;
   private readonly wordSearch: WordSearchMinigame;
+  private readonly match: MatchMinigame;
 
   /** `onRight`: chamado quando a atividade fica certa (ex.: tocar o som de acerto). */
   constructor(root: HTMLElement, content: GameContent, onRight: () => void = () => {}) {
@@ -44,6 +46,7 @@ export class Activities {
     this.messages = new MessagesMinigame(root, onRight);
     this.memory = new MemoryMinigame(root, onRight);
     this.wordSearch = new WordSearchMinigame(root, onRight);
+    this.match = new MatchMinigame(root, onRight);
   }
 
   run(activity: Activity, theme: ActivityTheme): Promise<ActivityResult> {
@@ -65,6 +68,8 @@ export class Activities {
         return this.memory.run(activity, theme);
       case 'caca-palavras':
         return this.wordSearch.run(activity, theme);
+      case 'ligar':
+        return this.match.run(activity, theme);
       default: {
         // Um tipo novo em ACTIVITY_TYPES sem tela aqui dá erro no `npx tsc --noEmit`.
         const missing: never = activity;

@@ -1,40 +1,136 @@
 [
   {
     "id": "a01-plano-familia",
-    "tipo": "ordenar",
-    "titulo": "Plano da família",
-    "instrucao": "Toque nos passos do plano de emergência na ordem em que a família faz cada um.",
-    "passos": [
+    "tipo": "historia",
+    "titulo": "O alerta e o plano da família",
+    "instrucao": "Os temporais estão chegando. Responda às perguntas sobre o plano de emergência da família.",
+    "momentos": [
       {
-        "texto": "Guardar documentos e papéis de saúde em sacos plásticos fechados",
-        "explicacao": "Fechados no saco plástico, os documentos ficam protegidos da água."
+        "situacao": "Ao perceber a aproximação de temporais e o risco de inundação, qual deve ser a primeira atitude da família?",
+        "alternativas": [
+          {
+            "texto": "Esperar a água entrar na casa",
+            "explicacao": "Se a família esperar a água chegar, pode não dar mais tempo. O certo é começar o plano de emergência antes."
+          },
+          {
+            "texto": "Começar o plano de emergência da casa",
+            "explicacao": "Isso! Com o aviso de temporal, a família já começa o plano de emergência da casa."
+          },
+          {
+            "texto": "Deixar os preparativos para os vizinhos",
+            "explicacao": "Cada família cuida do seu plano. Comece o plano de emergência da sua casa."
+          },
+          {
+            "texto": "Juntar só roupas e comida",
+            "explicacao": "Roupas e comida ajudam, mas não bastam. A primeira atitude é começar o plano de emergência da casa."
+          }
+        ],
+        "correta": 1
       },
       {
-        "texto": "Separar os remédios que cada pessoa toma todo dia",
-        "explicacao": "Quem toma remédio todo dia não pode ficar sem ele, mesmo longe de casa."
+        "situacao": "Como os documentos pessoais e os registros de saúde devem ser protegidos?",
+        "alternativas": [
+          {
+            "texto": "Deixados em cima dos móveis",
+            "explicacao": "Em cima dos móveis, a água ainda pode alcançar os documentos. Guarde em sacos plásticos fechados."
+          },
+          {
+            "texto": "Guardados em caixas de papelão",
+            "explicacao": "O papelão molha e desmancha. Guarde os documentos em sacos plásticos fechados."
+          },
+          {
+            "texto": "Colocados em sacos plásticos fechados",
+            "explicacao": "Isso! Fechados no saco plástico, os documentos ficam protegidos da água."
+          },
+          {
+            "texto": "Guardados junto com a comida",
+            "explicacao": "Junto com a comida, os documentos podem molhar ou sujar. Guarde em sacos plásticos fechados."
+          }
+        ],
+        "correta": 2
       },
       {
-        "texto": "Separar os remédios do animal de estimação, como o veterinário orientou",
-        "explicacao": "O animal também pode precisar de remédio. Vale o que o veterinário orientou."
+        "situacao": "Se a família precisar sair de casa, o que deve ser separado para os cuidados com a saúde não pararem?",
+        "alternativas": [
+          {
+            "texto": "Os registros de saúde da família",
+            "explicacao": "Os registros de saúde também vão, protegidos no saco plástico. Mas, para o tratamento não parar, o mais importante são os remédios que a família toma todo dia."
+          },
+          {
+            "texto": "Os remédios do animal, como o veterinário orientou",
+            "explicacao": "Os remédios do animal também vão, como o veterinário orientou. Mas, para os cuidados da família não pararem, o mais importante são os remédios que cada pessoa toma todo dia."
+          },
+          {
+            "texto": "Os remédios que a família toma todo dia",
+            "explicacao": "Isso! Quem toma remédio todo dia não pode ficar sem ele, mesmo longe de casa."
+          },
+          {
+            "texto": "Só os produtos de higiene",
+            "explicacao": "Higiene é importante, mas não basta. Quem toma remédio todo dia não pode ficar sem ele."
+          }
+        ],
+        "correta": 2
       },
       {
-        "texto": "Pôr no animal a coleira com a plaquinha de nome e telefone",
-        "explicacao": "Com a plaquinha de nome e telefone, o animal que se perder volta mais fácil para a família."
+        "situacao": "Para que serve pôr no animal a coleira com identificação antes de sair de casa?",
+        "alternativas": [
+          {
+            "texto": "Para o animal não se perder e ser achado mais fácil",
+            "explicacao": "Isso! Com a plaquinha de nome e telefone, o animal que se perder volta mais fácil para a família."
+          },
+          {
+            "texto": "Para não precisar da caixa de transporte",
+            "explicacao": "A coleira não substitui a caixa de transporte: o animal precisa das duas. A plaquinha serve para ele ser achado se se perder."
+          },
+          {
+            "texto": "Para não precisar cuidar dele no caminho",
+            "explicacao": "Com coleira ou sem, o animal precisa de cuidado no caminho. A plaquinha serve para ele ser achado se se perder."
+          },
+          {
+            "texto": "Para ficar mais fácil dar comida para ele",
+            "explicacao": "A coleira não tem a ver com comida. A plaquinha de nome e telefone serve para o animal ser achado se se perder."
+          }
+        ],
+        "correta": 0
       },
       {
-        "texto": "Abastecer a mochila com água e ração",
-        "explicacao": "Com água e ração, o animal fica alimentado longe de casa."
+        "situacao": "Verdadeiro ou falso? O animal deve ser colocado com calma na caixa de transporte, numa caixa que ele já conhece porque treinou antes.",
+        "alternativas": [
+          {
+            "texto": "Verdadeiro",
+            "explicacao": "Isso! Com calma e numa caixa que ele já conhece, o animal fica menos assustado."
+          },
+          {
+            "texto": "Falso",
+            "explicacao": "É verdadeiro: com calma e numa caixa que ele já conhece do treino, o animal fica menos assustado."
+          }
+        ],
+        "correta": 0
       },
       {
-        "texto": "Pôr o animal com calma na caixa de transporte",
-        "explicacao": "Na caixa de transporte, o animal viaja com segurança junto com a família."
-      },
-      {
-        "texto": "Seguir a rota de evacuação até um lugar seguro",
-        "explicacao": "A rota de evacuação leva a família por um caminho seguro, longe da água."
+        "situacao": "Por que é importante treinar antes o animal para usar a caixa de transporte?",
+        "alternativas": [
+          {
+            "texto": "Para ele ficar sempre dentro da caixa",
+            "explicacao": "O treino não é para o animal ficar sempre preso. É para a caixa já ser conhecida na hora de sair."
+          },
+          {
+            "texto": "Para ele não precisar de água e comida",
+            "explicacao": "Na caixa ou fora dela, o animal precisa de água e comida. O treino serve para facilitar o transporte."
+          },
+          {
+            "texto": "Para não precisar da coleira com identificação",
+            "explicacao": "A plaquinha na coleira continua necessária. O treino com a caixa serve para facilitar o transporte."
+          },
+          {
+            "texto": "Para facilitar o transporte e diminuir o estresse na emergência",
+            "explicacao": "Isso! Acostumado com a caixa, o animal viaja com menos estresse na hora da emergência."
+          }
+        ],
+        "correta": 3
       }
     ],
-    "todoValidar": "Rascunho a partir da cena 1 do roteiro, na ordem da cena. A equipe precisa confirmar se a ordem dos passos importa (plano-parte-3, seção 4.3); se não importar, a atividade muda. Confirmar as explicações."
+    "todoValidar": "Perguntas e gabarito do Canva (cena 1, Casa). As explicações de cada alternativa são rascunho: o Canva só traz o gabarito. Na pergunta dos cuidados com a saúde, os registros de saúde e os remédios do animal também fazem parte do plano: confirmar se a resposta certa é mesmo só a dos remédios da família e se as explicações das outras estão boas. Os enunciados foram encurtados para caber no celular: confirmar."
   },
   {
     "id": "a02-mochila",
@@ -43,129 +139,126 @@
   {
     "id": "a03-chegada-abrigo",
     "tipo": "historia",
-    "titulo": "Chegada ao abrigo",
-    "instrucao": "Leia cada momento e escolha o que você faz.",
+    "titulo": "Verdadeiro ou falso?",
+    "instrucao": "O que você conhece sobre o abrigo comunitário? Para cada frase, escolha: é verdadeira ou falsa?",
     "momentos": [
       {
-        "situacao": "Sua família vai para o abrigo, e as ruas da parte baixa estão alagadas. Por onde vocês vão?",
+        "situacao": "O abrigo comunitário é um espaço seguro para acolher pessoas e famílias que precisam deixar suas casas durante um desastre.",
         "alternativas": [
           {
-            "texto": "Pelas ruas da parte alta, longe da água",
-            "explicacao": "Isso! A rota pela parte alta é a rota segura."
+            "texto": "Verdadeiro",
+            "explicacao": "Isso! O abrigo comunitário acolhe e protege as pessoas e famílias que precisaram sair de casa."
           },
           {
-            "texto": "Pela rua alagada, que é mais curta",
-            "explicacao": "O caminho mais curto nem sempre é o mais seguro. Rua alagada não se atravessa."
-          },
-          {
-            "texto": "Pela beira do rio, para ver a água subir",
-            "explicacao": "A beira do rio não é lugar seguro durante a cheia. Vá pela parte alta."
+            "texto": "Falso",
+            "explicacao": "É verdadeiro: o abrigo comunitário é um lugar seguro para quem precisou sair de casa durante o desastre."
           }
         ],
         "correta": 0
       },
       {
-        "situacao": "Vocês chegaram ao abrigo com o cachorro da família. O que você faz?",
+        "situacao": "No abrigo comunitário, as pessoas recebem só um lugar para dormir, sem precisar de apoio emocional ou acolhimento.",
         "alternativas": [
           {
-            "texto": "Pergunto para a equipe do abrigo como fazer com ele",
-            "explicacao": "Isso! Animais de estimação também precisam de cuidado, e a equipe do abrigo explica como fazer."
+            "texto": "Verdadeiro",
+            "explicacao": "É falso: além do lugar para dormir, o abrigo oferece acolhimento, escuta e atenção às necessidades das famílias."
           },
           {
-            "texto": "Deixo o cachorro sozinho do lado de fora",
-            "explicacao": "Sozinho, o animal pode se perder ou se machucar. Pergunte para a equipe do abrigo como fazer com ele."
+            "texto": "Falso",
+            "explicacao": "Isso! O abrigo também oferece acolhimento, escuta e atenção às necessidades das famílias."
+          }
+        ],
+        "correta": 1
+      },
+      {
+        "situacao": "As atividades educativas e recreativas ajudam as crianças a lidar com o medo, a ansiedade e as mudanças na rotina durante uma emergência.",
+        "alternativas": [
+          {
+            "texto": "Verdadeiro",
+            "explicacao": "Isso! Brincar e aprender juntos ajuda as crianças a se adaptar e a reorganizar a rotina."
           },
           {
-            "texto": "Volto para casa para deixar ele lá",
-            "explicacao": "Enquanto não dá para voltar para casa, o lugar seguro é o abrigo. Pergunte para a equipe como fazer com o cachorro."
+            "texto": "Falso",
+            "explicacao": "É verdadeiro: as atividades educativas e recreativas ajudam as crianças a se adaptar e a reorganizar a rotina."
           }
         ],
         "correta": 0
       },
       {
-        "situacao": "Uma criança chegou ao abrigo assustada e está chorando. O que você faz?",
+        "situacao": "O abrigo comunitário deve promover respeito, solidariedade e colaboração entre todas as pessoas acolhidas.",
         "alternativas": [
           {
-            "texto": "Chamo alguém da equipe do abrigo",
-            "explicacao": "Isso! No abrigo tem uma equipe para escutar e acalmar quem chega, criança ou adulto."
+            "texto": "Verdadeiro",
+            "explicacao": "Isso! No abrigo, a convivência é feita de respeito, solidariedade e apoio entre todos."
           },
           {
-            "texto": "Finjo que não vi",
-            "explicacao": "Todo mundo pode ajudar. Chame alguém da equipe do abrigo: ela está ali para escutar e acalmar quem chega."
+            "texto": "Falso",
+            "explicacao": "É verdadeiro: no abrigo, a convivência é feita de respeito, solidariedade e apoio entre todos."
           }
         ],
         "correta": 0
       },
       {
-        "situacao": "Sua vizinha mora sozinha, e você não viu ela chegar ao abrigo. O que você faz?",
+        "situacao": "Depois de um desastre, o abrigo comunitário não tem importância para a recuperação e a reorganização da vida das famílias.",
         "alternativas": [
           {
-            "texto": "Peço para um adulto ver se ela está bem",
-            "explicacao": "Muito bem! Ninguém fica para trás. Um adulto pode ver como ela está e chamar ajuda se precisar."
+            "texto": "Verdadeiro",
+            "explicacao": "É falso: o abrigo também ajuda as famílias a reorganizar a rotina e a ter condições de recomeçar depois do desastre."
           },
           {
-            "texto": "Não faço nada, ela deve estar bem",
-            "explicacao": "Na dúvida, vale conferir. Peça para um adulto ver se ela está bem."
-          },
-          {
-            "texto": "Posto no grupo que ela sumiu",
-            "explicacao": "Isso pode espalhar boato e não ajuda. Peça para um adulto ir ver como ela está."
+            "texto": "Falso",
+            "explicacao": "Isso! O abrigo também ajuda as famílias a reorganizar a rotina e a ter condições de recomeçar depois do desastre."
           }
         ],
-        "correta": 0
+        "correta": 1
       }
     ],
-    "todoValidar": "Rascunho a partir do diálogo d03 e das perguntas q09 e q10. As atitudes de acolhimento e convivência no abrigo (como agir ao chegar e quais cuidados ter com outras pessoas) são da equipe (plano-parte-3, seção 4.3). Confirmar a regra para animais de estimação no abrigo do município."
+    "todoValidar": "Frases e gabarito do Canva (cena 6, Abrigo comunitário). As explicações são rascunho a partir do banner da mesma cena: o Canva só traz o gabarito. Confirmar como funciona o abrigo no município."
   },
   {
     "id": "a04-seguro-ou-perigoso",
     "tipo": "classificar",
     "titulo": "Seguro ou perigoso?",
-    "instrucao": "Toque num cartão e depois na coluna: durante uma inundação, essa atitude é segura ou perigosa?",
+    "instrucao": "Toque num cartão e depois na coluna: essa atitude é um comportamento seguro ou perigoso?",
     "grupos": ["Seguro", "Perigoso"],
     "cartoes": [
       {
-        "texto": "Atravessar a rua alagada a pé",
-        "grupo": 1,
-        "explicacao": "Rua alagada não se atravessa a pé: a água pode estar mais funda e mais forte do que parece."
-      },
-      {
-        "texto": "Passar de carro pela rua alagada",
-        "grupo": 1,
-        "explicacao": "De carro também não. Rua alagada não se atravessa, nem a pé, nem de carro."
-      },
-      {
-        "texto": "Procurar outro caminho pelas ruas da parte alta",
+        "texto": "Ao receber um alerta da Defesa Civil, a família segue as orientações e procura um local seguro",
         "grupo": 0,
-        "explicacao": "A rota pela parte alta, longe da água, é a rota segura."
+        "explicacao": "Não ignore os alertas: seguir as orientações da Defesa Civil protege a família."
       },
       {
-        "texto": "Ficar na beira do rio para ver a água subir",
+        "texto": "Uma criança brinca na água acumulada de uma inundação",
         "grupo": 1,
-        "explicacao": "A beira do rio não é lugar seguro durante a cheia. Fique longe e vá pela parte alta."
+        "explicacao": "A água da inundação não é lugar de brincar: pode estar mais funda e mais forte do que parece, e pode estar contaminada."
       },
       {
-        "texto": "Desligar a energia e o gás antes de sair de casa",
+        "texto": "Um estudante avisa um professor ao perceber que a água está entrando no pátio da escola",
         "grupo": 0,
-        "explicacao": "Desligar a energia e o gás antes de sair ajuda a evitar acidentes."
+        "explicacao": "Avisar logo um adulto responsável ajuda a escola a agir a tempo."
       },
       {
-        "texto": "Repassar um aviso sem saber quem mandou",
+        "texto": "Uma pessoa tenta atravessar uma ponte coberta pela água para chegar mais rápido em casa",
         "grupo": 1,
-        "explicacao": "Repassar sem conferir pode espalhar boato e confusão. Primeiro confira na fonte oficial."
+        "explicacao": "Nunca atravesse áreas alagadas. O caminho mais curto nem sempre é o mais seguro."
       },
       {
-        "texto": "Conferir o aviso com a Defesa Civil antes de acreditar",
+        "texto": "A escola faz simulados de evacuação e ensina os estudantes a reconhecer rotas seguras",
         "grupo": 0,
-        "explicacao": "Conferir na fonte oficial é o jeito de separar notícia de boato."
+        "explicacao": "Com os simulados, todos aprendem as rotas seguras antes de precisar delas."
       },
       {
-        "texto": "Ligar para o 193 em vez de enfrentar o perigo sozinho",
+        "texto": "Uma família volta para casa com a área ainda alagada, sem autorização ou orientação das autoridades",
+        "grupo": 1,
+        "explicacao": "Só volte para casa quando as autoridades orientarem que é seguro."
+      },
+      {
+        "texto": "Ao perceber uma situação de risco, o estudante procura um adulto responsável e segue as orientações da escola",
         "grupo": 0,
-        "explicacao": "Em perigo, ninguém enfrenta sozinho: os Bombeiros atendem pelo 193."
+        "explicacao": "Procurar um adulto responsável e seguir as orientações da escola é a atitude segura."
       }
     ],
-    "todoValidar": "Rascunho a partir dos textos de antes (perguntas q02, q07, q08 e q09 e diálogos). O texto sobre mudanças climáticas da Escola é da equipe (plano-parte-3, seção 4.3). Confirmar a explicação da água mais funda e mais forte."
+    "todoValidar": "Situações e gabarito do Canva (Escola). As explicações são rascunho a partir do banner da Escola: o Canva só traz o gabarito. Confirmar a explicação da água mais funda, mais forte e contaminada."
   },
   {
     "id": "a05-mapa-risco",
@@ -217,7 +310,7 @@
     "id": "a06-ligacao-193",
     "tipo": "chamada",
     "titulo": "Ligação para o 193",
-    "instrucao": "Um poste caiu em cima de um carro, e tem uma pessoa presa. Ligue para pedir ajuda e responda ao atendente.",
+    "instrucao": "Um poste caiu em cima de um carro, e tem uma pessoa presa. Ligue para os Bombeiros e responda ao atendente.",
     "atendente": "Atendente do 193",
     "discagem": {
       "situacao": "Para qual número você liga para pedir o resgate dos Bombeiros?",
@@ -239,25 +332,7 @@
     },
     "momentos": [
       {
-        "situacao": "Bombeiros. Qual é a emergência?",
-        "alternativas": [
-          {
-            "texto": "Um poste caiu em cima de um carro, e tem uma pessoa presa lá dentro.",
-            "explicacao": "Isso! Contar com calma o que aconteceu ajuda o atendente a entender do que você precisa."
-          },
-          {
-            "texto": "Está tudo uma bagunça aqui, venham logo!",
-            "explicacao": "Com calma, conte o que aconteceu. Assim o atendente entende do que você precisa."
-          },
-          {
-            "texto": "Desligo sem falar nada.",
-            "explicacao": "Não desligue. Fale com calma e responda ao que o atendente perguntar."
-          }
-        ],
-        "correta": 0
-      },
-      {
-        "situacao": "Qual é o endereço?",
+        "situacao": "Bombeiros. Para agilizar o socorro, responda às perguntas. Qual é o endereço exato da ocorrência?",
         "alternativas": [
           {
             "texto": "É na Rua das Araucárias, 241.",
@@ -279,70 +354,104 @@
         "correta": 0
       },
       {
-        "situacao": "A equipe está a caminho. O que você faz enquanto ela não chega?",
+        "situacao": "O que aconteceu exatamente? Descreva a situação.",
         "alternativas": [
           {
-            "texto": "Espero a equipe dos Bombeiros, sem tentar resolver sozinho.",
-            "explicacao": "Isso! Numa situação assim, nunca tente resolver sozinho. Quem faz o resgate é a equipe dos Bombeiros."
+            "texto": "Um poste caiu em cima de um carro, e tem uma pessoa presa lá dentro.",
+            "explicacao": "Isso! Contar com calma o que aconteceu ajuda o atendente a entender do que você precisa."
+          },
+          {
+            "texto": "Está tudo uma bagunça aqui, venham logo!",
+            "explicacao": "Com calma, conte o que aconteceu. Assim o atendente entende do que você precisa."
+          },
+          {
+            "texto": "Desligo sem falar nada.",
+            "explicacao": "Não desligue. Fale com calma e responda ao que o atendente perguntar."
+          }
+        ],
+        "correta": 0
+      },
+      {
+        "situacao": "Quantas vítimas há no total? Há feridos graves?",
+        "alternativas": [
+          {
+            "texto": "Uma pessoa presa no carro. Ela parece acordada, mas não sei se está ferida.",
+            "explicacao": "Isso! Diga o que você sabe e o que não sabe. Assim a equipe chega preparada."
+          },
+          {
+            "texto": "Falo que são muitas, para virem mais rápido.",
+            "explicacao": "Diga só o que você sabe. Informação errada atrapalha o socorro."
+          },
+          {
+            "texto": "Desligo, porque já falei o endereço.",
+            "explicacao": "Não desligue antes de o atendente terminar. As respostas dele ajudam a equipe a chegar preparada."
+          }
+        ],
+        "correta": 0
+      },
+      {
+        "situacao": "Por favor, confirme o seu nome e um telefone para contato.",
+        "alternativas": [
+          {
+            "texto": "Falo o meu nome e um telefone para contato.",
+            "explicacao": "Isso! Com o seu nome e telefone, a equipe consegue falar com você se precisar."
+          },
+          {
+            "texto": "Prefiro não dizer e desligo.",
+            "explicacao": "Não desligue. Com o seu nome e telefone, a equipe consegue falar com você se precisar."
+          }
+        ],
+        "correta": 0
+      },
+      {
+        "situacao": "Obrigado. As equipes de resgate já estão a caminho, e a ambulância também foi chamada. O que você faz enquanto elas não chegam?",
+        "alternativas": [
+          {
+            "texto": "Mantenho a calma, fico longe dos fios e espero em local seguro.",
+            "explicacao": "Isso! Não se aproxime dos fios caídos e espere a equipe dos Bombeiros em local seguro."
           },
           {
             "texto": "Tento tirar a pessoa do carro sozinho.",
-            "explicacao": "Nunca tente resolver sozinho. Espere a equipe dos Bombeiros, que faz o resgate."
+            "explicacao": "Nunca tente resolver sozinho. Quem faz o resgate é a equipe dos Bombeiros. Mantenha a calma e espere em local seguro."
+          },
+          {
+            "texto": "Chego perto do poste para ver melhor.",
+            "explicacao": "Não se aproxime do poste nem dos fios caídos. Mantenha a calma e espere a equipe em local seguro."
           }
         ],
         "correta": 0
       }
     ],
-    "todoValidar": "Rascunho genérico a partir da cena 4 do roteiro e do diálogo d06. O que o atendente do 193 pergunta, o que responder e o que fazer (e não fazer) perto de poste e fio caídos são da equipe (plano-parte-3, seção 4.3). De propósito, nada aqui fala de distância do poste ou do fio. O endereço (Rua das Araucárias, 241) é o que aparece nas placas do lugar do acidente: se o nome da rua mudar em ruas.json, mudar aqui também (o jogo avisa ao abrir)."
+    "todoValidar": "Perguntas do atendente na ordem do chat do Canva (cena 4, Bombeiros), e o que fazer enquanto a equipe não chega (\"mantenha a calma, não se aproxime dos fios e aguarde em local seguro\") também vem de lá. O endereço é o do jogo, não o do Canva (Rua das Laranjeiras, 19), porque tem que bater com as placas do lugar do acidente: se o nome da rua mudar em ruas.json, mudar aqui também (o jogo avisa ao abrir). As respostas erradas e as explicações são rascunho."
   },
   {
     "id": "a07-confiavel-ou-boato",
-    "tipo": "mensagens",
-    "titulo": "Confiável ou boato?",
-    "instrucao": "As mensagens estão chegando no celular. Para cada uma, escolha: dá para confiar ou é melhor conferir antes de repassar?",
-    "respostas": {
-      "confiar": "Pode confiar",
-      "conferir": "Conferir antes de repassar"
-    },
-    "mensagens": [
+    "tipo": "ligar",
+    "titulo": "Relacione o chamado certo",
+    "instrucao": "Ligue cada acontecimento ao canal de socorro ou de informação certo para garantir a segurança de todos.",
+    "pares": [
       {
-        "de": "Defesa Civil (alerta por SMS)",
-        "texto": "Alerta: chuva forte nas próximas horas e risco de o rio subir. Siga as orientações da Defesa Civil.",
-        "confiavel": true,
-        "explicacao": "O alerta oficial da Defesa Civil chega por SMS para quem fez o cadastro. É uma fonte oficial."
+        "situacao": "Alguém está machucado ou com urgência de saúde.",
+        "resposta": "192 – SAMU",
+        "explicacao": "O SAMU, no 192, atende quem está machucado ou com urgência de saúde."
       },
       {
-        "de": "Número desconhecido",
-        "texto": "Repassem! A ponte vai fechar hoje à noite!",
-        "confiavel": false,
-        "explicacao": "A mensagem não diz quem deu a informação. Confira se a Defesa Civil ou outra fonte oficial falou disso antes de repassar."
+        "situacao": "Um acidente grave: um poste caiu, e tem uma pessoa presa.",
+        "resposta": "193 – Bombeiros",
+        "explicacao": "Os Bombeiros, no 193, fazem o resgate em acidente grave com pessoa presa."
       },
       {
-        "de": "Grupo da turma",
-        "texto": "Meu primo falou que a água vai chegar na escola amanhã. Manda pra todo mundo!",
-        "confiavel": false,
-        "explicacao": "“Alguém falou” não é fonte. Confira na fonte oficial antes de acreditar ou repassar."
+        "situacao": "Uma situação de perigo ou de desordem pública.",
+        "resposta": "190 – Polícia",
+        "explicacao": "A Polícia, no 190, atende situações de perigo ou desordem pública."
       },
       {
-        "de": "Rádio comunitária",
-        "texto": "Boletim de utilidade pública: o abrigo municipal está aberto e recebe as famílias.",
-        "confiavel": true,
-        "explicacao": "A rádio comunitária transmite os boletins com os avisos oficiais, inclusive onde tem abrigo."
-      },
-      {
-        "de": "Grupo da família",
-        "texto": "Vi um vídeo dizendo que a chuva já vai passar e ninguém precisa sair de casa.",
-        "confiavel": false,
-        "explicacao": "Mesmo quem a gente conhece pode repassar boato sem saber. Siga os avisos oficiais e confira na fonte."
-      },
-      {
-        "de": "Mensagem encaminhada",
-        "texto": "URGENTE: vai faltar comida na cidade. Corram para o mercado e comprem tudo!",
-        "confiavel": false,
-        "explicacao": "Mensagem sem fonte espalha confusão. Na dúvida, não compartilhe: confira antes na fonte oficial."
+        "situacao": "A energia caiu, e você quer ouvir os boletins informativos e os alertas de utilidade pública.",
+        "resposta": "Rádio a pilha",
+        "explicacao": "Quando a energia e a internet caem, o rádio a pilha continua trazendo os boletins e alertas da rádio comunitária."
       }
     ],
-    "todoValidar": "As mensagens são exemplos inventados, como o plano prevê. As explicações vêm dos diálogos d05 e d07 e da pergunta q02. Confirmar quais fontes oficiais citar além da Defesa Civil e da rádio (pendente no d07). Sem número de SMS de propósito: ele ainda não foi definido (pendente no d05)."
+    "todoValidar": "Acontecimentos, canais e gabarito do Canva (cena 3, Rádio: \"Relacione o chamado certo\"). As explicações são rascunho a partir do texto da mesma cena: o Canva só traz o gabarito. O id continua \"a07-confiavel-ou-boato\" para não quebrar a ligação com a missão, mas a atividade agora é outra (ligar os pontos)."
   },
   {
     "id": "a08-memoria-saude",

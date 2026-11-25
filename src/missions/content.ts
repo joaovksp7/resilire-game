@@ -36,6 +36,7 @@ export const ACTIVITY_TYPES = [
   'mensagens',
   'memoria',
   'caca-palavras',
+  'ligar',
 ] as const;
 export type ActivityType = (typeof ACTIVITY_TYPES)[number];
 
@@ -116,8 +117,11 @@ interface RawActivity {
   respostas?: { confiar: string; conferir: string };
   /** `mensagens`: as mensagens, na ordem em que chegam. */
   mensagens?: { de: string; texto: string; confiavel: boolean; explicacao: string }[];
-  /** `memoria`: os pares de situação e cuidado. */
-  pares?: { situacao: string; cuidado: string; explicacao: string }[];
+  /**
+   * `memoria`: os pares de situação e `cuidado`. `ligar`: os pares de situação e `resposta`, já
+   * ligados certo (o jogo embaralha as letras).
+   */
+  pares?: { situacao: string; cuidado?: string; resposta?: string; explicacao: string }[];
   /** `caca-palavras`: as palavras, escritas certo (com acento), e a explicação de cada uma. */
   palavras?: { palavra: string; explicacao: string }[];
   todoValidar?: string;
@@ -239,7 +243,7 @@ export interface StoryMoment {
   readonly alternativas: readonly OrderStep[];
   readonly correta: number;
 }
-/** História curta: de 2 a 4 momentos seguidos, cada um com alternativas. */
+/** História curta: de 2 a 6 momentos seguidos, cada um com alternativas. */
 export interface HistoriaActivity {
   readonly id: string;
   readonly tipo: 'historia';
@@ -317,6 +321,20 @@ export interface CacaPalavrasActivity {
   readonly instrucao: string;
   readonly palavras: readonly SearchWord[];
 }
+/** Um par do ligar os pontos: a situação (número), a resposta certa (letra) e a explicação. */
+export interface MatchPair {
+  readonly situacao: string;
+  readonly resposta: string;
+  readonly explicacao: string;
+}
+/** Ligar os pontos: cada situação numerada com a resposta certa, que aparece com uma letra sorteada. */
+export interface LigarActivity {
+  readonly id: string;
+  readonly tipo: 'ligar';
+  readonly titulo: string;
+  readonly instrucao: string;
+  readonly pares: readonly MatchPair[];
+}
 /** Uma atividade de content/atividades.json. Cada tipo tem os seus campos. */
 export type Activity =
   | MochilaActivity
@@ -327,7 +345,8 @@ export type Activity =
   | CenaActivity
   | MensagensActivity
   | MemoriaActivity
-  | CacaPalavrasActivity;
+  | CacaPalavrasActivity
+  | LigarActivity;
 export type KitItem = RawKitItem;
 /** Uma seção da tela de créditos (título e linhas). */
 export type CreditSection = RawCreditSection;
@@ -398,6 +417,9 @@ function checkItems(where: string, field: string, items: readonly { texto: strin
 /** Quantos pares o jogo da memória pode ter. */
 const MIN_PAIRS = 4;
 const MAX_PAIRS = 6;
+/** Quantos pares o ligar os pontos pode ter (as letras vão de A a F). */
+const MIN_LINKS = 3;
+const MAX_LINKS = 6;
 /** Quantas palavras o caça-palavras pode ter (10 ainda cabem na grade de 8 colunas). */
 const MIN_WORDS = 3;
 const MAX_WORDS = 10;
@@ -407,7 +429,7 @@ const MAX_LETTERS = 12;
 
 /** Quantos momentos uma `historia` ou `chamada` pode ter, e quantas alternativas cada momento. */
 const MIN_MOMENTS = 2;
-const MAX_MOMENTS = 4;
+const MAX_MOMENTS = 6;
 const MIN_OPTIONS = 2;
 const MAX_OPTIONS = 4;
 
@@ -512,10 +534,28 @@ function checkActivity(a: RawActivity): Activity {
     }
     pares.forEach((par, i) => {
       requireText('atividades.json', where, `pares[${i}].situacao`, par.situacao);
-      requireText('atividades.json', where, `pares[${i}].cuidado`, par.cuidado);
+      requireText('atividades.json', where, `pares[${i}].cuidado`, par.cuidado ?? '');
       requireText('atividades.json', where, `pares[${i}].explicacao`, par.explicacao);
     });
-    return { id: a.id, tipo, titulo, instrucao, pares };
+    return { id: a.id, tipo, titulo, instrucao, pares: pares as MemoryPair[] };
+  }
+
+  if (tipo === 'ligar') {
+    const pares = a.pares;
+    if (!Array.isArray(pares) || pares.length < MIN_LINKS || pares.length > MAX_LINKS) {
+      fail('atividades.json', `${where}: "pares" precisa ter de ${MIN_LINKS} a ${MAX_LINKS} pares.`);
+    }
+    pares.forEach((par, i) => {
+      requireText('atividades.json', where, `pares[${i}].situacao`, par.situacao);
+      requireText('atividades.json', where, `pares[${i}].resposta`, par.resposta ?? '');
+      requireText('atividades.json', where, `pares[${i}].explicacao`, par.explicacao);
+    });
+    // Cada letra liga com um número só: duas respostas iguais deixariam o gabarito ambíguo.
+    pares.forEach((par, i) => {
+      const twin = pares.findIndex((o, j) => j < i && o.resposta?.trim() === par.resposta?.trim());
+      if (twin >= 0) fail('atividades.json', `${where}: a resposta "${par.resposta}" aparece duas vezes (pares[${twin}] e pares[${i}]).`);
+    });
+    return { id: a.id, tipo, titulo, instrucao, pares: pares as MatchPair[] };
   }
 
   if (tipo === 'caca-palavras') {

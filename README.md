@@ -5,7 +5,7 @@ Jogo educativo para navegador sobre **enchentes e deslizamentos**, para estudant
 - Game design completo: [`prompt-jogo-desastres-climaticos.md`](prompt-jogo-desastres-climaticos.md) (o plano original), [`plano-parte-2.md`](plano-parte-2.md) (até 4 jogadores, em equipe) e [`plano-parte-3.md`](plano-parte-3.md) (uma atividade diferente em cada parada), com o roteiro das cenas em [`Tabuleiro Digital.docx (1).md`](<Tabuleiro Digital.docx (1).md>)
 - Regras para quem desenvolve: [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md)
 
-> **Status:** Parte 3 concluída (Fases 15 a 21). De 1 a 4 jogadores no mesmo aparelho, em equipe, cada um com o seu peão e a sua missão, passando a vez a cada jogada do dado. São 10 paradas, cada lugar uma vez só, em quatro eixos (Alerta, Preparação, Durante o evento e Depois do evento), com o clima mudando a cada eixo. Cada visita abre com uma carta sobre o que o lugar faz, segue com a conversa e termina numa atividade diferente em cada parada (ordenar, mochila, história, classificar, mapa de risco, ligação, mensagens, jogo da memória e caça-palavras; o Abrigo de animais fica com uma pergunta). Os pins são da equipe e mostram quem buscou cada um; o progresso fica salvo. O jogo tem tela inicial, Como jogar, pausa, tela final, créditos e som gerado por código.
+> **Status:** Parte 3 concluída (Fases 15 a 21). De 1 a 4 jogadores no mesmo aparelho, em equipe, cada um com o seu peão e a sua missão, passando a vez a cada jogada do dado. São 10 paradas, cada lugar uma vez só, em quatro eixos (Alerta, Preparação, Durante o evento e Depois do evento), com o clima mudando a cada eixo. Cada visita abre com uma carta sobre o que o lugar faz, segue com a conversa e termina numa atividade diferente em cada parada (mochila, história, classificar, ligação, ligar os pontos, jogo da memória e caça-palavras; a Defesa Civil fica com uma pergunta). Os pins são da equipe e mostram quem buscou cada um; o progresso fica salvo. O jogo tem tela inicial, Como jogar, pausa, tela final, créditos e som gerado por código.
 >
 > **Antes de publicar:** todo o texto educativo é rascunho e precisa ser validado com a Defesa Civil, e o de saúde e primeiros socorros também com a área da saúde (veja os campos `todoValidar` em `content/`). Os créditos ainda estão "A definir" (veja `content/creditos.json`). Faltam os testes com aparelho de verdade (veja [Antes de publicar](#antes-de-publicar-testes-com-aparelho-de-verdade)).
 
@@ -79,18 +79,18 @@ São 10 missões, uma em cada instituição, entregues nesta ordem:
 
 | Ordem | Missão | Eixo | Instituição |
 |---|---|---|---|
-| 1 | Estou preparado? | Alerta | Casa (atividade "Plano da família": pôr os passos em ordem) |
+| 1 | Estou preparado? | Alerta | Casa (atividade "O alerta e o plano da família": perguntas sobre o plano de emergência) |
 | 2 | Compras conscientes | Preparação | Mercado (atividade da mochila) |
-| 3 | Um lugar seguro | Preparação | Abrigo (atividade "Chegada ao abrigo": uma história com momentos de "O que você faz?") |
+| 3 | Um lugar seguro | Preparação | Abrigo (atividade "Verdadeiro ou falso?": frases sobre o abrigo comunitário) |
 | 4 | Conhecimento que protege | Preparação | Escola (atividade "Seguro ou perigoso?": separar atitudes em colunas) |
-| 5 | Informação e prevenção | Durante o evento | Defesa Civil (atividade "Mapa de risco": achar as áreas de risco no mapa da cidade) |
-| 6 | Segurança em primeiro lugar | Durante o evento | Bombeiros, no local do acidente (atividade "Ligação para o 193": escolher o número, conversar com o atendente e dizer o endereço) |
-| 7 | Informação salva vidas | Durante o evento | Rádio (atividade "Confiável ou boato?": decidir se dá para confiar em cada mensagem) |
+| 5 | Informação e prevenção | Durante o evento | Defesa Civil (pergunta "Caça ao intruso": o que não ajuda nas chuvas fortes) |
+| 6 | Segurança em primeiro lugar | Durante o evento | Bombeiros, no local do acidente (atividade "Ligação para o 193": escolher o número, responder ao atendente: endereço, o que aconteceu, vítimas, nome e telefone, e o que fazer enquanto a equipe não chega) |
+| 7 | Informação salva vidas | Durante o evento | Rádio (atividade "Relacione o chamado certo": ligar os pontos, cada acontecimento numerado com o canal de socorro ou de informação, numa letra sorteada) |
 | 8 | Cuidar também é prevenir | Depois do evento | UBS (atividade "Jogo da memória": formar pares de situação e cuidado) |
 | 9 | Animal perdido | Depois do evento | Abrigo de animais (atividade "Caça-palavras": achar as palavras dos cuidados com os animais) |
 | 10 | Primeiros socorros | Depois do evento | Hospital (atividade "Caça-palavras": achar as palavras dos primeiros socorros) |
 
-Todos os peões começam na porta de casa, então o Jogador 1 faz a visita da Casa logo na primeira vez, sem jogar o dado. Cada visita segue esta ordem: o banner da missão (só nas que têm: Casa, Escola e Abrigo de animais), a carta do local (o que aquele lugar faz pela cidade, com o endereço), a conversa com o personagem, a pergunta ou a atividade e o pin.
+Todos os peões começam na porta de casa, então o Jogador 1 faz a visita da Casa logo na primeira vez, sem jogar o dado. Cada visita segue esta ordem: o banner da missão (só nas que têm: Casa, Mercado, Abrigo, Escola, Defesa Civil, Bombeiros, Rádio e Abrigo de animais), a carta do local (o que aquele lugar faz pela cidade, com o endereço), a conversa com o personagem, a pergunta ou a atividade e o pin.
 
 **A missão dos Bombeiros não é no quartel.** Ela leva ao **local do acidente**, na Rua das Araucárias, onde um poste caiu em cima de um carro (o desenho só aparece enquanto a missão está em andamento). Lá a atividade vem **antes** da conversa: primeiro o aluno liga para o 193 e diz o endereço, que ele lê no nome escrito no chão da rua e na placa com o número do lugar; depois o bombeiro chega com a equipe e conversa.
 
@@ -243,7 +243,7 @@ Tem duas listas:
 
 #### Banners
 
-Uma missão pode ter um **banner**: uma imagem (cartaz, infográfico, quadrinho) que aparece numa tela própria assim que o peão chega ao local, antes da carta do local. A tela mostra a imagem inteira, com o botão **Ampliar** (a imagem em tamanho real, para ler no celular, rolando com o dedo ou com as setas) e **Continuar**. Hoje têm banner a Casa (`m01`), a Escola (`m04`) e o Abrigo de animais (`m09`).
+Uma missão pode ter um **banner**: uma imagem (cartaz, infográfico, quadrinho) que aparece numa tela própria assim que o peão chega ao local, antes da carta do local. A tela mostra só a imagem inteira, sobre o jogo escurecido, e o botão **Continuar** embaixo (o `titulo` não aparece escrito: é o nome da tela para leitor de tela). Hoje têm banner a Casa (`m01`), a Escola (`m04`) e o Abrigo de animais (`m09`).
 
 ```json
 "banner": {
@@ -286,7 +286,7 @@ Uma lista de atividades. Uma missão com `atividade` no lugar da `pergunta` abre
 | Campo | O que é |
 |---|---|
 | `id` | Id da atividade (ex.: `"a02-mochila"`) |
-| `tipo` | Qual atividade é: `mochila`, `ordenar`, `classificar`, `historia`, `chamada`, `cena`, `mensagens`, `memoria` ou `caca-palavras` |
+| `tipo` | Qual atividade é: `mochila`, `ordenar`, `classificar`, `historia`, `chamada`, `cena`, `mensagens`, `memoria`, `caca-palavras` ou `ligar` |
 | `titulo`, `instrucao` | O título e a instrução que aparecem no alto da tela (menos na `mochila`) |
 
 Os outros campos dependem do tipo. Em todos, errar não reprova: o jogo mostra a explicação e deixa tentar de novo, e conta como acerto de primeira quando a primeira conferida já está certa.
@@ -348,7 +348,7 @@ Os outros campos dependem do tipo. Em todos, errar não reprova: o jogo mostra a
 
 | Campo | O que é |
 |---|---|
-| `momentos` | De 2 a 4 momentos, na ordem da história. Cada um tem `situacao` (o que está acontecendo), `alternativas` (de 2 a 4, cada uma com `texto` e `explicacao`) e `correta` |
+| `momentos` | De 2 a 6 momentos, na ordem da história. Cada um tem `situacao` (o que está acontecendo), `alternativas` (de 2 a 4, cada uma com `texto` e `explicacao`) e `correta` |
 | `correta` | **O número da alternativa certa, contando a partir de 0**, como nas perguntas |
 
 ```json
@@ -376,7 +376,7 @@ Os outros campos dependem do tipo. Em todos, errar não reprova: o jogo mostra a
 |---|---|
 | `atendente` | Quem atende a ligação. Aparece no alto da tela e em cada fala (ex.: `"Atendente do 193"`) |
 | `discagem` | A escolha do número. Tem o mesmo formato de um momento: `situacao` (a pergunta), `alternativas` (os números, cada um com `explicacao`) e `correta`. **Os números aparecem na ordem do arquivo**, como num teclado, sem embaralhar |
-| `momentos` | De 2 a 4 momentos, como na `historia`. Aqui a `situacao` é o que o atendente fala, e cada alternativa é uma resposta |
+| `momentos` | De 2 a 6 momentos, como na `historia`. Aqui a `situacao` é o que o atendente fala, e cada alternativa é uma resposta |
 
 ```json
 {
@@ -505,6 +505,28 @@ Se as palavras não couberem num dos dois formatos, o jogo avisa ao abrir.
 }
 ```
 
+**`ligar`** — ligar os pontos. À esquerda ficam as situações, numeradas na ordem do arquivo (1, 2, 3...); à direita, as respostas, com letras (A, B, C...). **A ordem das letras é sorteada cada vez que a atividade abre**, então o 1 não liga sempre no A. O aluno arrasta de um card até o do outro lado (com o dedo ou o mouse; uma linha tracejada segue o arraste e o card de destino fica destacado), ou toca num número e depois na letra (ou o contrário). Arrastar nunca é obrigatório: o toque e o teclado fazem tudo. No celular, o dedo em cima de um card arrasta e não rola a tela; para rolar, desliza-se fora dos cards, e durante o arraste a tela rola sozinha perto da borda de cima ou de baixo. Ligados, uma linha liga os dois, e o número também mostra a letra escrita ("→ B"). Cada letra liga com um número só, e tocar de novo num ponto já ligado troca a ligação. Ao conferir, cada ligação errada mostra a `explicacao` do seu número e é desfeita; as certas ficam.
+
+| Campo | O que é |
+|---|---|
+| `pares` | De 3 a 6 pares, cada um com `situacao` (o número), `resposta` (a letra) e `explicacao`. **Cada par já vem ligado certo no arquivo**: o jogo sorteia as letras na hora de mostrar. Duas respostas não podem ser iguais |
+
+```json
+{
+  "id": "a07-confiavel-ou-boato",
+  "tipo": "ligar",
+  "titulo": "Relacione o chamado certo",
+  "instrucao": "Ligue cada acontecimento ao canal certo.",
+  "pares": [
+    {
+      "situacao": "Alguém está machucado ou com urgência de saúde.",
+      "resposta": "192 – SAMU",
+      "explicacao": "O SAMU, no 192, atende quem está machucado ou com urgência de saúde."
+    }
+  ]
+}
+```
+
 ### `kit-items.json` — atividade da mochila de emergência (tipo `mochila`)
 
 O jogador toca nos itens da prateleira para colocar ou tirar da mochila. A mochila tem espaço exato para **todos os itens com `"levar": true`, e só eles**: cada item que não é prioridade ocupa o lugar de um útil. Ao fechar a mochila, o jogo mostra o que faltou, o que não precisava levar e o que ficou bom, com a `explicacao` de cada item. Se não estiver tudo certo, o jogador arruma de novo; conta como acerto de primeira quando a primeira mochila fechada já está certa.
@@ -602,6 +624,7 @@ src/
     messagesMinigame.ts atividade "mensagens" (confiável ou boato, num celular)
     memoryMinigame.ts atividade "memoria" (jogo da memória, pares de situação e cuidado)
     wordSearchMinigame.ts atividade "caca-palavras" (monta a grade e confere as palavras achadas)
+    matchMinigame.ts  atividade "ligar" (ligar os pontos: números e letras sorteadas, com linhas)
     kitIcons.ts       desenhos dos itens da mochila
   player/
     character.ts      personagem low-poly e animação de andar

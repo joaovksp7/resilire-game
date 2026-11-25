@@ -42,8 +42,6 @@ const TEXT = {
   teamFirstTry: 'Acerto de primeira da equipe!',
   foundBy: (name: string) => `Buscado por ${name}`,
   next: 'Continuar',
-  bannerZoomIn: 'Ampliar',
-  bannerZoomOut: 'Ver inteira',
   eixoKicker: 'Novo eixo',
   wrongDoor: (here: string, goal: string) => `Você está ${here}. Sua missão agora é ${goal}.`,
   noMissionHere: (name: string, here: string) => `${name} está ${here}. Nenhuma missão em andamento aqui.`,
@@ -258,13 +256,9 @@ export class MissionFlow {
       // Se a missão tiver banner, ele abre a visita, logo ao chegar.
       if (mission.banner) {
         await showBanner(uiRoot, {
-          kicker: inst.nome,
           title: mission.banner.titulo,
           url: mission.banner.url,
           alt: mission.banner.descricao,
-          color: style.color,
-          zoomIn: TEXT.bannerZoomIn,
-          zoomOut: TEXT.bannerZoomOut,
           button: TEXT.next,
         });
       }

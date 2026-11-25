@@ -27,7 +27,7 @@ const TEXT = {
   ],
   activitiesTitle: 'As atividades',
   activities: [
-    'Cada lugar tem uma atividade diferente: pôr passos em ordem, separar cartões, montar a mochila, escolher o que fazer numa história, fazer uma ligação, achar áreas de risco num mapa, conferir mensagens, jogo da memória e caça-palavras.',
+    'Cada lugar tem uma atividade diferente: pôr passos em ordem, separar cartões, montar a mochila, escolher o que fazer numa história, fazer uma ligação, achar áreas de risco num mapa, conferir mensagens, ligar os pontos, jogo da memória e caça-palavras.',
     'Nada precisa ser arrastado: toque no cartão e depois no lugar onde ele vai.',
     'Com o teclado: Tab para andar entre os botões e Enter para escolher. No caça-palavras, as setas andam pela grade de letras.',
     'Não tem tempo: cada um faz no seu ritmo.',
